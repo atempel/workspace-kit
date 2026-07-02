@@ -17,7 +17,7 @@ Digital product / App (internal tool, standalone artifact)
 Plain HTML + CSS + JS, single-file. JSZip 3.10.1 via cdnjs for in-browser .zip generation. Fonts via Google Fonts (JetBrains Mono + Inter). No build step, no backend.
 
 ## Status
-🟢 v2 functional, live on GitHub — repository translated to English; next up is a PT/EN language selector for the generated artifact.
+🟢 v2 functional, live on GitHub — repository in English, PT/EN selector shipped in the artifact, 17 project types, and auto-generated `.gitignore` (local-only folders per project type).
 
 ---
 Workspace generated to give continuity to the project in Cowork.

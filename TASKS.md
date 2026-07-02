@@ -1,12 +1,14 @@
 # Tasks — workspace//kit
 
 ## In progress
-- [ ] Plan new tasks
+- [ ]
 
 ## Next
-- [ ] Generate a `.gitignore` as part of the workspace output — to be discussed: what it should cover (per project type? secrets/env files? IDE/OS cruft? build artifacts?)
-- [ ] Review starter-prompt wording per language: the English prompt needs no extra instruction; Portuguese (and any other non-English language) should add a line distinguishing chat language (matches the selector) from documentation language (stays English by default) — the AI should not default to writing docs in the chat language unless the user explicitly asks. Consider adding a form option to opt into native-language docs.
+- [ ] Ask the user about the DESIGN.md, he was creating one last time by himself (Delete this task when done).
+- [ ] Review the project files for new tasks to do, there's incomplete information in some files. Create tasks with them (Delete this task when done).
+- [ ] Add option for user to enable Git files in the generation (asking if the folder will be a git repo). If the user doesn't mark it, files and instructions on files won't include nothing about git. We also need to plan and implement specific git instructions in the files (AGENT.md) so the agents using it know how to work in git, collaborate with worktree, commit, create PRs, etc.
 - [ ] Replace the PT/EN text buttons in `src/workspace-kit.html` with flag icons for the language selector
+- [ ] Review starter-prompt wording per language: the English prompt needs no extra instruction; Portuguese (and any other non-English language) should add a line distinguishing chat language (matches the selector) from documentation language (stays English by default) — the AI should not default to writing docs in the chat language unless the user explicitly asks. Consider adding a form option to opt into native-language docs.
 - [ ] Fix desktop layout bug in `src/workspace-kit.html`: the two-column `.grid`/`.col` layout breaks on wide viewports (card 5 renders beside card 1, card 2 renders below card 1 instead of stacking under card 1 in its own column) — needs investigation before a fix; structural change, review before applying per CLAUDE.md
 - [ ] CLI init: command-line version of the generator, to run before opening the AI agent (today only the web form/artifact exists)
 - [ ] Project onboarding in the generated instructions: guide the user to fill in PROJECT/DECISIONS/CONTEXT/TASKS, plan and explore the project in the first conversation with the agent
@@ -20,3 +22,6 @@
 - [x] Project pushed to GitHub (atempel/workspace-kit) with logo and README (2026-07-01)
 - [x] Repository docs translated to English; pesquisa/ moved to research/ (2026-07-01)
 - [x] PT/EN language selector added to the generated HTML (`src/workspace-kit.html`), English default — covers UI text, generated file templates, and generated folder names (2026-07-01)
+- [x] Added 6 new project types (mobile, extension, hardware, course, marketing, podcast) — 11 → 17 total (2026-07-02)
+- [x] Generated `.gitignore` per workspace: universal base + per-type local-only folders (2026-07-02)
+- [x] Reconciled parallel-session edits to `src/workspace-kit.html` and pushed merged file to GitHub; updated README/PROJECT.md stale "11 types" references (2026-07-02)
