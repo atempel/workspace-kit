@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,6 +26,24 @@
     padding:28px 20px 60px;
   }
   .wrap{max-width:1080px;margin:0 auto;}
+
+  /* language toggle */
+  .langbar{display:flex;justify-content:flex-end;gap:6px;margin-bottom:14px;}
+  .lang-btn{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.05em;
+    padding:5px 12px;
+    border-radius:5px;
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--text-dim);
+    cursor:pointer;
+    transition:opacity .15s ease;
+  }
+  .lang-btn:hover{opacity:.85;}
+  .lang-btn.active{background:var(--accent);color:#141414;border-color:var(--accent);}
 
   /* logo */
   .brand{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:26px;}
@@ -156,6 +174,11 @@
 <body>
 <div class="wrap">
 
+  <div class="langbar">
+    <button type="button" class="lang-btn" id="langPt">PT</button>
+    <button type="button" class="lang-btn" id="langEn">EN</button>
+  </div>
+
   <div class="brand">
     <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
       <rect x="20" y="8" width="30" height="38" rx="5" fill="#161922" stroke="#2A2E3A" stroke-width="1.5"/>
@@ -167,31 +190,31 @@
       <rect class="cursor-blink" x="24" y="45" width="6" height="2.4" rx="1" fill="#D4A24C"/>
     </svg>
     <div class="wordmark">workspace<span class="slash">//</span>kit</div>
-    <div class="tagline">gerador de workspaces multi-agente</div>
+    <div class="tagline" id="tagline"></div>
   </div>
 
   <header>
-    <h1>Monte um workspace pronto pra qualquer agente de IA</h1>
-    <p>Descreva o projeto e gere, de uma vez, a camada de contexto pra humano (PROJECT.md, DECISIONS.md...) e a camada de instruções pra IA — no formato certo pra cada ferramenta que você usa.</p>
+    <h1 id="headerH1"></h1>
+    <p id="headerP"></p>
   </header>
 
   <div class="grid">
     <div class="col">
       <div class="card">
-        <h2>01 · Projeto</h2>
-        <label for="pname">Nome do projeto</label>
-        <input type="text" id="pname" placeholder="Ex: A Lista Infinita">
+        <h2 id="card01Title"></h2>
+        <label for="pname" id="pnameLabel"></label>
+        <input type="text" id="pname">
 
-        <label for="ptype">Tipo de projeto</label>
+        <label for="ptype" id="ptypeLabel"></label>
         <select id="ptype"></select>
 
-        <label for="pdesc">Descrição breve</label>
-        <textarea id="pdesc" style="font-family:'Inter',sans-serif;font-size:14px;" placeholder="Do que se trata o projeto, em 2-3 frases."></textarea>
+        <label for="pdesc" id="pdescLabel"></label>
+        <textarea id="pdesc" style="font-family:'Inter',sans-serif;font-size:14px;"></textarea>
 
-        <label for="pobj">Objetivo principal (opcional)</label>
-        <input type="text" id="pobj" placeholder="Ex: validar se o app é viável antes de codar">
+        <label for="pobj" id="pobjLabel"></label>
+        <input type="text" id="pobj">
 
-        <label id="checksTitle" for="chk1">Pastas do workspace</label>
+        <label id="checksTitle" for="chk1"></label>
         <div class="checks" id="typeChecks">
           <div class="check-row"><input type="checkbox" id="chk1"><label id="chk1label" for="chk1" style="margin:0"></label></div>
           <div class="check-row"><input type="checkbox" id="chk2"><label id="chk2label" for="chk2" style="margin:0"></label></div>
@@ -200,182 +223,279 @@
       </div>
 
       <div class="card">
-        <h2>02 · Contexto técnico</h2>
-        <p class="subhint">Isso vira o corpo dos arquivos de instrução (CLAUDE.md/AGENTS.md etc.) — quanto mais concreto, menos a IA erra convenção.</p>
-        <label for="pstack">Stack &amp; comandos</label>
-        <textarea id="pstack" placeholder="preenchido conforme o tipo de projeto"></textarea>
+        <h2 id="card02Title"></h2>
+        <p class="subhint" id="card02Sub"></p>
+        <label for="pstack" id="pstackLabel"></label>
+        <textarea id="pstack"></textarea>
 
-        <label for="plimits">Limites — o que a IA não deve fazer sem perguntar</label>
-        <textarea id="plimits" placeholder="preenchido conforme o tipo de projeto"></textarea>
+        <label for="plimits" id="plimitsLabel"></label>
+        <textarea id="plimits"></textarea>
       </div>
 
       <div class="card">
-        <h2>03 · Camada de agentes</h2>
-        <p class="subhint">Escolha pra quais IAs gerar arquivo de instrução. Cada uma lê um nome e formato diferente na raiz do workspace.</p>
+        <h2 id="card03Title"></h2>
+        <p class="subhint" id="card03Sub"></p>
         <div class="checks">
-          <div class="check-row"><input type="checkbox" id="agClaude" checked><label style="margin:0" for="agClaude">Claude Code / Cowork <span class="desc">CLAUDE.md</span></label></div>
-          <div class="check-row"><input type="checkbox" id="agAgentsmd" checked><label style="margin:0" for="agAgentsmd">Padrão universal <span class="desc">AGENTS.md — lido por Codex, Cursor, Windsurf, Gemini CLI, Devin, Amazon Q e outros</span></label></div>
-          <div class="check-row"><input type="checkbox" id="agCursor"><label style="margin:0" for="agCursor">Cursor (regra dedicada) <span class="desc">.cursor/rules/{slug}.mdc</span></label></div>
-          <div class="check-row"><input type="checkbox" id="agCopilot"><label style="margin:0" for="agCopilot">GitHub Copilot <span class="desc">.github/copilot-instructions.md</span></label></div>
-          <div class="check-row"><input type="checkbox" id="agGemini"><label style="margin:0" for="agGemini">Gemini CLI <span class="desc">GEMINI.md</span></label></div>
-          <div class="check-row"><input type="checkbox" id="agWindsurf"><label style="margin:0" for="agWindsurf">Windsurf <span class="desc">.windsurf/rules/{slug}.md</span></label></div>
-          <div class="check-row"><input type="checkbox" id="agSkill"><label style="margin:0" for="agSkill">Esqueleto de Skill portátil <span class="desc">.claude/skills/{slug}/SKILL.md</span></label></div>
+          <div class="check-row"><input type="checkbox" id="agClaude" checked><label style="margin:0" for="agClaude"><span id="agClaudeLabel"></span> <span class="desc">CLAUDE.md</span></label></div>
+          <div class="check-row"><input type="checkbox" id="agAgentsmd" checked><label style="margin:0" for="agAgentsmd"><span id="agAgentsmdLabel"></span> <span class="desc" id="agAgentsmdDesc"></span></label></div>
+          <div class="check-row"><input type="checkbox" id="agCursor"><label style="margin:0" for="agCursor"><span id="agCursorLabel"></span> <span class="desc">.cursor/rules/{slug}.mdc</span></label></div>
+          <div class="check-row"><input type="checkbox" id="agCopilot"><label style="margin:0" for="agCopilot"><span id="agCopilotLabel"></span> <span class="desc">.github/copilot-instructions.md</span></label></div>
+          <div class="check-row"><input type="checkbox" id="agGemini"><label style="margin:0" for="agGemini"><span id="agGeminiLabel"></span> <span class="desc">GEMINI.md</span></label></div>
+          <div class="check-row"><input type="checkbox" id="agWindsurf"><label style="margin:0" for="agWindsurf"><span id="agWindsurfLabel"></span> <span class="desc">.windsurf/rules/{slug}.md</span></label></div>
+          <div class="check-row"><input type="checkbox" id="agSkill"><label style="margin:0" for="agSkill"><span id="agSkillLabel"></span> <span class="desc">.claude/skills/{slug}/SKILL.md</span></label></div>
         </div>
-        <div class="info-box">
-          <b>Por que dois arquivos por padrão?</b> CLAUDE.md e AGENTS.md guardam o mesmo conteúdo, mas servem públicos diferentes: AGENTS.md é o formato aberto que a maioria das ferramentas já lê nativamente; CLAUDE.md é o que o Claude Code/Cowork carrega antes de cada sessão. Com os dois marcados, o CLAUDE.md apenas importa o AGENTS.md (<code>@AGENTS.md</code>) e deixa espaço pra regras exclusivas do Claude — sem duplicar texto.
-        </div>
+        <div class="info-box" id="infoBox"></div>
       </div>
     </div>
 
     <div class="col">
       <div class="card">
-        <h2>04 · Estrutura do workspace</h2>
+        <h2 id="card04Title"></h2>
         <pre id="tree"></pre>
         <div class="actions">
-          <button class="btn-primary" id="btnZip">Baixar .zip do workspace</button>
+          <button class="btn-primary" id="btnZip"></button>
         </div>
         <div class="status" id="zipStatus"></div>
       </div>
 
       <div class="card">
-        <h2>05 · Prompt inicial</h2>
+        <h2 id="card05Title"></h2>
         <textarea id="promptOut" readonly></textarea>
         <div class="actions">
-          <button class="btn-secondary" id="btnCopy">Copiar prompt</button>
+          <button class="btn-secondary" id="btnCopy"></button>
         </div>
-        <div class="hint">Cole isso na primeira mensagem, depois de subir os arquivos do .zip na pasta de trabalho do agente.</div>
+        <div class="hint" id="promptHint"></div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
+let LANG = 'en';
+
+const UI = {
+  en: {
+    tagline: 'multi-agent workspace generator',
+    h1: 'Build a workspace ready for any AI agent',
+    p: 'Describe the project and generate, in one go, the human context layer (PROJECT.md, DECISIONS.md...) and the AI instruction layer — in the right format for whichever tool you use.',
+    card01: '01 · Project',
+    pnameLabel: 'Project name',
+    pnamePh: 'e.g. Infinite List',
+    ptypeLabel: 'Project type',
+    pdescLabel: 'Brief description',
+    pdescPh: 'What the project is about, in 2-3 sentences.',
+    pobjLabel: 'Main goal (optional)',
+    pobjPh: 'e.g. validate whether the app is viable before coding',
+    checksTitle: 'Workspace folders',
+    card02: '02 · Technical context',
+    card02sub: 'This becomes the body of the instruction files (CLAUDE.md/AGENTS.md etc.) — the more concrete, the less the AI gets conventions wrong.',
+    pstackLabel: 'Stack & commands',
+    genericPh: 'filled in based on the project type',
+    plimitsLabel: 'Limits — what the AI should not do without asking',
+    card03: '03 · Agent layer',
+    card03sub: 'Choose which AIs to generate an instruction file for. Each one reads a different name and format at the workspace root.',
+    agClaude: 'Claude Code / Cowork',
+    agAgentsmd: 'Universal standard',
+    agAgentsmdDesc: 'AGENTS.md — read by Codex, Cursor, Windsurf, Gemini CLI, Devin, Amazon Q and others',
+    agCursor: 'Cursor (dedicated rule)',
+    agCopilot: 'GitHub Copilot',
+    agGemini: 'Gemini CLI',
+    agWindsurf: 'Windsurf',
+    agSkill: 'Portable Skill skeleton',
+    infoBox: '<b>Why two files by default?</b> CLAUDE.md and AGENTS.md hold the same content, but serve different audiences: AGENTS.md is the open format most tools already read natively; CLAUDE.md is what Claude Code/Cowork loads before each session. With both checked, CLAUDE.md just imports AGENTS.md (<code>@AGENTS.md</code>) and leaves room for rules exclusive to Claude — without duplicating text.',
+    card04: '04 · Workspace structure',
+    btnZip: 'Download workspace .zip',
+    card05: '05 · Starter prompt',
+    btnCopy: 'Copy prompt',
+    copied: 'Copied!',
+    promptHint: 'Paste this as the first message, after uploading the .zip files into the agent\'s working folder.',
+    zipGenerating: 'Generating .zip...',
+    zipDone: (slug)=>`Downloaded: ${slug}.zip`,
+    zipError: (msg)=>`Error generating .zip: ${msg}`,
+    agentListFallback: 'the context files in the root folder',
+    newProject: 'New project',
+    fillIn: '(fill in)',
+  },
+  pt: {
+    tagline: 'gerador de workspaces multi-agente',
+    h1: 'Monte um workspace pronto pra qualquer agente de IA',
+    p: 'Descreva o projeto e gere, de uma vez, a camada de contexto pra humano (PROJECT.md, DECISIONS.md...) e a camada de instruções pra IA — no formato certo pra cada ferramenta que você usa.',
+    card01: '01 · Projeto',
+    pnameLabel: 'Nome do projeto',
+    pnamePh: 'Ex: A Lista Infinita',
+    ptypeLabel: 'Tipo de projeto',
+    pdescLabel: 'Descrição breve',
+    pdescPh: 'Do que se trata o projeto, em 2-3 frases.',
+    pobjLabel: 'Objetivo principal (opcional)',
+    pobjPh: 'Ex: validar se o app é viável antes de codar',
+    checksTitle: 'Pastas do workspace',
+    card02: '02 · Contexto técnico',
+    card02sub: 'Isso vira o corpo dos arquivos de instrução (CLAUDE.md/AGENTS.md etc.) — quanto mais concreto, menos a IA erra convenção.',
+    pstackLabel: 'Stack & comandos',
+    genericPh: 'preenchido conforme o tipo de projeto',
+    plimitsLabel: 'Limites — o que a IA não deve fazer sem perguntar',
+    card03: '03 · Camada de agentes',
+    card03sub: 'Escolha pra quais IAs gerar arquivo de instrução. Cada uma lê um nome e formato diferente na raiz do workspace.',
+    agClaude: 'Claude Code / Cowork',
+    agAgentsmd: 'Padrão universal',
+    agAgentsmdDesc: 'AGENTS.md — lido por Codex, Cursor, Windsurf, Gemini CLI, Devin, Amazon Q e outros',
+    agCursor: 'Cursor (regra dedicada)',
+    agCopilot: 'GitHub Copilot',
+    agGemini: 'Gemini CLI',
+    agWindsurf: 'Windsurf',
+    agSkill: 'Esqueleto de Skill portátil',
+    infoBox: '<b>Por que dois arquivos por padrão?</b> CLAUDE.md e AGENTS.md guardam o mesmo conteúdo, mas servem públicos diferentes: AGENTS.md é o formato aberto que a maioria das ferramentas já lê nativamente; CLAUDE.md é o que o Claude Code/Cowork carrega antes de cada sessão. Com os dois marcados, o CLAUDE.md apenas importa o AGENTS.md (<code>@AGENTS.md</code>) e deixa espaço pra regras exclusivas do Claude — sem duplicar texto.',
+    card04: '04 · Estrutura do workspace',
+    btnZip: 'Baixar .zip do workspace',
+    card05: '05 · Prompt inicial',
+    btnCopy: 'Copiar prompt',
+    copied: 'Copiado!',
+    promptHint: 'Cole isso na primeira mensagem, depois de subir os arquivos do .zip na pasta de trabalho do agente.',
+    zipGenerating: 'Gerando .zip...',
+    zipDone: (slug)=>`Baixado: ${slug}.zip`,
+    zipError: (msg)=>`Erro ao gerar o .zip: ${msg}`,
+    agentListFallback: 'os arquivos de contexto na raiz',
+    newProject: 'Novo projeto',
+    fillIn: '(preencher)',
+  }
+};
+
 const TYPE_CONFIG = {
   produto: {
-    label:'Produto digital / App',
+    label:{en:'Digital product / App', pt:'Produto digital / App'},
     checks:[
-      {label:'Pesquisa / discovery', folder:'pesquisa'},
-      {label:'Design / assets', folder:'design'},
-      {label:'Código (/src)', folder:'src'}
+      {label:{en:'Research / discovery', pt:'Pesquisa / discovery'}, folder:{en:'research', pt:'pesquisa'}},
+      {label:{en:'Design / assets', pt:'Design / assets'}, folder:{en:'design', pt:'design'}},
+      {label:{en:'Code (/src)', pt:'Código (/src)'}, folder:{en:'src', pt:'src'}}
     ],
     defaults:[true,true,true],
-    stackPh:'Ex: Tauri v2 + React + SQLite · pnpm · testes com vitest',
-    limitsPh:'Ex: não commitar direto na main · não usar libs pagas sem avisar',
-    extraFile:{path:'docs/PRD.md', build:(n)=>`# PRD — ${n}\n\n## Problema\n\n## Solução proposta\n\n## Escopo\n\n## Fora de escopo\n\n## Métricas de sucesso\n`}
+    stackPh:{en:'e.g. Tauri v2 + React + SQLite · pnpm · tests with vitest', pt:'Ex: Tauri v2 + React + SQLite · pnpm · testes com vitest'},
+    limitsPh:{en:"e.g. don't commit directly to main · don't use paid libraries without asking", pt:'Ex: não commitar direto na main · não usar libs pagas sem avisar'},
+    extraFile:{path:{en:'docs/PRD.md', pt:'docs/PRD.md'}, build:(n,lang)=> lang==='en'
+      ? `# PRD — ${n}\n\n## Problem\n\n## Proposed solution\n\n## Scope\n\n## Out of scope\n\n## Success metrics\n`
+      : `# PRD — ${n}\n\n## Problema\n\n## Solução proposta\n\n## Escopo\n\n## Fora de escopo\n\n## Métricas de sucesso\n`}
   },
   pesquisa: {
-    label:'Pesquisa & análise',
+    label:{en:'Research & analysis', pt:'Pesquisa & análise'},
     checks:[
-      {label:'Dados brutos', folder:'dados'},
-      {label:'Notas de fontes', folder:'notas'},
-      {label:'Resultados / outputs', folder:'outputs'}
+      {label:{en:'Raw data', pt:'Dados brutos'}, folder:{en:'data', pt:'dados'}},
+      {label:{en:'Source notes', pt:'Notas de fontes'}, folder:{en:'notes', pt:'notas'}},
+      {label:{en:'Results / outputs', pt:'Resultados / outputs'}, folder:{en:'outputs', pt:'outputs'}}
     ],
     defaults:[true,true,true],
-    stackPh:'Ex: Python + pandas + Jupyter · dataset em /dados',
-    limitsPh:'Ex: nunca alterar os dados brutos, só copiar antes de processar',
+    stackPh:{en:'e.g. Python + pandas + Jupyter · dataset in /data', pt:'Ex: Python + pandas + Jupyter · dataset em /dados'},
+    limitsPh:{en:'e.g. never modify raw data, only copy before processing', pt:'Ex: nunca alterar os dados brutos, só copiar antes de processar'},
   },
   escrita: {
-    label:'Escrita & conteúdo',
+    label:{en:'Writing & content', pt:'Escrita & conteúdo'},
     checks:[
-      {label:'Rascunhos', folder:'rascunhos'},
-      {label:'Referências', folder:'referencias'},
-      {label:'Publicado', folder:'publicado'}
+      {label:{en:'Drafts', pt:'Rascunhos'}, folder:{en:'drafts', pt:'rascunhos'}},
+      {label:{en:'References', pt:'Referências'}, folder:{en:'references', pt:'referencias'}},
+      {label:{en:'Published', pt:'Publicado'}, folder:{en:'published', pt:'publicado'}}
     ],
     defaults:[true,true,false],
-    stackPh:'Ex: Markdown · publicação no Medium (PT/EN)',
-    limitsPh:'Ex: manter tom em primeira pessoa · nunca apresentar a IA como autora do texto',
+    stackPh:{en:'e.g. Markdown · published on Medium (PT/EN)', pt:'Ex: Markdown · publicação no Medium (PT/EN)'},
+    limitsPh:{en:"e.g. keep a first-person tone · never present the AI as the text's author", pt:'Ex: manter tom em primeira pessoa · nunca apresentar a IA como autora do texto'},
   },
   design: {
-    label:'Design (UI/produto)',
+    label:{en:'Design (UI/product)', pt:'Design (UI/produto)'},
     checks:[
-      {label:'Referências', folder:'referencias'},
-      {label:'Assets', folder:'assets'},
-      {label:'Wireframes', folder:'wireframes'}
+      {label:{en:'References', pt:'Referências'}, folder:{en:'references', pt:'referencias'}},
+      {label:{en:'Assets', pt:'Assets'}, folder:{en:'assets', pt:'assets'}},
+      {label:{en:'Wireframes', pt:'Wireframes'}, folder:{en:'wireframes', pt:'wireframes'}}
     ],
     defaults:[true,true,true],
-    stackPh:'Ex: Figma como fonte da verdade · tokens exportados em /assets',
-    limitsPh:'Ex: não gerar peças finais com IA sem marcar claramente como rascunho',
-    extraFile:{path:'handoff/SPEC.md', build:(n)=>`# Spec de handoff — ${n}\n\n## Tokens\n\n## Componentes\n\n## Estados\n\n## Breakpoints\n`}
+    stackPh:{en:'e.g. Figma as source of truth · tokens exported to /assets', pt:'Ex: Figma como fonte da verdade · tokens exportados em /assets'},
+    limitsPh:{en:"e.g. don't generate final assets with AI without clearly marking them as drafts", pt:'Ex: não gerar peças finais com IA sem marcar claramente como rascunho'},
+    extraFile:{path:{en:'handoff/SPEC.md', pt:'handoff/SPEC.md'}, build:(n,lang)=> lang==='en'
+      ? `# Handoff spec — ${n}\n\n## Tokens\n\n## Components\n\n## States\n\n## Breakpoints\n`
+      : `# Spec de handoff — ${n}\n\n## Tokens\n\n## Componentes\n\n## Estados\n\n## Breakpoints\n`}
   },
   dataml: {
-    label:'Dados / ML pipeline',
+    label:{en:'Data / ML pipeline', pt:'Dados / ML pipeline'},
     checks:[
-      {label:'Dados', folder:'dados'},
-      {label:'Notebooks', folder:'notebooks'},
-      {label:'Modelos / outputs', folder:'modelos'}
+      {label:{en:'Data', pt:'Dados'}, folder:{en:'data', pt:'dados'}},
+      {label:{en:'Notebooks', pt:'Notebooks'}, folder:{en:'notebooks', pt:'notebooks'}},
+      {label:{en:'Models / outputs', pt:'Modelos / outputs'}, folder:{en:'models', pt:'modelos'}}
     ],
     defaults:[true,true,true],
-    stackPh:'Ex: Python + PyTorch · dados versionados fora do git',
-    limitsPh:'Ex: nunca subir dataset completo pro repositório',
+    stackPh:{en:'e.g. Python + PyTorch · data versioned outside git', pt:'Ex: Python + PyTorch · dados versionados fora do git'},
+    limitsPh:{en:'e.g. never push the full dataset to the repository', pt:'Ex: nunca subir dataset completo pro repositório'},
   },
   automacao: {
-    label:'Automação / script interno',
+    label:{en:'Automation / internal script', pt:'Automação / script interno'},
     checks:[
-      {label:'Scripts', folder:'scripts'},
-      {label:'Configuração', folder:'config'},
-      {label:'Logs', folder:'logs'}
+      {label:{en:'Scripts', pt:'Scripts'}, folder:{en:'scripts', pt:'scripts'}},
+      {label:{en:'Configuration', pt:'Configuração'}, folder:{en:'config', pt:'config'}},
+      {label:{en:'Logs', pt:'Logs'}, folder:{en:'logs', pt:'logs'}}
     ],
     defaults:[true,true,false],
-    stackPh:'Ex: Node.js + node-cron · roda via PowerShell 7',
-    limitsPh:'Ex: nunca commitar credenciais ou tokens em /config',
+    stackPh:{en:'e.g. Node.js + node-cron · runs via PowerShell 7', pt:'Ex: Node.js + node-cron · roda via PowerShell 7'},
+    limitsPh:{en:'e.g. never commit credentials or tokens in /config', pt:'Ex: nunca commitar credenciais ou tokens em /config'},
   },
   jogo: {
-    label:'Jogo digital (game dev)',
+    label:{en:'Digital game (game dev)', pt:'Jogo digital (game dev)'},
     checks:[
-      {label:'Assets', folder:'assets'},
-      {label:'Builds', folder:'builds'},
-      {label:'Código (/src)', folder:'src'}
+      {label:{en:'Assets', pt:'Assets'}, folder:{en:'assets', pt:'assets'}},
+      {label:{en:'Builds', pt:'Builds'}, folder:{en:'builds', pt:'builds'}},
+      {label:{en:'Code (/src)', pt:'Código (/src)'}, folder:{en:'src', pt:'src'}}
     ],
     defaults:[true,false,true],
-    stackPh:'Ex: Construct 3 / Unreal Engine 5 · só Blueprints',
-    limitsPh:'Ex: mecânica única, escopo de poucos dias · nada de sistemas multi-camada',
-    extraFile:{path:'design/GDD.md', build:(n)=>`# GDD — ${n}\n\n## Conceito em uma frase\n\n## Mecânica principal (core loop)\n\n## Escopo (o que cabe no prazo)\n\n## Fora de escopo\n`}
+    stackPh:{en:'e.g. Construct 3 / Unreal Engine 5 · Blueprints only', pt:'Ex: Construct 3 / Unreal Engine 5 · só Blueprints'},
+    limitsPh:{en:'e.g. single mechanic, scope of a few days · no multi-layer systems', pt:'Ex: mecânica única, escopo de poucos dias · nada de sistemas multi-camada'},
+    extraFile:{path:{en:'design/GDD.md', pt:'design/GDD.md'}, build:(n,lang)=> lang==='en'
+      ? `# GDD — ${n}\n\n## One-sentence concept\n\n## Core mechanic (core loop)\n\n## Scope (what fits the timeline)\n\n## Out of scope\n`
+      : `# GDD — ${n}\n\n## Conceito em uma frase\n\n## Mecânica principal (core loop)\n\n## Escopo (o que cabe no prazo)\n\n## Fora de escopo\n`}
   },
   boardgame: {
-    label:'Jogo de tabuleiro / cartas',
+    label:{en:'Board / card game', pt:'Jogo de tabuleiro / cartas'},
     checks:[
-      {label:'Protótipos', folder:'prototipos'},
-      {label:'Playtests', folder:'playtests'},
-      {label:'Arte / componentes', folder:'arte'}
+      {label:{en:'Prototypes', pt:'Protótipos'}, folder:{en:'prototypes', pt:'prototipos'}},
+      {label:{en:'Playtests', pt:'Playtests'}, folder:{en:'playtests', pt:'playtests'}},
+      {label:{en:'Art / components', pt:'Arte / componentes'}, folder:{en:'art', pt:'arte'}}
     ],
     defaults:[true,true,true],
-    stackPh:'Ex: cooperativo, tema WWII aviação · print-and-play pra testar',
-    limitsPh:'Ex: todo ajuste de balanceamento precisa ser registrado com o motivo',
-    extraFile:{path:'regras/RULEBOOK.md', build:(n)=>`# Rulebook — ${n}\n\n## Tema\n\n## Objetivo do jogo\n\n## Componentes\n\n## Setup\n\n## Turno / fluxo\n\n## Condições de vitória e derrota\n`}
+    stackPh:{en:'e.g. cooperative, WWII aviation theme · print-and-play for testing', pt:'Ex: cooperativo, tema WWII aviação · print-and-play pra testar'},
+    limitsPh:{en:'e.g. every balance change must be logged with a reason', pt:'Ex: todo ajuste de balanceamento precisa ser registrado com o motivo'},
+    extraFile:{path:{en:'rules/RULEBOOK.md', pt:'regras/RULEBOOK.md'}, build:(n,lang)=> lang==='en'
+      ? `# Rulebook — ${n}\n\n## Theme\n\n## Game objective\n\n## Components\n\n## Setup\n\n## Turn / flow\n\n## Win and loss conditions\n`
+      : `# Rulebook — ${n}\n\n## Tema\n\n## Objetivo do jogo\n\n## Componentes\n\n## Setup\n\n## Turno / fluxo\n\n## Condições de vitória e derrota\n`}
   },
   site: {
-    label:'Site / landing page',
+    label:{en:'Website / landing page', pt:'Site / landing page'},
     checks:[
-      {label:'Conteúdo', folder:'conteudo'},
-      {label:'Assets', folder:'assets'},
-      {label:'Código (/src)', folder:'src'}
+      {label:{en:'Content', pt:'Conteúdo'}, folder:{en:'content', pt:'conteudo'}},
+      {label:{en:'Assets', pt:'Assets'}, folder:{en:'assets', pt:'assets'}},
+      {label:{en:'Code (/src)', pt:'Código (/src)'}, folder:{en:'src', pt:'src'}}
     ],
     defaults:[true,true,true],
-    stackPh:'Ex: Astro/Next.js · deploy na Vercel',
-    limitsPh:'Ex: manter Lighthouse acima de 90 em performance',
+    stackPh:{en:'e.g. Astro/Next.js · deployed on Vercel', pt:'Ex: Astro/Next.js · deploy na Vercel'},
+    limitsPh:{en:'e.g. keep Lighthouse performance score above 90', pt:'Ex: manter Lighthouse acima de 90 em performance'},
   },
   lib: {
-    label:'Biblioteca / SDK open source',
+    label:{en:'Open source library / SDK', pt:'Biblioteca / SDK open source'},
     checks:[
-      {label:'Exemplos', folder:'exemplos'},
-      {label:'Documentação', folder:'docs'},
-      {label:'Testes', folder:'testes'}
+      {label:{en:'Examples', pt:'Exemplos'}, folder:{en:'examples', pt:'exemplos'}},
+      {label:{en:'Documentation', pt:'Documentação'}, folder:{en:'docs', pt:'docs'}},
+      {label:{en:'Tests', pt:'Testes'}, folder:{en:'tests', pt:'testes'}}
     ],
     defaults:[true,true,true],
-    stackPh:'Ex: TypeScript · publicado no npm · semver estrito',
-    limitsPh:'Ex: toda mudança pública de API precisa de entrada no changelog',
-    extraFile:{path:'docs/API.md', build:(n)=>`# Referência de API — ${n}\n\n## Instalação\n\n## Uso básico\n\n## API pública\n\n## Versionamento\n`}
+    stackPh:{en:'e.g. TypeScript · published on npm · strict semver', pt:'Ex: TypeScript · publicado no npm · semver estrito'},
+    limitsPh:{en:'e.g. every public API change needs a changelog entry', pt:'Ex: toda mudança pública de API precisa de entrada no changelog'},
+    extraFile:{path:{en:'docs/API.md', pt:'docs/API.md'}, build:(n,lang)=> lang==='en'
+      ? `# API reference — ${n}\n\n## Installation\n\n## Basic usage\n\n## Public API\n\n## Versioning\n`
+      : `# Referência de API — ${n}\n\n## Instalação\n\n## Uso básico\n\n## API pública\n\n## Versionamento\n`}
   },
   generico: {
-    label:'Genérico',
+    label:{en:'Generic', pt:'Genérico'},
     checks:[
-      {label:'Documentos', folder:'docs'},
-      {label:'Assets', folder:'assets'},
-      {label:'Resultados / outputs', folder:'outputs'}
+      {label:{en:'Documents', pt:'Documentos'}, folder:{en:'docs', pt:'docs'}},
+      {label:{en:'Assets', pt:'Assets'}, folder:{en:'assets', pt:'assets'}},
+      {label:{en:'Results / outputs', pt:'Resultados / outputs'}, folder:{en:'outputs', pt:'outputs'}}
     ],
     defaults:[false,false,false],
-    stackPh:'Ex: ferramentas e convenções usadas neste projeto',
-    limitsPh:'Ex: o que a IA não deve decidir sozinha aqui',
+    stackPh:{en:'e.g. tools and conventions used in this project', pt:'Ex: ferramentas e convenções usadas neste projeto'},
+    limitsPh:{en:'e.g. what the AI should not decide on its own here', pt:'Ex: o que a IA não deve decidir sozinha aqui'},
   },
 };
 
@@ -402,55 +522,94 @@ const els = {
   tree: document.getElementById('tree'),
   prompt: document.getElementById('promptOut'),
   zipStatus: document.getElementById('zipStatus'),
+  langPt: document.getElementById('langPt'),
+  langEn: document.getElementById('langEn'),
+  tagline: document.getElementById('tagline'),
+  headerH1: document.getElementById('headerH1'),
+  headerP: document.getElementById('headerP'),
+  card01Title: document.getElementById('card01Title'),
+  pnameLabel: document.getElementById('pnameLabel'),
+  ptypeLabel: document.getElementById('ptypeLabel'),
+  pdescLabel: document.getElementById('pdescLabel'),
+  pobjLabel: document.getElementById('pobjLabel'),
+  checksTitle: document.getElementById('checksTitle'),
+  card02Title: document.getElementById('card02Title'),
+  card02Sub: document.getElementById('card02Sub'),
+  pstackLabel: document.getElementById('pstackLabel'),
+  plimitsLabel: document.getElementById('plimitsLabel'),
+  card03Title: document.getElementById('card03Title'),
+  card03Sub: document.getElementById('card03Sub'),
+  agClaudeLabel: document.getElementById('agClaudeLabel'),
+  agAgentsmdLabel: document.getElementById('agAgentsmdLabel'),
+  agAgentsmdDesc: document.getElementById('agAgentsmdDesc'),
+  agCursorLabel: document.getElementById('agCursorLabel'),
+  agCopilotLabel: document.getElementById('agCopilotLabel'),
+  agGeminiLabel: document.getElementById('agGeminiLabel'),
+  agWindsurfLabel: document.getElementById('agWindsurfLabel'),
+  agSkillLabel: document.getElementById('agSkillLabel'),
+  infoBox: document.getElementById('infoBox'),
+  card04Title: document.getElementById('card04Title'),
+  btnZip: document.getElementById('btnZip'),
+  card05Title: document.getElementById('card05Title'),
+  btnCopy: document.getElementById('btnCopy'),
+  promptHint: document.getElementById('promptHint'),
 };
 
-// populate type select
-Object.entries(TYPE_CONFIG).forEach(([key,cfg])=>{
-  const opt = document.createElement('option');
-  opt.value = key; opt.textContent = cfg.label;
-  els.type.appendChild(opt);
-});
-
 function slugify(s){
-  return (s || 'novo-projeto')
+  return (s || 'new-project')
     .normalize('NFD').replace(/[̀-ͯ]/g,'')
     .toLowerCase().trim()
     .replace(/[^a-z0-9]+/g,'-')
-    .replace(/(^-|-$)/g,'') || 'novo-projeto';
+    .replace(/(^-|-$)/g,'') || 'new-project';
 }
-function todayStr(){ return new Date().toLocaleDateString('pt-BR'); }
+function todayStr(lang){ return new Date().toLocaleDateString(lang==='en' ? 'en-US' : 'pt-BR'); }
+
+function populateTypeSelect(){
+  const prevValue = els.type.value;
+  els.type.innerHTML = '';
+  Object.entries(TYPE_CONFIG).forEach(([key,cfg])=>{
+    const opt = document.createElement('option');
+    opt.value = key; opt.textContent = cfg.label[LANG];
+    els.type.appendChild(opt);
+  });
+  if(prevValue && TYPE_CONFIG[prevValue]) els.type.value = prevValue;
+}
 
 function applyTypeDefaults(){
   const cfg = TYPE_CONFIG[els.type.value];
   [els.chk1, els.chk2, els.chk3].forEach((el,i)=>{ el.checked = cfg.defaults[i]; });
-  [els.chk1label, els.chk2label, els.chk3label].forEach((el,i)=>{ el.textContent = cfg.checks[i].label; });
-  els.stack.placeholder = cfg.stackPh;
-  els.limits.placeholder = cfg.limitsPh;
+  [els.chk1label, els.chk2label, els.chk3label].forEach((el,i)=>{ el.textContent = cfg.checks[i].label[LANG]; });
+  els.stack.placeholder = cfg.stackPh[LANG];
+  els.limits.placeholder = cfg.limitsPh[LANG];
 }
 els.type.addEventListener('change', ()=>{ applyTypeDefaults(); renderAll(); });
-applyTypeDefaults();
 
 function selectedFolders(){
   const cfg = TYPE_CONFIG[els.type.value];
   const out = [];
-  [els.chk1, els.chk2, els.chk3].forEach((el,i)=>{ if(el.checked) out.push(cfg.checks[i].folder); });
+  [els.chk1, els.chk2, els.chk3].forEach((el,i)=>{ if(el.checked) out.push(cfg.checks[i].folder[LANG]); });
   return [...new Set(out)];
 }
 
 function buildAgentBody(d){
-  return `# ${d.name}\n\n${d.desc}\n\n## Stack & comandos\n${d.stack || '(preencher: como buildar, testar e rodar este projeto)'}\n\n## Limites — o que não fazer sem perguntar\n${d.limits || '- (preencher)'}\n\n## Ver também\n- PROJECT.md — visão geral para humanos\n- DECISIONS.md — histórico de decisões (atualizar a cada decisão relevante)\n- TASKS.md — tarefas ativas\n`;
+  return LANG==='en'
+    ? `# ${d.name}\n\n${d.desc}\n\n## Stack & commands\n${d.stack || '(fill in: how to build, test, and run this project)'}\n\n## Limits — don't do this without asking\n${d.limits || '- (fill in)'}\n\n## See also\n- PROJECT.md — overview for humans\n- DECISIONS.md — decision history (update on every relevant decision)\n- TASKS.md — active tasks\n`
+    : `# ${d.name}\n\n${d.desc}\n\n## Stack & comandos\n${d.stack || '(preencher: como buildar, testar e rodar este projeto)'}\n\n## Limites — o que não fazer sem perguntar\n${d.limits || '- (preencher)'}\n\n## Ver também\n- PROJECT.md — visão geral para humanos\n- DECISIONS.md — histórico de decisões (atualizar a cada decisão relevante)\n- TASKS.md — tarefas ativas\n`;
 }
 
 function buildSkillFile(d, slug){
-  return `---\nname: ${slug}\ndescription: Skill de apoio para o projeto ${d.name}. Use quando precisar de contexto ou rotinas específicas deste projeto.\n---\n\n# ${d.name} — skill de apoio\n\nInstruções e procedimentos reutilizáveis para tarefas recorrentes deste projeto.\n\n## Quando usar\n- (preencher: em que situações esta skill deve ser carregada)\n\n## Procedimento\n1. \n2. \n3. \n`;
+  return LANG==='en'
+    ? `---\nname: ${slug}\ndescription: Support skill for the ${d.name} project. Use when you need context or routines specific to this project.\n---\n\n# ${d.name} — support skill\n\nReusable instructions and procedures for recurring tasks in this project.\n\n## When to use\n- (fill in: in which situations this skill should be loaded)\n\n## Procedure\n1. \n2. \n3. \n`
+    : `---\nname: ${slug}\ndescription: Skill de apoio para o projeto ${d.name}. Use quando precisar de contexto ou rotinas específicas deste projeto.\n---\n\n# ${d.name} — skill de apoio\n\nInstruções e procedimentos reutilizáveis para tarefas recorrentes deste projeto.\n\n## Quando usar\n- (preencher: em que situações esta skill deve ser carregada)\n\n## Procedimento\n1. \n2. \n3. \n`;
 }
 
 function collectData(){
+  const t = UI[LANG];
   return {
-    name: els.name.value.trim() || 'Novo projeto',
+    name: els.name.value.trim() || t.newProject,
     type: els.type.value,
-    desc: els.desc.value.trim() || '(preencher)',
-    obj: els.obj.value.trim() || '(preencher)',
+    desc: els.desc.value.trim() || t.fillIn,
+    obj: els.obj.value.trim() || t.fillIn,
     stack: els.stack.value.trim(),
     limits: els.limits.value.trim(),
   };
@@ -459,37 +618,44 @@ function collectData(){
 function buildFileMap(){
   const d = collectData();
   const cfg = TYPE_CONFIG[d.type];
-  const date = todayStr();
+  const date = todayStr(LANG);
   const slug = slugify(d.name);
   const files = {};
 
-  // human layer
   const folders = selectedFolders();
   const folderList = folders.map(f=>`- \`${f}/\``).join('\n');
-  files['README.md'] = `# ${d.name}\n\nÍndice deste workspace:\n- \`PROJECT.md\` — visão geral e objetivo\n- \`DECISIONS.md\` — histórico de decisões\n- \`CONTEXT.md\` — contexto acumulado para a IA\n- \`TASKS.md\` — tarefas ativas\n${folderList ? '\nPastas:\n'+folderList : ''}\n\n> A IA é uma ferramenta que amplia julgamento humano, não um substituto para ele. Decisões relevantes vão para DECISIONS.md.\n`;
 
-  files['PROJECT.md'] = `# ${d.name}\n\n## Visão geral\n${d.desc}\n\n## Objetivo principal\n${d.obj}\n\n## Tipo de projeto\n${cfg.label}\n\n## Stack\n${d.stack || '(preencher)'}\n\n## Status\n🟡 Em definição\n\n---\nCriado em ${date} via workspace//kit.\n`;
-
-  files['DECISIONS.md'] = `# Decisões — ${d.name}\n\nRegistro cronológico de decisões tomadas neste projeto. Cada entrada deve conter o quê, por quê, e alternativas descartadas.\n\n## ${date}\n- **Decisão:** —\n- **Motivo:** —\n- **Alternativas consideradas:** —\n`;
-
-  files['CONTEXT.md'] = `# Contexto — ${d.name}\n\nContexto que a IA deve conhecer para trabalhar bem neste projeto: convenções, restrições, vocabulário, pessoas envolvidas.\n\n## Convenções\n- \n\n## Restrições\n- \n\n## Vocabulário / termos específicos\n- \n`;
-
-  files['TASKS.md'] = `# Tarefas — ${d.name}\n\n## Em andamento\n- [ ] \n\n## Próximas\n- [ ] \n\n## Concluídas\n- [x] Workspace criado (${date})\n`;
+  if(LANG==='en'){
+    files['README.md'] = `# ${d.name}\n\nIndex of this workspace:\n- \`PROJECT.md\` — overview and goal\n- \`DECISIONS.md\` — decision history\n- \`CONTEXT.md\` — accumulated context for the AI\n- \`TASKS.md\` — active tasks\n${folderList ? '\nFolders:\n'+folderList : ''}\n\n> The AI is a tool that extends human judgment, not a substitute for it. Relevant decisions go into DECISIONS.md.\n`;
+    files['PROJECT.md'] = `# ${d.name}\n\n## Overview\n${d.desc}\n\n## Main goal\n${d.obj}\n\n## Project type\n${cfg.label[LANG]}\n\n## Stack\n${d.stack || '(fill in)'}\n\n## Status\n🟡 In definition\n\n---\nCreated on ${date} via workspace//kit.\n`;
+    files['DECISIONS.md'] = `# Decisions — ${d.name}\n\nChronological record of decisions made in this project. Each entry should contain what, why, and discarded alternatives.\n\n## ${date}\n- **Decision:** —\n- **Reason:** —\n- **Alternatives considered:** —\n`;
+    files['CONTEXT.md'] = `# Context — ${d.name}\n\nContext the AI should know to work well on this project: conventions, constraints, vocabulary, people involved.\n\n## Conventions\n- \n\n## Constraints\n- \n\n## Vocabulary / specific terms\n- \n`;
+    files['TASKS.md'] = `# Tasks — ${d.name}\n\n## In progress\n- [ ] \n\n## Next\n- [ ] \n\n## Done\n- [x] Workspace created (${date})\n`;
+  } else {
+    files['README.md'] = `# ${d.name}\n\nÍndice deste workspace:\n- \`PROJECT.md\` — visão geral e objetivo\n- \`DECISIONS.md\` — histórico de decisões\n- \`CONTEXT.md\` — contexto acumulado para a IA\n- \`TASKS.md\` — tarefas ativas\n${folderList ? '\nPastas:\n'+folderList : ''}\n\n> A IA é uma ferramenta que amplia julgamento humano, não um substituto para ele. Decisões relevantes vão para DECISIONS.md.\n`;
+    files['PROJECT.md'] = `# ${d.name}\n\n## Visão geral\n${d.desc}\n\n## Objetivo principal\n${d.obj}\n\n## Tipo de projeto\n${cfg.label[LANG]}\n\n## Stack\n${d.stack || '(preencher)'}\n\n## Status\n🟡 Em definição\n\n---\nCriado em ${date} via workspace//kit.\n`;
+    files['DECISIONS.md'] = `# Decisões — ${d.name}\n\nRegistro cronológico de decisões tomadas neste projeto. Cada entrada deve conter o quê, por quê, e alternativas descartadas.\n\n## ${date}\n- **Decisão:** —\n- **Motivo:** —\n- **Alternativas consideradas:** —\n`;
+    files['CONTEXT.md'] = `# Contexto — ${d.name}\n\nContexto que a IA deve conhecer para trabalhar bem neste projeto: convenções, restrições, vocabulário, pessoas envolvidas.\n\n## Convenções\n- \n\n## Restrições\n- \n\n## Vocabulário / termos específicos\n- \n`;
+    files['TASKS.md'] = `# Tarefas — ${d.name}\n\n## Em andamento\n- [ ] \n\n## Próximas\n- [ ] \n\n## Concluídas\n- [x] Workspace criado (${date})\n`;
+  }
 
   folders.forEach(f => { files[`${f}/.gitkeep`] = ''; });
-  if(cfg.extraFile){ files[cfg.extraFile.path] = cfg.extraFile.build(d.name); }
+  if(cfg.extraFile){ files[cfg.extraFile.path[LANG]] = cfg.extraFile.build(d.name, LANG); }
 
-  // agent layer
   const agentBody = buildAgentBody(d);
   const wantsAgentsmd = els.agAgentsmd.checked;
   if(els.agClaude.checked){
     files['CLAUDE.md'] = wantsAgentsmd
-      ? `@AGENTS.md\n\n## Específico para Claude Code / Cowork\n- (adicione aqui regras exclusivas deste agente, ex: usar plan mode antes de mudanças estruturais)\n`
+      ? (LANG==='en'
+          ? `@AGENTS.md\n\n## Specific to Claude Code / Cowork\n- (add rules exclusive to this agent here, e.g. use plan mode before structural changes)\n`
+          : `@AGENTS.md\n\n## Específico para Claude Code / Cowork\n- (adicione aqui regras exclusivas deste agente, ex: usar plan mode antes de mudanças estruturais)\n`)
       : agentBody;
   }
   if(wantsAgentsmd){ files['AGENTS.md'] = agentBody; }
   if(els.agCursor.checked){
-    files[`.cursor/rules/${slug}.mdc`] = `---\ndescription: Regras do projeto ${d.name}\nglobs:\nalwaysApply: true\n---\n\n${agentBody}`;
+    files[`.cursor/rules/${slug}.mdc`] = LANG==='en'
+      ? `---\ndescription: Rules for the ${d.name} project\nglobs:\nalwaysApply: true\n---\n\n${agentBody}`
+      : `---\ndescription: Regras do projeto ${d.name}\nglobs:\nalwaysApply: true\n---\n\n${agentBody}`;
   }
   if(els.agCopilot.checked){ files['.github/copilot-instructions.md'] = agentBody; }
   if(els.agGemini.checked){ files['GEMINI.md'] = agentBody; }
@@ -546,14 +712,30 @@ function renderPrompt(){
   if(els.agCopilot.checked) agentFiles.push('.github/copilot-instructions.md');
   if(els.agGemini.checked) agentFiles.push('GEMINI.md');
   if(els.agWindsurf.checked) agentFiles.push('.windsurf/rules/');
-  const agentList = agentFiles.length ? agentFiles.join(', ') : 'os arquivos de contexto na raiz';
+  const agentList = agentFiles.length ? agentFiles.join(', ') : UI[LANG].agentListFallback;
 
-  const text = `Você vai atuar como parceiro de trabalho neste projeto: "${d.name}".
+  const text = LANG==='en'
+    ? `You'll act as a working partner on this project: "${d.name}".
+
+CONTEXT
+${d.desc}
+Main goal: ${d.obj}
+Project type: ${cfg.label[LANG]}
+
+HOW TO WORK
+- Before taking any action, read ${agentList}, then PROJECT.md, CONTEXT.md, and DECISIONS.md in this folder.
+- Every relevant decision we make should be logged in DECISIONS.md (what, why, discarded alternatives).
+- Update TASKS.md as work progresses.
+- You are a tool that extends my judgment — at points of strategic ambiguity, don't decide on your own: bring options and trade-offs for me to decide.
+- Be explicit about what is fact, inference, or assumption.
+
+Start by reviewing the workspace files and tell me what's missing before we begin.`
+    : `Você vai atuar como parceiro de trabalho neste projeto: "${d.name}".
 
 CONTEXTO
 ${d.desc}
 Objetivo principal: ${d.obj}
-Tipo de projeto: ${cfg.label}
+Tipo de projeto: ${cfg.label[LANG]}
 
 COMO TRABALHAR
 - Antes de qualquer ação, leia ${agentList}, depois PROJECT.md, CONTEXT.md e DECISIONS.md nesta pasta.
@@ -569,6 +751,56 @@ Comece revisando os arquivos do workspace e me diga o que falta preencher antes 
 
 function renderAll(){ renderTree(); renderPrompt(); }
 
+function applyStaticUI(){
+  const t = UI[LANG];
+  document.documentElement.lang = LANG==='en' ? 'en' : 'pt-BR';
+  els.tagline.textContent = t.tagline;
+  els.headerH1.textContent = t.h1;
+  els.headerP.textContent = t.p;
+  els.card01Title.textContent = t.card01;
+  els.pnameLabel.textContent = t.pnameLabel;
+  els.name.placeholder = t.pnamePh;
+  els.ptypeLabel.textContent = t.ptypeLabel;
+  els.pdescLabel.textContent = t.pdescLabel;
+  els.desc.placeholder = t.pdescPh;
+  els.pobjLabel.textContent = t.pobjLabel;
+  els.obj.placeholder = t.pobjPh;
+  els.checksTitle.textContent = t.checksTitle;
+  els.card02Title.textContent = t.card02;
+  els.card02Sub.textContent = t.card02sub;
+  els.pstackLabel.textContent = t.pstackLabel;
+  els.stack.placeholder = els.stack.placeholder || t.genericPh;
+  els.plimitsLabel.textContent = t.plimitsLabel;
+  els.card03Title.textContent = t.card03;
+  els.card03Sub.textContent = t.card03sub;
+  els.agClaudeLabel.textContent = t.agClaude;
+  els.agAgentsmdLabel.textContent = t.agAgentsmd;
+  els.agAgentsmdDesc.textContent = t.agAgentsmdDesc;
+  els.agCursorLabel.textContent = t.agCursor;
+  els.agCopilotLabel.textContent = t.agCopilot;
+  els.agGeminiLabel.textContent = t.agGemini;
+  els.agWindsurfLabel.textContent = t.agWindsurf;
+  els.agSkillLabel.textContent = t.agSkill;
+  els.infoBox.innerHTML = t.infoBox;
+  els.card04Title.textContent = t.card04;
+  els.btnZip.textContent = t.btnZip;
+  els.card05Title.textContent = t.card05;
+  els.btnCopy.textContent = t.btnCopy;
+  els.promptHint.textContent = t.promptHint;
+  els.langPt.classList.toggle('active', LANG==='pt');
+  els.langEn.classList.toggle('active', LANG==='en');
+}
+
+function setLang(lang){
+  LANG = lang;
+  populateTypeSelect();
+  applyTypeDefaults();
+  applyStaticUI();
+  renderAll();
+}
+els.langPt.addEventListener('click', ()=> setLang('pt'));
+els.langEn.addEventListener('click', ()=> setLang('en'));
+
 [els.name, els.desc, els.obj, els.stack, els.limits,
  els.chk1, els.chk2, els.chk3,
  els.agClaude, els.agAgentsmd, els.agCursor, els.agCopilot, els.agGemini, els.agWindsurf, els.agSkill
@@ -579,14 +811,14 @@ document.getElementById('btnCopy').addEventListener('click', ()=>{
   navigator.clipboard.writeText(els.prompt.value).then(()=>{
     const btn = document.getElementById('btnCopy');
     const old = btn.textContent;
-    btn.textContent = 'Copiado!';
+    btn.textContent = UI[LANG].copied;
     setTimeout(()=>btn.textContent = old, 1500);
   });
 });
 
 document.getElementById('btnZip').addEventListener('click', async ()=>{
   const status = els.zipStatus;
-  status.textContent = 'Gerando .zip...';
+  status.textContent = UI[LANG].zipGenerating;
   try{
     const {files, slug} = buildFileMap();
     const zip = new JSZip();
@@ -598,13 +830,13 @@ document.getElementById('btnZip').addEventListener('click', async ()=>{
     a.href = url; a.download = `${slug}.zip`;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(url), 2000);
-    status.textContent = `Baixado: ${slug}.zip`;
+    status.textContent = UI[LANG].zipDone(slug);
   }catch(err){
-    status.textContent = 'Erro ao gerar o .zip: ' + err.message;
+    status.textContent = UI[LANG].zipError(err.message);
   }
 });
 
-renderAll();
+setLang('en');
 </script>
 </body>
 </html>
