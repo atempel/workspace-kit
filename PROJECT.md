@@ -6,6 +6,10 @@ AI workspace generator: from a project description, produces the human context l
 ## Main goal
 Eliminate the manual work of assembling context every time a new project starts — and make sure that context is born in the right format for whichever AI tool is being used.
 
+## Pillars
+- **Security & privacy** — the generator and this repository itself should never expose secrets, personal data, or private discussions. Heavy or sensitive content belongs on each user's machine, not in version control.
+- **Collaboration** — the generated context layer should make it easy for multiple people (and agents) to pick up a project without re-litigating past decisions. Local-only, per-user state should be isolated so it doesn't get in the way of shared work.
+
 ## Project type
 Digital product / App (internal tool, standalone artifact)
 
