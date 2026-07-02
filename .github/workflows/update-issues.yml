@@ -1,0 +1,74 @@
+name: Sync TASKS.md to Issues
+
+on:
+  push:
+    paths:
+      - 'TASKS.md'
+    branches:
+      - main
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  sync-tasks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Parse TASKS.md and Sync Issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python -c "
+          import os, re, subprocess, json
+
+          # 1. Busca todas as issues existentes (abertas e fechadas) no repositório
+          result = subprocess.run(
+              ['gh', 'issue', 'list', '--state', 'all', '--json', 'title,number,state', '--limit', '500'], 
+              capture_output=True, text=True, check=True
+          )
+          issues = json.loads(result.stdout)
+          
+          # Mapeia as issues pelo título para evitar duplicatas
+          issue_map = {issue['title'].strip(): issue for issue in issues}
+
+          # 2. Lê o arquivo TASKS.md
+          with open('TASKS.md', 'r', encoding='utf-8') as f:
+              lines = f.readlines()
+
+          # 3. Processa cada linha procurando por checkboxes do Markdown
+          for line in lines:
+              match = re.match(r'^\s*-\s*\[([xX ])\]\s*(.*)', line)
+              if not match:
+                  continue
+
+              is_done = match.group(1).lower() == 'x'
+              full_text = match.group(2).strip()
+
+              # Formata o título da issue. 
+              # Usa o texto até o primeiro travessão '—' ou trunca em 80 caracteres.
+              title = full_text.split(' — ')[0].strip()
+              if len(title) > 80:
+                  title = title[:77] + '...'
+
+              # 4. Lógica de Sincronização
+              if title in issue_map:
+                  issue = issue_map[title]
+                  # Se a tarefa foi marcada como concluída [x], mas a issue está aberta -> Fecha a issue
+                  if is_done and issue['state'] == 'OPEN':
+                      print(f'Fechando issue: {title}')
+                      subprocess.run(['gh', 'issue', 'close', str(issue['number'])])
+                  
+                  # Se a tarefa foi desmarcada [ ], mas a issue está fechada -> Reabre a issue
+                  elif not is_done and issue['state'] == 'CLOSED':
+                      print(f'Reabrindo issue: {title}')
+                      subprocess.run(['gh', 'issue', 'reopen', str(issue['number'])])
+              else:
+                  # Se a issue não existe e a tarefa está pendente [ ] -> Cria a issue
+                  if not is_done:
+                      print(f'Criando issue: {title}')
+                      subprocess.run(['gh', 'issue', 'create', '--title', title, '--body', full_text])
+          "
