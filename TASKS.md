@@ -1,8 +1,7 @@
 # Tasks — workspace//kit
 
 ## In progress
-- [ ] Translate the entire repository to English (docs done; generator selector still pending — see below)
-- [ ] Add a PT/EN language selector to the generated HTML (`src/workspace-kit.html`) — covers UI text, generated file templates, and generated folder names; needs a reviewed implementation plan before applying (structural change, see CLAUDE.md)
+- [ ]
 
 ## Next
 - [ ] CLI init: command-line version of the generator, to run before opening the AI agent (today only the web form/artifact exists)
@@ -15,3 +14,5 @@
 - [x] v2: multi-agent layer (CLAUDE.md/AGENTS.md/Cursor/Copilot/Gemini CLI/Windsurf/Skill), 11 project types, logo
 - [x] Continuity workspace generated for use in Cowork
 - [x] Project pushed to GitHub (atempel/workspace-kit) with logo and README (2026-07-01)
+- [x] Repository docs translated to English; pesquisa/ moved to research/ (2026-07-01)
+- [x] PT/EN language selector added to the generated HTML (`src/workspace-kit.html`), English default — covers UI text, generated file templates, and generated folder names (2026-07-01)
