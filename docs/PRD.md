@@ -1,20 +1,20 @@
 # PRD — workspace//kit
 
-## Problema
-Começar um novo projeto com IA exige montar, na mão e toda vez, tanto os arquivos de contexto de processo (visão, decisões, tarefas) quanto os arquivos de instrução específicos de cada ferramenta de IA (CLAUDE.md, AGENTS.md, .cursorrules, etc.) — e é fácil deixar isso desatualizado ou incompleto entre ferramentas.
+## Problem
+Starting a new project with AI requires manually assembling, every time, both the process context files (vision, decisions, tasks) and the instruction files specific to each AI tool (CLAUDE.md, AGENTS.md, .cursorrules, etc.) — and it's easy to leave this outdated or incomplete across tools.
 
-## Solução proposta
-Um gerador de workspace: a partir de nome, tipo, descrição, stack e limites de um projeto, produz as duas camadas de arquivo já formatadas corretamente por ferramenta, mais um prompt inicial, empacotados em um .zip pronto pra soltar em qualquer agente com acesso a workspace.
+## Proposed solution
+A workspace generator: from a project's name, type, description, stack, and limits, it produces both file layers already formatted correctly per tool, plus a starter prompt, packaged into a .zip ready to drop into any agent with workspace access.
 
-## Escopo
-- Geração client-side (HTML/JS + JSZip), sem backend.
-- Suporte a múltiplos tipos de projeto com pastas e arquivo-âncora próprios.
-- Suporte a múltiplos "alvos" de agente (Claude/Cowork, AGENTS.md universal, Cursor, Copilot, Gemini CLI, Windsurf, Skills).
+## Scope
+- Client-side generation (HTML/JS + JSZip), no backend.
+- Support for multiple project types with their own folders and anchor file.
+- Support for multiple agent "targets" (Claude/Cowork, universal AGENTS.md, Cursor, Copilot, Gemini CLI, Windsurf, Skills).
 
-## Fora de escopo (por ora)
-- Persistência entre sessões (o usuário preenche o formulário e baixa; nada fica salvo).
-- Edição de templates pelo próprio usuário via UI (hoje os templates são fixos no código).
-- Integração direta com Notion/GitHub para já criar o workspace remotamente.
+## Out of scope (for now)
+- Persistence across sessions (the user fills the form and downloads; nothing is saved).
+- Editing templates through the UI (today templates are fixed in the code).
+- Direct integration with Notion/GitHub to create the workspace remotely.
 
-## Métricas de sucesso
-- (a definir no Cowork)
+## Success metrics
+- (to be defined in Cowork)

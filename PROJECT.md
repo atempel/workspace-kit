@@ -1,19 +1,19 @@
 # workspace//kit
 
-## Visão geral
-Gerador de workspaces para agentes de IA: a partir de uma descrição de projeto, produz a camada de contexto humana (PROJECT.md, DECISIONS.md, CONTEXT.md, TASKS.md) e a camada de instrução para IA (CLAUDE.md, AGENTS.md, regras do Cursor, Copilot, Gemini CLI, Windsurf, Skills), tudo baixável como .zip e com um prompt inicial pronto.
+## Overview
+AI workspace generator: from a project description, produces the human context layer (PROJECT.md, DECISIONS.md, CONTEXT.md, TASKS.md) and the AI instruction layer (CLAUDE.md, AGENTS.md, Cursor/Copilot/Gemini CLI/Windsurf rules, Skills) — all downloadable as a .zip, plus a ready-to-use starter prompt.
 
-## Objetivo principal
-Eliminar o trabalho manual de montar contexto toda vez que um novo projeto começa — e garantir que esse contexto já nasça no formato certo pra cada ferramenta de IA usada.
+## Main goal
+Eliminate the manual work of assembling context every time a new project starts — and make sure that context is born in the right format for whichever AI tool is being used.
 
-## Tipo de projeto
-Produto digital / App (ferramenta interna, artefato standalone)
+## Project type
+Digital product / App (internal tool, standalone artifact)
 
 ## Stack
-HTML + CSS + JS puro, single-file. JSZip 3.10.1 via cdnjs para geração de .zip no navegador. Fontes via Google Fonts (JetBrains Mono + Inter). Sem build step, sem backend.
+Plain HTML + CSS + JS, single-file. JSZip 3.10.1 via cdnjs for in-browser .zip generation. Fonts via Google Fonts (JetBrains Mono + Inter). No build step, no backend.
 
 ## Status
-🟢 v2 funcional — indo para planejamento de próximas features no Cowork
+🟢 v2 functional, live on GitHub — repository translated to English; next up is a PT/EN language selector for the generated artifact.
 
 ---
-Workspace gerado para dar continuidade ao projeto no Cowork.
+Workspace generated to give continuity to the project in Cowork.

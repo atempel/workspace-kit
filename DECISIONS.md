@@ -1,41 +1,48 @@
-# Decisões — workspace//kit
+# Decisions — workspace//kit
 
-Registro cronológico de decisões tomadas neste projeto. Cada entrada contém o quê, por quê, e alternativas descartadas.
+Chronological record of decisions made in this project. Each entry contains what, why, and discarded alternatives.
 
-## v1 — estrutura base
-- **Decisão:** arquivos base sempre gerados: PROJECT.md, DECISIONS.md, CONTEXT.md, TASKS.md, README.md.
-- **Motivo:** replica a hierarquia de contexto que já uso em outros projetos ("contexto é o produto").
-- **Alternativas consideradas:** um único arquivo de contexto — descartado por misturar histórico de decisões com tarefas ativas.
+## v1 — base structure
+- **Decision:** base files always generated: PROJECT.md, DECISIONS.md, CONTEXT.md, TASKS.md, README.md.
+- **Reason:** replicates the context hierarchy already used in other projects ("context is the product").
+- **Alternatives considered:** a single context file — discarded for mixing decision history with active tasks.
 
-## v2 — camada de agentes (CLAUDE.md + AGENTS.md)
-- **Decisão:** gerar CLAUDE.md e AGENTS.md por padrão, sendo que CLAUDE.md apenas importa AGENTS.md (`@AGENTS.md`) e adiciona uma seção exclusiva pro Claude.
-- **Motivo:** Claude Code/Cowork não lê AGENTS.md nativamente (confirmado em documentação de abril/maio 2026), mas AGENTS.md já é lido nativamente por Codex, Cursor, Windsurf, Gemini CLI, Devin, Amazon Q e outros. Duplicar o conteúdo nos dois arquivos criaria risco de desalinhamento.
-- **Alternativas consideradas:** gerar só CLAUDE.md (perde portabilidade); duplicar texto integralmente nos dois arquivos (descartado pelo risco de desalinhamento).
+## v2 — agent layer (CLAUDE.md + AGENTS.md)
+- **Decision:** generate CLAUDE.md and AGENTS.md by default, with CLAUDE.md only importing AGENTS.md (`@AGENTS.md`) and adding a section exclusive to Claude.
+- **Reason:** Claude Code/Cowork does not read AGENTS.md natively (confirmed in April/May 2026 documentation), but AGENTS.md is already read natively by Codex, Cursor, Windsurf, Gemini CLI, Devin, Amazon Q, and others. Duplicating content across both files would risk them drifting out of sync.
+- **Alternatives considered:** generating only CLAUDE.md (loses portability); duplicating the full text in both files (discarded due to drift risk).
 
-## v2 — duas camadas de arquivo (humana vs. agente)
-- **Decisão:** separar arquivos "humanos" (PROJECT/DECISIONS/CONTEXT/TASKS, mais descritivos) dos arquivos "de agente" (CLAUDE.md/AGENTS.md/etc., mais enxutos: stack, comandos, limites).
-- **Motivo:** seções longas de arquitetura/prosa diluem a aderência do agente às instruções; comandos e limites concretos funcionam melhor em arquivos de instrução.
-- **Alternativas consideradas:** um único conjunto de arquivos servindo os dois públicos — descartado por gerar arquivos longos demais para os agentes.
+## v2 — two file layers (human vs. agent)
+- **Decision:** separate "human" files (PROJECT/DECISIONS/CONTEXT/TASKS, more descriptive) from "agent" files (CLAUDE.md/AGENTS.md/etc., leaner: stack, commands, limits).
+- **Reason:** long architecture/prose sections dilute how well the agent follows instructions; concrete commands and limits work better in instruction files.
+- **Alternatives considered:** a single set of files serving both audiences — discarded for producing files too long for agents.
 
-## v2 — 11 tipos de projeto com arquivo-âncora
-- **Decisão:** cada tipo de projeto (produto, pesquisa, escrita, design, dados/ML, automação, jogo digital, jogo de tabuleiro, site, biblioteca, genérico) tem pastas padrão e, quando faz sentido, um arquivo-âncora (PRD, GDD, Rulebook, Spec de handoff, referência de API).
-- **Motivo:** refletir os tipos de projeto reais trabalhados, sem forçar todo projeto a usar a mesma estrutura de produto de software.
+## v2 — 11 project types with anchor file
+- **Decision:** each project type (product, research, writing, design, data/ML, automation, digital game, board game, website, library, generic) has standard folders and, when it makes sense, an anchor file (PRD, GDD, Rulebook, handoff spec, API reference).
+- **Reason:** reflect the actual project types worked on, without forcing every project into the same software-product structure.
 
-## v2 — geração 100% client-side
-- **Decisão:** toda a geração de arquivos e .zip acontece no navegador via JSZip, sem backend.
-- **Motivo:** o artefato precisa funcionar dentro do Claude.ai sem infraestrutura própria.
+## v2 — 100% client-side generation
+- **Decision:** all file and .zip generation happens in the browser via JSZip, no backend.
+- **Reason:** the artifact needs to work inside Claude.ai without its own infrastructure.
 
-## Ajuste final — workspace//kit
-- **Decisão:** o repositório foi cadastrado no GitHub como `workspace-kit` (palavra cheia), não `wrkspc-kit` (abreviado). Todos os arquivos e o wordmark do artefato foram sincronizados para `workspace//kit`.
-- **Motivo:** manter o nome exibido em todo lugar (docs, artefato, repositório) idêntico ao slug real do repositório, evitando divergência entre o que está escrito e o que existe de fato no GitHub.
-- **Pendência resolvida:** a checagem de disponibilidade do slug, deixada em aberto na decisão anterior, foi concluída — `workspace-kit` está cadastrado.
+## Final adjustment — workspace//kit
+- **Decision:** the repository was registered on GitHub as `workspace-kit` (full word), not `wrkspc-kit` (abbreviated). All files and the artifact's wordmark were synced to `workspace//kit`.
+- **Reason:** keep the name shown everywhere (docs, artifact, repository) identical to the repository's actual slug, avoiding a mismatch between what's written and what actually exists on GitHub.
+- **Resolved pending item:** the slug availability check, left open in the previous decision, was completed — `workspace-kit` is registered.
 
-## Renomeação — workspace//kit
-- **Decisão:** o projeto passa a se chamar `workspace//kit` (slug de repositório: `workspace-kit`), substituindo o nome de trabalho anterior `ctx//forge` (e a ideia intermediária "Context Forge").
-- **Motivo:** "context-forge" já existe como projeto real no GitHub com proposta quase idêntica (`webdevtodayjason/context-forge`, CLI de scaffolding de contexto pra Claude Code). Ao pesquisar alternativas dentro do mesmo radical, ficou claro que tanto `ctx` quanto `forge` são radicais extremamente usados no nicho de ferramentas de contexto para IA em 2026 (ctxloom, lean-ctx, ctx-init, RigForge, WorkForge, entre outros) — manter qualquer combinação dos dois tende a colidir de novo. `workspace//kit` sai desses dois radicais saturados, não apresentou colisão relevante na checagem, e mantém a mesma linguagem visual (abreviação + `//` + palavra).
-- **Alternativas consideradas:** `Context Forge` / `context-forge` (descartado por colisão direta); `ctx//forge` (descartado por radicais saturados); `ctx//prime` (descartado — nome coincide com uma corretora forex investigada por fraude, más associações de busca); `workspace//boilerplate` (avaliado, sem colisão relevante, mas "boilerplate" foi considerado um termo com conotação um pouco datada pro posicionamento pretendido); `brief//kit` e `wrk//spawn` (alternativas viáveis, não escolhidas).
-- **Pendência:** slug de repositório `workspace-kit` ainda precisa ser conferido e cadastrado no GitHub (o dono/usuário deve verificar disponibilidade exata no momento de criar o repo).
+## Renaming — workspace//kit
+- **Decision:** the project is now called `workspace//kit` (repository slug: `workspace-kit`), replacing the previous working name `ctx//forge` (and the intermediate idea "Context Forge").
+- **Reason:** "context-forge" already exists as a real GitHub project with an almost identical pitch (`webdevtodayjason/context-forge`, a context-scaffolding CLI for Claude Code). Researching alternatives within the same root made it clear that both `ctx` and `forge` are extremely saturated roots in the AI context-tooling niche in 2026 (ctxloom, lean-ctx, ctx-init, RigForge, WorkForge, among others) — keeping any combination of the two was likely to collide again. `workspace//kit` moves away from both saturated roots, showed no relevant collision in the check, and keeps the same visual language (abbreviation + `//` + word).
+- **Alternatives considered:** `Context Forge` / `context-forge` (discarded for a direct collision); `ctx//forge` (discarded for saturated roots); `ctx//prime` (discarded — the name coincides with a forex broker investigated for fraud, bad search associations); `workspace//boilerplate` (evaluated, no relevant collision, but "boilerplate" was considered a slightly dated term for the intended positioning); `brief//kit` and `wrk//spawn` (viable alternatives, not chosen).
+- **Pending item:** the `workspace-kit` repository slug still needed to be checked and registered on GitHub (the owner/user had to verify exact availability at repo creation time).
 
-## v2 — identidade visual
-- **Decisão:** paleta "terminal" (fundo quase-preto, âmbar + teal), tipografia JetBrains Mono/Inter, logo de cartões de contexto empilhados com cursor piscando.
-- **Motivo:** evitar os três "defaults" visuais de conteúdo gerado por IA (cream+terracota, preto+verde ácido, broadsheet) e ancorar na estética do próprio ambiente de terminal do usuário.
+## v2 — visual identity
+- **Decision:** "terminal" palette (near-black background, amber + teal), JetBrains Mono/Inter typography, a logo of stacked context cards with a blinking cursor.
+- **Reason:** avoid the three visual "defaults" of AI-generated content (cream+terracotta, black+acid green, broadsheet) and anchor the identity in the user's own terminal environment aesthetic.
+
+## 2026-07-01 — Repository translated to English + bilingual generator planned
+- **Decision:** the repository's own documentation (README, PROJECT, DECISIONS, CONTEXT, TASKS, AGENTS, CLAUDE, docs/PRD, research/) is now maintained in English only, replacing the Portuguese versions — no parallel bilingual docs. The generated artifact (`src/workspace-kit.html`) will get a PT/EN language selector covering both UI text and the physical folder names it generates (e.g. "pesquisa" → "research"), not just prose inside files.
+- **Reason:** the project is moving toward a broader, GitHub-facing audience, and a single source of truth in English avoids double maintenance of the repo's own docs. For the generator's own output, translating only prose while keeping folder names fixed in Portuguese would leave a generated workspace inconsistent (English file content inside Portuguese-named folders), defeating the point of a language selector.
+- **Alternatives considered:** keeping parallel bilingual repo docs (e.g. `README.md` + `README.pt-BR.md`) — discarded for ongoing double maintenance; translating only the generator's UI chrome while keeping folder names fixed in Portuguese — discarded for producing inconsistent generated output.
+- **Supersedes:** the CONTEXT.md convention "interface and generated file texts in Portuguese (PT-BR)" recorded under v2 identity — see the updated CONTEXT.md convention.
+- **Pending:** the language-selector implementation in `src/workspace-kit.html` is a structural change to a single-file artifact — per CLAUDE.md, it needs a reviewed plan before being applied. Plan to be presented separately.

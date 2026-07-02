@@ -3,50 +3,54 @@
 </p>
 
 <h1 align="center">workspace//kit</h1>
-<p align="center"><i>gerador de workspaces multi-agente</i></p>
+<p align="center"><i>multi-agent workspace generator</i></p>
 
-Descreva um projeto e gere, de uma vez, a camada de contexto para humanos (`PROJECT.md`, `DECISIONS.md`, `CONTEXT.md`, `TASKS.md`) e a camada de instruções para IA (`CLAUDE.md`, `AGENTS.md`, Cursor, Copilot, Gemini CLI, Windsurf, Skills) — tudo empacotado em um `.zip`, com um prompt inicial pronto para colar.
+Describe a project and generate, in one shot, the human context layer (`PROJECT.md`, `DECISIONS.md`, `CONTEXT.md`, `TASKS.md`) and the AI instruction layer (`CLAUDE.md`, `AGENTS.md`, Cursor, Copilot, Gemini CLI, Windsurf, Skills) — all packaged into a `.zip`, with a ready-to-paste starter prompt.
 
-## Por quê
+## Why
 
-Começar um projeto novo com IA exige montar esse contexto na mão, toda vez, e é fácil deixar arquivos desatualizados ou incompletos entre ferramentas diferentes. O workspace//kit elimina esse trabalho manual.
+Starting a new project with AI means assembling this context by hand, every time, and it's easy to leave files outdated or incomplete across different tools. workspace//kit removes that manual work.
 
-## Como usar
+## How to use
 
-1. Abra `src/workspace-kit.html` no navegador (ou use como Claude artifact).
-2. Preencha nome, tipo, descrição e stack do projeto.
-3. Escolha para quais agentes de IA gerar arquivo de instrução.
-4. Baixe o `.zip`, extraia na pasta do projeto e cole o prompt inicial gerado na primeira mensagem do agente.
+1. Open `src/workspace-kit.html` in your browser (or use it as a Claude artifact).
+2. Fill in the project's name, type, description, and stack.
+3. Choose which AI agents to generate an instruction file for.
+4. Download the `.zip`, extract it into the project folder, and paste the generated starter prompt as your first message to the agent.
 
-Não há build step nem backend — é um único arquivo HTML/CSS/JS, 100% client-side.
+No build step, no backend — it's a single HTML/CSS/JS file, 100% client-side.
 
-## O que é gerado
+## What gets generated
 
-**Camada humana** — `PROJECT.md`, `DECISIONS.md`, `CONTEXT.md`, `TASKS.md`, `README.md`, mais um arquivo-âncora quando o tipo de projeto pede (PRD, GDD, Rulebook, Spec de handoff, referência de API).
+**Human layer** — `PROJECT.md`, `DECISIONS.md`, `CONTEXT.md`, `TASKS.md`, `README.md`, plus an anchor file when the project type calls for one (PRD, GDD, Rulebook, handoff spec, API reference).
 
-**Camada de agente** — `CLAUDE.md` (importando `AGENTS.md`), `AGENTS.md` (padrão universal, lido por Codex, Cursor, Windsurf, Gemini CLI, Devin, Amazon Q e outros), além de arquivos dedicados para Cursor, Copilot, Gemini CLI, Windsurf e um esqueleto de Skill portátil.
+**Agent layer** — `CLAUDE.md` (importing `AGENTS.md`), `AGENTS.md` (universal standard, read natively by Codex, Cursor, Windsurf, Gemini CLI, Devin, Amazon Q and others), plus dedicated files for Cursor, Copilot, Gemini CLI, Windsurf, and a portable Skill skeleton.
 
-11 tipos de projeto com pastas e arquivo-âncora próprios: produto digital, pesquisa & análise, escrita & conteúdo, design, dados/ML, automação, jogo digital, jogo de tabuleiro, site, biblioteca/SDK e genérico.
+11 project types with their own folders and anchor file: digital product, research & analysis, writing & content, design, data/ML, automation, digital game, board game, website, library/SDK, and generic.
 
 ## Stack
 
-HTML + CSS + JS puro, single-file. [JSZip](https://stuk.github.io/jszip/) via cdnjs para gerar o `.zip` no navegador. Fontes via Google Fonts (JetBrains Mono + Inter).
+Plain HTML + CSS + JS, single-file. [JSZip](https://stuk.github.io/jszip/) via cdnjs to generate the `.zip` in the browser. Fonts via Google Fonts (JetBrains Mono + Inter).
 
-## Estrutura do repositório
+## Repository structure
 
 ```
 workspace-kit/
-├── src/workspace-kit.html      # o artefato (funcional, standalone)
-├── docs/PRD.md                 # problema, escopo, métricas
-├── pesquisa/                   # levantamento sobre CLAUDE.md/AGENTS.md/Cursor/etc.
+├── src/workspace-kit.html      # the artifact (functional, standalone)
+├── docs/PRD.md                 # problem, scope, metrics
+├── research/                   # research on CLAUDE.md/AGENTS.md/Cursor/etc.
 ├── PROJECT.md · DECISIONS.md · CONTEXT.md · TASKS.md
-└── CLAUDE.md · AGENTS.md       # instruções para agentes de IA neste próprio repo
+└── CLAUDE.md · AGENTS.md       # AI agent instructions for this repo itself
 ```
 
 ## Roadmap
 
-Próximas features em discussão estão em [`TASKS.md`](TASKS.md).
+Upcoming features under discussion live in [`TASKS.md`](TASKS.md).
 
-## Licença
+## Generated with workspace//kit
+
+This repository's own context layer (`PROJECT.md`, `DECISIONS.md`, `CONTEXT.md`, `TASKS.md`) and agent layer (`CLAUDE.md`, `AGENTS.md`) were scaffolded using workspace//kit itself.
+
+## License
 
 [MIT](LICENSE)

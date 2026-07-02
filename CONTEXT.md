@@ -1,17 +1,17 @@
-# Contexto — workspace//kit
+# Context — workspace//kit
 
-Contexto que a IA deve conhecer para trabalhar bem neste projeto: convenções, restrições, vocabulário, pessoas envolvidas.
+Context the AI should know to work well on this project: conventions, constraints, vocabulary, people involved.
 
-## Convenções
-- Artefato é um único arquivo HTML (sem build step); qualquer nova dependência externa deve vir de CDN (cdnjs/Google Fonts) e ser justificada.
-- Textos da interface e dos arquivos gerados em português (PT-BR); nomes de arquivo de convenção internacional (CLAUDE.md, AGENTS.md etc.) permanecem em inglês por serem nomes fixos lidos pelas ferramentas.
-- Paleta e tipografia definidas na v2 (ver DECISIONS.md) são a identidade visual atual — mudanças de marca devem ser registradas como decisão, não feitas silenciosamente.
+## Conventions
+- The artifact is a single HTML file (no build step); any new external dependency must come from a CDN (cdnjs/Google Fonts) and be justified.
+- Interface and generated file texts are available in Portuguese or English via the artifact's language selector (see DECISIONS.md, 2026-07-01 entry); file names that are fixed tool conventions (CLAUDE.md, AGENTS.md, etc.) always stay in English, since those are literal names read by external tools.
+- The palette and typography defined in v2 (see DECISIONS.md) are the current visual identity — brand changes must be logged as a decision, not made silently.
 
-## Restrições
-- Sem backend, sem chamadas de API externas que exijam chave — o gerador precisa continuar funcionando como artefato standalone dentro do Claude.ai.
-- IA (Claude/Cowork) é tratada, nos próprios templates gerados pelo produto, como ferramenta que amplia julgamento humano — nunca como entidade criativa com agência própria. Essa regra vale tanto para o produto quanto para como ele se comunica sobre si mesmo.
+## Constraints
+- No backend, no external API calls requiring a key — the generator needs to keep working as a standalone artifact inside Claude.ai.
+- The AI (Claude/Cowork) is treated, in the templates the product itself generates, as a tool that extends human judgment — never as a creative entity with its own agency. This rule applies both to the product and to how it talks about itself.
 
-## Vocabulário / termos específicos
-- "Camada humana" = PROJECT.md/DECISIONS.md/CONTEXT.md/TASKS.md.
-- "Camada de agente" = CLAUDE.md/AGENTS.md/regras do Cursor/Copilot/Gemini CLI/Windsurf/Skills.
-- "Arquivo-âncora" = documento central de um tipo de projeto (PRD, GDD, Rulebook, Spec de handoff, referência de API).
+## Vocabulary / specific terms
+- "Human layer" = PROJECT.md/DECISIONS.md/CONTEXT.md/TASKS.md.
+- "Agent layer" = CLAUDE.md/AGENTS.md/Cursor/Copilot/Gemini CLI/Windsurf rules/Skills.
+- "Anchor file" = the central document for a project type (PRD, GDD, Rulebook, handoff spec, API reference).
