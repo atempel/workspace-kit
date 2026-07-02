@@ -1,7 +1,7 @@
 # Tasks — workspace//kit
 
 ## In progress
-- [ ]
+- [ ] Plan new tasks
 
 ## Next
 - [ ] Generate a `.gitignore` as part of the workspace output — to be discussed: what it should cover (per project type? secrets/env files? IDE/OS cruft? build artifacts?)
