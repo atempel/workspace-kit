@@ -315,6 +315,7 @@ const UI = {
     agentListFallback: 'the context files in the root folder',
     newProject: 'New project',
     fillIn: '(fill in)',
+    localOnlyTag: '· local only (.gitignore)',
   },
   pt: {
     tagline: 'gerador de workspaces multi-agente',
@@ -357,6 +358,7 @@ const UI = {
     agentListFallback: 'os arquivos de contexto na raiz',
     newProject: 'Novo projeto',
     fillIn: '(preencher)',
+    localOnlyTag: '· só local (.gitignore)',
   }
 };
 
@@ -378,9 +380,9 @@ const TYPE_CONFIG = {
   pesquisa: {
     label:{en:'Research & analysis', pt:'Pesquisa & análise'},
     checks:[
-      {label:{en:'Raw data', pt:'Dados brutos'}, folder:{en:'data', pt:'dados'}},
+      {label:{en:'Raw data', pt:'Dados brutos'}, folder:{en:'data', pt:'dados'}, localOnly:true},
       {label:{en:'Source notes', pt:'Notas de fontes'}, folder:{en:'notes', pt:'notas'}},
-      {label:{en:'Results / outputs', pt:'Resultados / outputs'}, folder:{en:'outputs', pt:'outputs'}}
+      {label:{en:'Results / outputs', pt:'Resultados / outputs'}, folder:{en:'outputs', pt:'outputs'}, localOnly:true}
     ],
     defaults:[true,true,true],
     stackPh:{en:'e.g. Python + pandas + Jupyter · dataset in /data', pt:'Ex: Python + pandas + Jupyter · dataset em /dados'},
@@ -414,9 +416,9 @@ const TYPE_CONFIG = {
   dataml: {
     label:{en:'Data / ML pipeline', pt:'Dados / ML pipeline'},
     checks:[
-      {label:{en:'Data', pt:'Dados'}, folder:{en:'data', pt:'dados'}},
+      {label:{en:'Data', pt:'Dados'}, folder:{en:'data', pt:'dados'}, localOnly:true},
       {label:{en:'Notebooks', pt:'Notebooks'}, folder:{en:'notebooks', pt:'notebooks'}},
-      {label:{en:'Models / outputs', pt:'Modelos / outputs'}, folder:{en:'models', pt:'modelos'}}
+      {label:{en:'Models / outputs', pt:'Modelos / outputs'}, folder:{en:'models', pt:'modelos'}, localOnly:true}
     ],
     defaults:[true,true,true],
     stackPh:{en:'e.g. Python + PyTorch · data versioned outside git', pt:'Ex: Python + PyTorch · dados versionados fora do git'},
@@ -426,8 +428,8 @@ const TYPE_CONFIG = {
     label:{en:'Automation / internal script', pt:'Automação / script interno'},
     checks:[
       {label:{en:'Scripts', pt:'Scripts'}, folder:{en:'scripts', pt:'scripts'}},
-      {label:{en:'Configuration', pt:'Configuração'}, folder:{en:'config', pt:'config'}},
-      {label:{en:'Logs', pt:'Logs'}, folder:{en:'logs', pt:'logs'}}
+      {label:{en:'Configuration', pt:'Configuração'}, folder:{en:'config', pt:'config'}, localOnly:true},
+      {label:{en:'Logs', pt:'Logs'}, folder:{en:'logs', pt:'logs'}, localOnly:true}
     ],
     defaults:[true,true,false],
     stackPh:{en:'e.g. Node.js + node-cron · runs via PowerShell 7', pt:'Ex: Node.js + node-cron · roda via PowerShell 7'},
@@ -437,7 +439,7 @@ const TYPE_CONFIG = {
     label:{en:'Digital game (game dev)', pt:'Jogo digital (game dev)'},
     checks:[
       {label:{en:'Assets', pt:'Assets'}, folder:{en:'assets', pt:'assets'}},
-      {label:{en:'Builds', pt:'Builds'}, folder:{en:'builds', pt:'builds'}},
+      {label:{en:'Builds', pt:'Builds'}, folder:{en:'builds', pt:'builds'}, localOnly:true},
       {label:{en:'Code (/src)', pt:'Código (/src)'}, folder:{en:'src', pt:'src'}}
     ],
     defaults:[true,false,true],
@@ -486,17 +488,106 @@ const TYPE_CONFIG = {
       ? `# API reference — ${n}\n\n## Installation\n\n## Basic usage\n\n## Public API\n\n## Versioning\n`
       : `# Referência de API — ${n}\n\n## Instalação\n\n## Uso básico\n\n## API pública\n\n## Versionamento\n`}
   },
+  mobile: {
+    label:{en:'Mobile app (iOS/Android)', pt:'App mobile (iOS/Android)'},
+    checks:[
+      {label:{en:'Assets (icons/screenshots)', pt:'Assets (ícones/screenshots)'}, folder:{en:'assets', pt:'assets'}},
+      {label:{en:'Code (/src)', pt:'Código (/src)'}, folder:{en:'src', pt:'src'}},
+      {label:{en:'Store listing', pt:'Ficha na loja'}, folder:{en:'store', pt:'store'}}
+    ],
+    defaults:[true,true,false],
+    stackPh:{en:'e.g. React Native + Expo · TestFlight for iOS beta · target Android 8+', pt:'Ex: React Native + Expo · TestFlight pra beta iOS · Android 8+ como alvo'},
+    limitsPh:{en:"e.g. don't submit to app stores without review · keep requested permissions minimal", pt:'Ex: não submeter às lojas sem revisão · manter permissões pedidas no mínimo'},
+    extraFile:{path:{en:'store/LISTING.md', pt:'store/LISTING.md'}, build:(n,lang)=> lang==='en'
+      ? `# Store listing — ${n}\n\n## App name\n\n## Short description\n\n## Full description\n\n## Screenshots\n\n## Keywords\n\n## Privacy policy URL\n\n## Support contact\n`
+      : `# Ficha na loja — ${n}\n\n## Nome do app\n\n## Descrição curta\n\n## Descrição completa\n\n## Screenshots\n\n## Palavras-chave\n\n## URL da política de privacidade\n\n## Contato de suporte\n`}
+  },
+  extension: {
+    label:{en:'Browser extension', pt:'Extensão de navegador'},
+    checks:[
+      {label:{en:'Code (/src)', pt:'Código (/src)'}, folder:{en:'src', pt:'src'}},
+      {label:{en:'Icons & assets', pt:'Ícones & assets'}, folder:{en:'assets', pt:'assets'}},
+      {label:{en:'Store listing', pt:'Ficha na loja'}, folder:{en:'store', pt:'store'}}
+    ],
+    defaults:[true,true,false],
+    stackPh:{en:'e.g. Manifest V3 · Chrome Web Store + Firefox Add-ons · TypeScript', pt:'Ex: Manifest V3 · Chrome Web Store + Firefox Add-ons · TypeScript'},
+    limitsPh:{en:"e.g. don't request broader permissions than needed · document every permission's purpose", pt:'Ex: não pedir permissões além do necessário · documentar o motivo de cada permissão'},
+    extraFile:{path:{en:'docs/PERMISSIONS.md', pt:'docs/PERMISSIONS.md'}, build:(n,lang)=> lang==='en'
+      ? `# Permissions — ${n}\n\n## Requested permissions\n\n## Why each one is needed\n\n## Data collected\n\n## Store listing notes\n`
+      : `# Permissões — ${n}\n\n## Permissões solicitadas\n\n## Por que cada uma é necessária\n\n## Dados coletados\n\n## Notas para a ficha da loja\n`}
+  },
+  hardware: {
+    label:{en:'Hardware / IoT', pt:'Hardware / IoT'},
+    checks:[
+      {label:{en:'Firmware', pt:'Firmware'}, folder:{en:'firmware', pt:'firmware'}},
+      {label:{en:'Hardware design (schematics/CAD)', pt:'Design de hardware (esquemas/CAD)'}, folder:{en:'hardware', pt:'hardware'}},
+      {label:{en:'Docs / BOM', pt:'Docs / BOM'}, folder:{en:'docs', pt:'docs'}}
+    ],
+    defaults:[true,true,true],
+    stackPh:{en:'e.g. ESP32 + Arduino framework · KiCad for schematics · 3D-printed enclosure', pt:'Ex: ESP32 + framework Arduino · KiCad pra esquemas · case impresso em 3D'},
+    limitsPh:{en:"e.g. don't change pinout without updating the schematic · flag any part with lead time over 2 weeks", pt:'Ex: não mudar pinagem sem atualizar o esquema · avisar sobre peças com prazo de entrega acima de 2 semanas'},
+    extraFile:{path:{en:'hardware/BOM.md', pt:'hardware/BOM.md'}, build:(n,lang)=> lang==='en'
+      ? `# Bill of materials — ${n}\n\n## Components\n\n## Sourcing / suppliers\n\n## Estimated cost\n\n## Lead-time risks\n`
+      : `# Lista de materiais — ${n}\n\n## Componentes\n\n## Fornecedores\n\n## Custo estimado\n\n## Riscos de prazo de entrega\n`}
+  },
+  course: {
+    label:{en:'Course / educational content', pt:'Curso / conteúdo educacional'},
+    checks:[
+      {label:{en:'Modules / curriculum', pt:'Módulos / currículo'}, folder:{en:'modules', pt:'modules'}},
+      {label:{en:'Materials (slides, worksheets)', pt:'Materiais (slides, exercícios)'}, folder:{en:'materials', pt:'materials'}},
+      {label:{en:'Assessments', pt:'Avaliações'}, folder:{en:'assessments', pt:'assessments'}}
+    ],
+    defaults:[true,true,false],
+    stackPh:{en:'e.g. delivered via Notion + recorded video · cohort-based, 6 weeks', pt:'Ex: entregue via Notion + vídeo gravado · em turma, 6 semanas'},
+    limitsPh:{en:"e.g. don't change learning objectives without updating the syllabus · keep exercises aligned to stated objectives", pt:'Ex: não mudar objetivos de aprendizagem sem atualizar a ementa · manter exercícios alinhados aos objetivos'},
+    extraFile:{path:{en:'docs/SYLLABUS.md', pt:'docs/SYLLABUS.md'}, build:(n,lang)=> lang==='en'
+      ? `# Syllabus — ${n}\n\n## Audience\n\n## Learning objectives\n\n## Module breakdown\n\n## Assessment criteria\n\n## Prerequisites\n`
+      : `# Ementa — ${n}\n\n## Público-alvo\n\n## Objetivos de aprendizagem\n\n## Divisão em módulos\n\n## Critérios de avaliação\n\n## Pré-requisitos\n`}
+  },
+  marketing: {
+    label:{en:'Marketing campaign', pt:'Campanha de marketing'},
+    checks:[
+      {label:{en:'Creative assets', pt:'Assets criativos'}, folder:{en:'assets', pt:'assets'}},
+      {label:{en:'Copy / content', pt:'Copy / conteúdo'}, folder:{en:'copy', pt:'copy'}},
+      {label:{en:'Channel plan / calendar', pt:'Plano de canais / calendário'}, folder:{en:'calendar', pt:'calendar'}}
+    ],
+    defaults:[true,true,true],
+    stackPh:{en:'e.g. Meta Ads + Google Ads · scheduled via Buffer · landing page on Webflow', pt:'Ex: Meta Ads + Google Ads · agendado via Buffer · landing page na Webflow'},
+    limitsPh:{en:"e.g. don't publish paid ads without approval · keep messaging consistent with brand guidelines", pt:'Ex: não publicar anúncios pagos sem aprovação · manter mensagem consistente com as diretrizes de marca'},
+    extraFile:{path:{en:'docs/BRIEF.md', pt:'docs/BRIEF.md'}, build:(n,lang)=> lang==='en'
+      ? `# Campaign brief — ${n}\n\n## Objective\n\n## Target audience\n\n## Key message\n\n## Channels\n\n## Budget\n\n## Success metrics\n\n## Timeline\n`
+      : `# Brief de campanha — ${n}\n\n## Objetivo\n\n## Público-alvo\n\n## Mensagem principal\n\n## Canais\n\n## Orçamento\n\n## Métricas de sucesso\n\n## Cronograma\n`}
+  },
+  podcast: {
+    label:{en:'Podcast / video production', pt:'Podcast / produção de vídeo'},
+    checks:[
+      {label:{en:'Episodes / scripts', pt:'Episódios / roteiros'}, folder:{en:'episodes', pt:'episodes'}},
+      {label:{en:'Raw footage / audio', pt:'Material bruto (áudio/vídeo)'}, folder:{en:'raw', pt:'raw'}, localOnly:true},
+      {label:{en:'Published / distribution', pt:'Publicado / distribuição'}, folder:{en:'published', pt:'published'}}
+    ],
+    defaults:[true,true,false],
+    stackPh:{en:'e.g. recorded in Riverside.fm · edited in Descript · published via Spotify for Podcasters', pt:'Ex: gravado no Riverside.fm · editado no Descript · publicado via Spotify for Podcasters'},
+    limitsPh:{en:"e.g. don't publish an episode without a reviewed transcript · credit guests accurately", pt:'Ex: não publicar episódio sem transcrição revisada · creditar convidados corretamente'},
+    extraFile:{path:{en:'docs/SHOW-BIBLE.md', pt:'docs/SHOW-BIBLE.md'}, build:(n,lang)=> lang==='en'
+      ? `# Show bible — ${n}\n\n## Premise\n\n## Format\n\n## Target audience\n\n## Episode structure\n\n## Tone & voice guidelines\n`
+      : `# Show bible — ${n}\n\n## Premissa\n\n## Formato\n\n## Público-alvo\n\n## Estrutura dos episódios\n\n## Diretrizes de tom e voz\n`}
+  },
   generico: {
     label:{en:'Generic', pt:'Genérico'},
     checks:[
       {label:{en:'Documents', pt:'Documentos'}, folder:{en:'docs', pt:'docs'}},
       {label:{en:'Assets', pt:'Assets'}, folder:{en:'assets', pt:'assets'}},
-      {label:{en:'Results / outputs', pt:'Resultados / outputs'}, folder:{en:'outputs', pt:'outputs'}}
+      {label:{en:'Results / outputs', pt:'Resultados / outputs'}, folder:{en:'outputs', pt:'outputs'}, localOnly:true}
     ],
     defaults:[false,false,false],
     stackPh:{en:'e.g. tools and conventions used in this project', pt:'Ex: ferramentas e convenções usadas neste projeto'},
     limitsPh:{en:'e.g. what the AI should not decide on its own here', pt:'Ex: o que a IA não deve decidir sozinha aqui'},
   },
+};
+
+const GITIGNORE_BASE = {
+  en: `# OS\n.DS_Store\nThumbs.db\n\n# Editors\n.vscode/\n.idea/\n*.swp\n*.swo\n\n# Secrets & local overrides\n.env\n.env.local\n.env.*.local\n*.local.*\nCLAUDE.local.md\n\n# Logs\n*.log\n`,
+  pt: `# Sistema operacional\n.DS_Store\nThumbs.db\n\n# Editores\n.vscode/\n.idea/\n*.swp\n*.swo\n\n# Segredos e overrides locais\n.env\n.env.local\n.env.*.local\n*.local.*\nCLAUDE.local.md\n\n# Logs\n*.log\n`,
 };
 
 const els = {
@@ -578,7 +669,10 @@ function populateTypeSelect(){
 function applyTypeDefaults(){
   const cfg = TYPE_CONFIG[els.type.value];
   [els.chk1, els.chk2, els.chk3].forEach((el,i)=>{ el.checked = cfg.defaults[i]; });
-  [els.chk1label, els.chk2label, els.chk3label].forEach((el,i)=>{ el.textContent = cfg.checks[i].label[LANG]; });
+  [els.chk1label, els.chk2label, els.chk3label].forEach((el,i)=>{
+    const base = cfg.checks[i].label[LANG];
+    el.textContent = cfg.checks[i].localOnly ? `${base} ${UI[LANG].localOnlyTag}` : base;
+  });
   els.stack.placeholder = cfg.stackPh[LANG];
   els.limits.placeholder = cfg.limitsPh[LANG];
 }
@@ -589,6 +683,25 @@ function selectedFolders(){
   const out = [];
   [els.chk1, els.chk2, els.chk3].forEach((el,i)=>{ if(el.checked) out.push(cfg.checks[i].folder[LANG]); });
   return [...new Set(out)];
+}
+
+function selectedLocalOnlyFolders(){
+  const cfg = TYPE_CONFIG[els.type.value];
+  const out = [];
+  [els.chk1, els.chk2, els.chk3].forEach((el,i)=>{ if(el.checked && cfg.checks[i].localOnly) out.push(cfg.checks[i].folder[LANG]); });
+  return [...new Set(out)];
+}
+
+function buildGitignore(){
+  const localOnlyFolders = selectedLocalOnlyFolders();
+  let content = GITIGNORE_BASE[LANG];
+  if(localOnlyFolders.length){
+    content += LANG==='en'
+      ? '\n# Local-only folders (heavy or sensitive) — kept out of version control\n'
+      : '\n# Pastas locais (pesadas ou sensíveis) — fora do controle de versão\n';
+    localOnlyFolders.forEach(f=>{ content += `${f}/*\n!${f}/.gitkeep\n`; });
+  }
+  return content;
 }
 
 function buildAgentBody(d){
@@ -623,7 +736,10 @@ function buildFileMap(){
   const files = {};
 
   const folders = selectedFolders();
-  const folderList = folders.map(f=>`- \`${f}/\``).join('\n');
+  const localOnlySet = new Set(selectedLocalOnlyFolders());
+  const folderList = folders.map(f=> localOnlySet.has(f)
+    ? `- \`${f}/\` — ${LANG==='en' ? 'local only, see .gitignore' : 'só local, ver .gitignore'}`
+    : `- \`${f}/\``).join('\n');
 
   if(LANG==='en'){
     files['README.md'] = `# ${d.name}\n\nIndex of this workspace:\n- \`PROJECT.md\` — overview and goal\n- \`DECISIONS.md\` — decision history\n- \`CONTEXT.md\` — accumulated context for the AI\n- \`TASKS.md\` — active tasks\n${folderList ? '\nFolders:\n'+folderList : ''}\n\n> The AI is a tool that extends human judgment, not a substitute for it. Relevant decisions go into DECISIONS.md.\n`;
@@ -641,6 +757,7 @@ function buildFileMap(){
 
   folders.forEach(f => { files[`${f}/.gitkeep`] = ''; });
   if(cfg.extraFile){ files[cfg.extraFile.path[LANG]] = cfg.extraFile.build(d.name, LANG); }
+  files['.gitignore'] = buildGitignore();
 
   const agentBody = buildAgentBody(d);
   const wantsAgentsmd = els.agAgentsmd.checked;
