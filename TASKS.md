@@ -1,21 +1,19 @@
 # Tasks — workspace//kit
 
-## In progress
-- [ ]
-
 ## Next
 - [ ] Ask the user about the DESIGN.md, he was creating one last time by himself (Delete this task when done).
 - [ ] Review the project files for new tasks to do, there's incomplete information in some files. Create tasks with them (Delete this task when done).
 - [ ] Add option for user to enable Git files in the generation (asking if the folder will be a git repo). If the user doesn't mark it, files and instructions on files won't include nothing about git. We also need to plan and implement specific git instructions in the files (AGENT.md) so the agents using it know how to work in git, collaborate with worktree, commit, create PRs, etc.
-- [ ] Replace the PT/EN text buttons in `src/workspace-kit.html` with flag icons for the language selector
 - [ ] Review starter-prompt wording per language: the English prompt needs no extra instruction; Portuguese (and any other non-English language) should add a line distinguishing chat language (matches the selector) from documentation language (stays English by default) — the AI should not default to writing docs in the chat language unless the user explicitly asks. Consider adding a form option to opt into native-language docs.
-- [ ] Fix desktop layout bug in `src/workspace-kit.html`: the two-column `.grid`/`.col` layout breaks on wide viewports (card 5 renders beside card 1, card 2 renders below card 1 instead of stacking under card 1 in its own column) — needs investigation before a fix; structural change, review before applying per CLAUDE.md
 - [ ] CLI init: command-line version of the generator, to run before opening the AI agent (today only the web form/artifact exists)
 - [ ] Project onboarding in the generated instructions: guide the user to fill in PROJECT/DECISIONS/CONTEXT/TASKS, plan and explore the project in the first conversation with the agent
 - [ ] Recurring task suggestions in the generated files, adapted to the folder structure and chosen project type
 - [ ] Wording in the generated texts that nudges the agent to suggest organizational improvements non-destructively — solve the "first-run instruction" problem (should fire once, at project start) ending up permanently in CLAUDE.md/AGENTS.md and repeating in every future conversation
+- [ ] Add "I'm a visual person" checkbox to the form: when checked, append instructions to the generated files (CLAUDE.md/AGENTS.md and per-tool variants) nudging the agent to favor visual representations — diagrams, mockups, charts, visualizations — over text-only answers when the task allows it
 
 ## Done
+- [x] v3 visual redesign promoted to `src/workspace-kit.html`, archived previous version at `src/workspace-kit-v2-archive.html`, removed redundant preview file, and pushed everything to GitHub (atempel/workspace-kit) — new Figma-referenced interface (dark glass-card UI, centered pill nav, sticky workspace-preview sidebar, outlined-wordmark logo, SVG flag language selector) with full v2 functional parity, fixed across 3 review rounds (cropped logo, emoji flags, header/spacing, low text contrast, agent-card overflow + uniform sizing, unnecessary preview-panel scroll) (2026-07-10)
+- [x] README made bilingual (English + Portuguese), updated for the v3 visual identity, and a GitHub Release cut for v3 (2026-07-10)
 - [x] v1: working form + .zip generation (PROJECT/DECISIONS/CONTEXT/TASKS + per-type folders)
 - [x] v2: multi-agent layer (CLAUDE.md/AGENTS.md/Cursor/Copilot/Gemini CLI/Windsurf/Skill), 11 project types, logo
 - [x] Continuity workspace generated for use in Cowork

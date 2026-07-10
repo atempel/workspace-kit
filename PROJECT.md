@@ -17,7 +17,7 @@ Digital product / App (internal tool, standalone artifact)
 Plain HTML + CSS + JS, single-file. JSZip 3.10.1 via cdnjs for in-browser .zip generation. Fonts via Google Fonts (JetBrains Mono + Inter). No build step, no backend.
 
 ## Status
-🟢 v2 functional, live on GitHub — repository in English, PT/EN selector shipped in the artifact, 17 project types, and auto-generated `.gitignore` (local-only folders per project type).
+🟢 v3 live on GitHub — new Figma-referenced visual identity (dark glass-card UI, outlined-wordmark logo, SVG flag language selector) promoted to `src/workspace-kit.html` and pushed on 2026-07-10, full functional parity with v2 (17 project types, PT/EN selector, auto-generated `.gitignore`). Previous version preserved at `src/workspace-kit-v2-archive.html`. README is now bilingual (English + Portuguese).
 
 ---
 Workspace generated to give continuity to the project in Cowork.

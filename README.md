@@ -1,8 +1,9 @@
+<p align="right"><sub>🇺🇸 English (this page) · <a href="README.pt-BR.md">🇧🇷 Português</a></sub></p>
+
 <p align="center">
-  <img src="assets/logo.svg" width="96" height="96" alt="workspace//kit" />
+  <img src="assets/logo.svg" width="320" alt="workspace//kit" />
 </p>
 
-<h1 align="center">workspace//kit</h1>
 <p align="center"><i>multi-agent workspace generator</i></p>
 
 Describe a project and generate, in one shot, the human context layer (`PROJECT.md`, `DECISIONS.md`, `CONTEXT.md`, `TASKS.md`) and the AI instruction layer (`CLAUDE.md`, `AGENTS.md`, Cursor, Copilot, Gemini CLI, Windsurf, Skills) — all packaged into a `.zip`, with a ready-to-paste starter prompt.
@@ -30,7 +31,11 @@ No build step, no backend — it's a single HTML/CSS/JS file, 100% client-side.
 
 **`.gitignore`** is generated automatically for every workspace, combining universal patterns (OS/editor cruft, `.env*`, logs) with per-type "local only" folders (e.g. raw data, models, build outputs) that stay on your machine instead of getting committed.
 
-**Language** — the artifact has a PT/EN selector covering UI text, generated file content, and generated folder names (defaults to English).
+**Language** — both the generator itself and its generated output support English and Portuguese so far, covering UI text, generated file content, and generated folder names (defaults to English).
+
+## Interface
+
+v3 reworked the generator's UI around a Figma reference: a dark glass-card layout with a centered pill navigation bar, a sticky live workspace-preview sidebar, an outlined-wordmark logo, and real flag icons for the language switcher. It keeps 100% of the generator's original functionality — nothing about how projects are generated changed, only how the tool looks and feels to use. The previous interface is preserved at `src/workspace-kit-v2-archive.html` for reference.
 
 ## Stack
 
@@ -40,11 +45,12 @@ Plain HTML + CSS + JS, single-file. [JSZip](https://stuk.github.io/jszip/) via c
 
 ```
 workspace-kit/
-├── src/workspace-kit.html      # the artifact (functional, standalone)
-├── docs/PRD.md                 # problem, scope, metrics
-├── research/                   # research on CLAUDE.md/AGENTS.md/Cursor/etc.
+├── src/workspace-kit.html            # the artifact (functional, standalone)
+├── src/workspace-kit-v2-archive.html # previous interface, kept for reference
+├── docs/PRD.md                       # problem, scope, metrics
+├── research/                         # research on CLAUDE.md/AGENTS.md/Cursor/etc.
 ├── PROJECT.md · DECISIONS.md · CONTEXT.md · TASKS.md
-└── CLAUDE.md · AGENTS.md       # AI agent instructions for this repo itself
+└── CLAUDE.md · AGENTS.md             # AI agent instructions for this repo itself
 ```
 
 ## Roadmap
@@ -58,3 +64,7 @@ This repository's own context layer (`PROJECT.md`, `DECISIONS.md`, `CONTEXT.md`,
 ## License
 
 [MIT](LICENSE)
+
+---
+
+<p align="center"><sub>Made with ❤️ in Brazil 🇧🇷</sub></p>
