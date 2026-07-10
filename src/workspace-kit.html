@@ -3,8 +3,1287 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>workspace//kit — preview v3</title>
+<title>workspace//kit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-PLACEHOLDER
+<style>
+  :root{
+    --bg:#131315;
+    --panel:rgba(28,27,29,0.7);
+    --panel-strong:rgba(28,27,29,0.55);
+    --panel-solid:#1c1b1d;
+    --card-border:rgba(255,255,255,0.06);
+    --hairline:rgba(69,70,82,0.3);
+    --input-border:#454652;
+    --input-bg:#0e0e10;
+    --text:#e5e1e4;
+    --text-dim:#c6c5d5;
+    --text-mute:#9aa0ab;
+    --accent:#dba74e;
+    --accent-ink:#0e0e10;
+    --accent2:#5fa8a0;
+    --danger:#d4694c;
+  }
+  *{box-sizing:border-box;}
+  html{background:var(--bg);}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    border-top:6px solid var(--accent);
+    position:relative;
+  }
+  body::before{
+    content:'';
+    position:fixed;
+    top:-10%;left:50%;
+    width:900px;height:700px;
+    transform:translateX(-50%);
+    background:radial-gradient(closest-side, rgba(255,255,255,0.035), rgba(255,255,255,0) 70%);
+    pointer-events:none;
+    z-index:0;
+  }
+  .container{max-width:1152px;margin:0 auto;padding:0 24px;position:relative;z-index:1;}
+
+  a{color:inherit;}
+
+  /* ---------- header ---------- */
+  header.site-header{border-bottom:1px solid var(--hairline);position:relative;z-index:1;}
+  .header-inner{
+    display:flex;flex-direction:column;align-items:center;gap:20px;
+    padding:36px 24px 26px;
+  }
+  .logo-mark{display:flex;align-items:center;}
+  .logo-mark svg{display:block;height:32px;width:auto;overflow:visible;}
+
+  .pill-nav{
+    display:flex;flex-wrap:wrap;justify-content:center;gap:26px;
+    padding:13px 26px;
+    border-radius:9999px;
+    border:1px solid var(--hairline);
+    background:var(--panel-strong);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+  }
+  .pill-link{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--text-dim);
+    background:none;border:none;cursor:default;
+    white-space:nowrap;
+    line-height:1;
+  }
+  .pill-link svg{width:12px;height:12px;flex:none;}
+  .pill-link.active{color:var(--accent);}
+
+  .lang-row{
+    display:flex;justify-content:center;align-items:center;gap:9px;
+    padding:7px 10px;
+    border:1px solid var(--hairline);
+    border-radius:9999px;
+    background:var(--panel-strong);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    width:fit-content;
+  }
+  .flag-btn{
+    width:27px;height:19px;
+    display:flex;align-items:center;justify-content:center;
+    padding:0;
+    border-radius:4px;
+    border:1.5px solid transparent;
+    background:transparent;
+    cursor:pointer;
+    opacity:.5;
+    overflow:hidden;
+    transition:opacity .15s ease, border-color .15s ease;
+  }
+  .flag-btn svg{width:100%;height:100%;display:block;}
+  .flag-btn:hover{opacity:.8;}
+  .flag-btn.active{opacity:1;border-color:var(--accent);}
+
+  /* ---------- hero ---------- */
+  .hero{padding:48px 24px 44px;text-align:center;}
+  .hero h1{
+    font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1.3;
+    margin:0 0 20px;color:var(--text);
+  }
+  .hero .hero-tag{
+    font-size:17px;font-weight:600;color:var(--text-dim);
+    max-width:640px;margin:0 auto 12px;line-height:1.55;
+  }
+  .hero .hero-desc{
+    font-size:15px;font-weight:500;
+    max-width:720px;margin:0 auto;line-height:1.6;
+    color:var(--text-mute);
+  }
+
+  /* ---------- layout ---------- */
+  main{padding:0 24px 84px;}
+  .layout-grid{
+    max-width:1152px;margin:0 auto;
+    display:grid;grid-template-columns:2fr 1fr;gap:24px;align-items:start;
+  }
+  @media (max-width: 880px){
+    .layout-grid{grid-template-columns:1fr;}
+    .sticky-card{position:static !important;}
+  }
+
+  .col-main{display:flex;flex-direction:column;gap:24px;min-width:0;}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--card-border);
+    border-radius:12px;
+    padding:28px;
+    box-shadow:0 8px 32px rgba(0,0,0,.37);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    display:flex;flex-direction:column;gap:24px;
+  }
+  .card-head-group{display:flex;flex-direction:column;gap:8px;}
+  .card-head{display:flex;align-items:center;gap:12px;}
+  .card-head .icon-wrap{
+    width:26px;height:26px;flex:none;color:var(--accent);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .card-head .icon-wrap svg{width:100%;height:100%;}
+  .card h2{font-size:20px;font-weight:800;letter-spacing:-.01em;margin:0;color:var(--text);}
+  .card .subhint{font-size:12.5px;color:var(--text-mute);line-height:1.55;margin:0;padding-left:38px;}
+
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  .field{display:flex;flex-direction:column;gap:8px;}
+
+  label.field-label, .field-label{
+    font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--text-dim);
+  }
+
+  input[type=text], textarea, select{
+    width:100%;
+    background:var(--input-bg);
+    border:1px solid var(--input-border);
+    border-radius:8px;
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    padding:12px 14px;
+    resize:vertical;
+  }
+  input::placeholder, textarea::placeholder{color:var(--text-mute);}
+  textarea{min-height:60px;line-height:1.5;}
+  #pdesc{min-height:88px;}
+  #pstack, #plimits{font-family:'JetBrains Mono',monospace;font-size:12.5px;min-height:76px;}
+  input:focus, textarea:focus, select:focus{outline:2px solid var(--accent);outline-offset:1px;}
+
+  select{
+    appearance:none;-webkit-appearance:none;-moz-appearance:none;
+    padding-right:38px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23c6c5d5' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 14px center;
+  }
+
+  .checks{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
+  .check-row{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;color:var(--text);}
+  .check-row input{width:auto;accent-color:var(--accent);margin-top:3px;flex:none;}
+  .check-row .desc{display:block;font-size:11.5px;color:var(--text-mute);margin-top:1px;}
+
+  /* agent config cards */
+  .agent-grid{
+    display:grid;grid-template-columns:repeat(auto-fit, minmax(160px,1fr));
+    gap:12px;
+  }
+  .agent-card{
+    position:relative;
+    display:flex;flex-direction:column;gap:7px;
+    padding:16px;
+    min-width:0;
+    min-height:108px;
+    border:1px solid var(--input-border);
+    border-radius:8px;
+    background:rgba(255,255,255,0.015);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .agent-card:hover{border-color:var(--text-dim);}
+  .agent-card.selected{
+    border-color:var(--accent);
+    background:rgba(219,167,78,0.08);
+    box-shadow:inset 0 0 0 1px rgba(219,167,78,0.35);
+  }
+  .agent-card input{position:absolute;opacity:0;width:0;height:0;pointer-events:none;}
+  .agent-card-name{
+    font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+    letter-spacing:.05em;color:var(--text);
+    overflow-wrap:break-word;word-break:break-word;
+  }
+  .agent-card.selected .agent-card-name{color:var(--accent);}
+  .agent-card-desc{
+    font-size:10.5px;color:var(--text-mute);line-height:1.45;
+    overflow-wrap:break-word;word-break:break-word;
+  }
+
+  .info-box{
+    background:var(--input-bg);
+    border:1px solid var(--hairline);
+    border-left:3px solid var(--accent2);
+    border-radius:8px;
+    padding:14px 16px;
+    font-size:12.5px;
+    color:var(--text-mute);
+    line-height:1.6;
+  }
+  .info-box b{color:var(--text);}
+
+  /* sticky preview sidebar */
+  .sticky-card{position:sticky;top:24px;padding:0;gap:0;overflow:hidden;display:flex;flex-direction:column;}
+  .preview-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 22px;
+    background:#232225;
+    border-bottom:1px solid var(--hairline);
+  }
+  .preview-head .left{display:flex;align-items:center;gap:9px;}
+  .preview-head .icon-wrap{width:15px;height:15px;color:var(--accent);}
+  .preview-head .icon-wrap svg{width:100%;height:100%;}
+  .preview-head h2{font-size:13.5px;font-weight:700;margin:0;color:var(--text);}
+  .traffic-dots{display:flex;gap:6px;}
+  .traffic-dots span{width:9px;height:9px;border-radius:50%;display:block;}
+  .traffic-dots span:nth-child(1){background:rgba(255,180,171,.35);}
+  .traffic-dots span:nth-child(2){background:rgba(0,210,255,.3);}
+  .traffic-dots span:nth-child(3){background:rgba(94,106,210,.35);}
+
+  .preview-body{
+    background:rgba(14,14,16,0.35);
+    padding:22px;
+    flex:1 1 auto;
+    display:flex;flex-direction:column;gap:20px;
+  }
+
+  pre#tree{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    line-height:1.7;
+    margin:0;
+    white-space:pre;
+    color:var(--text-mute);
+  }
+  pre#tree .folder{color:var(--accent);}
+  pre#tree .file{color:var(--accent2);}
+  pre#tree .root{color:var(--text);font-weight:700;}
+
+  .prompt-block{border-top:1px solid var(--hairline);padding-top:18px;}
+  .prompt-label-row{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:10px;
+  }
+  .prompt-label-row .field-label{font-size:10.5px;}
+  #btnCopy{
+    background:none;border:none;color:var(--accent);
+    font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    cursor:pointer;padding:0;
+  }
+  #btnCopy:hover{opacity:.8;}
+
+  textarea#promptOut{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    min-height:160px;
+    line-height:1.55;
+    color:var(--text-dim);
+    background:rgba(0,0,0,0.5);
+    border-color:var(--hairline);
+  }
+  .hint{font-size:11.5px;color:var(--text-mute);margin-top:9px;line-height:1.55;}
+
+  .preview-footer{
+    border-top:1px solid var(--hairline);
+    background:rgba(14,14,16,0.5);
+    padding:18px 22px 22px;
+  }
+  .btn-block{width:100%;}
+  button{
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    font-weight:800;
+    border-radius:10px;
+    padding:13px 18px;
+    border:1px solid transparent;
+    cursor:pointer;
+    transition:opacity .15s ease, transform .1s ease;
+  }
+  button:hover{opacity:.9;}
+  button:active{transform:translateY(1px);}
+  button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .btn-primary{
+    background:var(--accent);color:var(--accent-ink);
+    box-shadow:0 20px 25px -5px rgba(154,154,154,.2), 0 8px 10px -6px rgba(126,126,126,.2);
+  }
+  .status{font-size:11.5px;color:var(--accent2);margin-top:10px;min-height:16px;text-align:center;}
+
+  /* ---------- footer ---------- */
+  footer.site-footer{
+    border-top:1px solid var(--hairline);
+    background:rgba(19,19,21,0.5);
+    position:relative;z-index:1;
+  }
+  .footer-inner{
+    max-width:1152px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;
+    padding:34px 24px;
+  }
+  .footer-inner .brand-line{
+    font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--text-dim);
+  }
+  .footer-links{display:flex;gap:26px;}
+  .footer-links a{
+    font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--text-dim);text-decoration:none;
+  }
+  .footer-links a:hover{color:var(--accent);}
+
+  .badge-note{
+    max-width:1152px;margin:0 auto;padding:14px 24px 0;
+    font-size:11.5px;color:var(--text-mute);text-align:center;
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="icon-blueprint" viewBox="0 0 20 20"><path d="M3 17V3h11l3 3v11H3z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M14 3v3h3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6.5 10.5h7M6.5 13.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+    <symbol id="icon-gear" viewBox="0 0 20 20"><circle cx="10" cy="10" r="3.1" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10 2.3v2.1M10 15.6v2.1M17.7 10h-2.1M4.4 10H2.3M15.3 4.7l-1.5 1.5M6.2 13.8l-1.5 1.5M15.3 15.3l-1.5-1.5M6.2 6.2 4.7 4.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+    <symbol id="icon-bot" viewBox="0 0 20 20"><rect x="3.5" y="7" width="13" height="9.5" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10 7V3.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="10" cy="2.6" r="1" fill="currentColor"/><circle cx="7.4" cy="11.6" r="1.15" fill="currentColor"/><circle cx="12.6" cy="11.6" r="1.15" fill="currentColor"/><path d="M7 14.7h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+    <symbol id="icon-folder" viewBox="0 0 20 20"><path d="M2.5 5.5c0-.83.67-1.5 1.5-1.5h3.4l1.6 1.8H16c.83 0 1.5.67 1.5 1.5v7.2c0 .83-.67 1.5-1.5 1.5H4c-.83 0-1.5-.67-1.5-1.5V5.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-bolt" viewBox="0 0 20 20"><path d="M11 2 4 12h5l-1 6 7-10h-5l1-6z" fill="currentColor"/></symbol>
+    <symbol id="icon-doc" viewBox="0 0 20 20"><path d="M5 2.5h7l3 3v12H5v-15z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M7.3 9.5h5.4M7.3 12.5h5.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10 6v4.3l3 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="flag-us" viewBox="0 0 20 14">
+      <rect width="20" height="14" fill="#B22234"/>
+      <g fill="#fff">
+        <rect y="1.08" width="20" height="1.08"/>
+        <rect y="3.23" width="20" height="1.08"/>
+        <rect y="5.38" width="20" height="1.08"/>
+        <rect y="7.54" width="20" height="1.08"/>
+        <rect y="9.69" width="20" height="1.08"/>
+        <rect y="11.85" width="20" height="1.08"/>
+      </g>
+      <rect width="8.4" height="7.54" fill="#3C3B6E"/>
+    </symbol>
+    <symbol id="flag-br" viewBox="0 0 20 14">
+      <rect width="20" height="14" fill="#009739"/>
+      <polygon points="10,1.4 18.6,7 10,12.6 1.4,7" fill="#FEDD00"/>
+      <circle cx="10" cy="7" r="3.1" fill="#002776"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo-mark">
+      <svg viewBox="0 0 358 42" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="workspace//kit">
+        <g id="Logo">
+          <g id="workspace//kit">
+            <path d="M51.6 33.2L48.4 11.2H53.2L54.8 23.2C54.9333 24.08 55.04 25.08 55.12 26.2C55.2267 27.32 55.3067 28.24 55.36 28.96C55.44 28.24 55.5467 27.3333 55.68 26.24C55.84 25.12 55.9867 24.1067 56.12 23.2L57.96 11.2H62.12L63.88 23.2C64.0133 24.1067 64.1467 25.12 64.28 26.24C64.44 27.36 64.56 28.28 64.64 29C64.6933 28.2533 64.7733 27.32 64.88 26.2C65.0133 25.0533 65.1333 24.0533 65.24 23.2L66.92 11.2H71.6L68.36 33.2H62.36L60.72 20.8C60.6133 20.0533 60.4933 19.16 60.36 18.12C60.2267 17.08 60.12 16.2133 60.04 15.52C59.9333 16.2133 59.8133 17.08 59.68 18.12C59.5467 19.16 59.4267 20.0533 59.32 20.8L57.64 33.2H51.6ZM81.9844 33.6C80.0377 33.6 78.3444 33.24 76.9044 32.52C75.4644 31.7733 74.3444 30.7467 73.5444 29.44C72.771 28.1067 72.3844 26.56 72.3844 24.8V19.6C72.3844 17.84 72.771 16.3067 73.5444 15C74.3444 13.6667 75.4644 12.64 76.9044 11.92C78.3444 11.1733 80.0377 10.8 81.9844 10.8C83.9577 10.8 85.651 11.1733 87.0644 11.92C88.5044 12.64 89.611 13.6667 90.3844 15C91.1844 16.3067 91.5844 17.84 91.5844 19.6V24.8C91.5844 26.56 91.1844 28.1067 90.3844 29.44C89.611 30.7467 88.5044 31.7733 87.0644 32.52C85.651 33.24 83.9577 33.6 81.9844 33.6ZM81.9844 28.4C83.1577 28.4 84.051 28.0933 84.6644 27.48C85.2777 26.84 85.5844 25.9467 85.5844 24.8V19.6C85.5844 18.4267 85.2777 17.5333 84.6644 16.92C84.051 16.3067 83.1577 16 81.9844 16C80.8377 16 79.9444 16.3067 79.3044 16.92C78.691 17.5333 78.3844 18.4267 78.3844 19.6V24.8C78.3844 25.9467 78.691 26.84 79.3044 27.48C79.9444 28.0933 80.8377 28.4 81.9844 28.4ZM95.2488 33.2V11.2H100.849V15.4H102.369L100.649 17.96C100.649 15.5867 101.195 13.8 102.289 12.6C103.382 11.4 104.982 10.8 107.089 10.8C109.515 10.8 111.395 11.5333 112.729 13C114.089 14.4667 114.769 16.5333 114.769 19.2V21H108.369V19.6C108.369 18.4 108.035 17.4667 107.369 16.8C106.729 16.1333 105.862 15.8 104.769 15.8C103.622 15.8 102.742 16.1333 102.129 16.8C101.542 17.4667 101.249 18.4 101.249 19.6V33.2H95.2488ZM116.713 33.2V4H122.713V19.52H125.673L130.273 11.2H136.953L130.833 21.96L137.073 33.2H130.273L125.633 24.56H122.713V33.2H116.713ZM147.018 33.6C145.204 33.6 143.618 33.32 142.258 32.76C140.898 32.1733 139.831 31.3733 139.058 30.36C138.311 29.3467 137.938 28.16 137.938 26.8H143.938C143.938 27.44 144.218 27.96 144.778 28.36C145.364 28.7333 146.111 28.92 147.018 28.92H148.778C149.871 28.92 150.698 28.72 151.258 28.32C151.844 27.92 152.138 27.36 152.138 26.64C152.138 25.9733 151.884 25.4667 151.378 25.12C150.871 24.7467 150.084 24.4933 149.018 24.36L146.458 24.04C143.711 23.6933 141.711 23.0267 140.458 22.04C139.204 21.0533 138.577 19.5467 138.577 17.52C138.577 15.3867 139.311 13.7333 140.778 12.56C142.244 11.3867 144.391 10.8 147.218 10.8H148.738C151.431 10.8 153.578 11.3867 155.178 12.56C156.778 13.7333 157.578 15.3067 157.578 17.28H151.578C151.578 16.7467 151.311 16.32 150.778 16C150.271 15.6533 149.591 15.48 148.738 15.48H147.218C146.231 15.48 145.511 15.6533 145.058 16C144.604 16.32 144.378 16.8133 144.378 17.48C144.378 18.0933 144.578 18.56 144.978 18.88C145.404 19.2 146.071 19.4267 146.978 19.56L149.738 19.92C152.511 20.2667 154.564 20.96 155.898 22C157.258 23.04 157.938 24.5867 157.938 26.64C157.938 28.88 157.164 30.6 155.618 31.8C154.071 33 151.791 33.6 148.778 33.6H147.018ZM160.562 40.4V11.2H166.362V15.4H167.762L166.362 16.8C166.362 14.9067 166.882 13.44 167.922 12.4C168.962 11.3333 170.389 10.8 172.202 10.8C174.415 10.8 176.189 11.5867 177.522 13.16C178.855 14.7067 179.522 16.7867 179.522 19.4V25C179.522 26.7333 179.215 28.2533 178.602 29.56C178.015 30.84 177.175 31.84 176.082 32.56C174.989 33.2533 173.695 33.6 172.202 33.6C170.389 33.6 168.962 33.08 167.922 32.04C166.882 30.9733 166.362 29.4933 166.362 27.6L167.762 29H166.362L166.562 34.4V40.4H160.562ZM170.042 28.4C171.162 28.4 172.015 28.0933 172.602 27.48C173.215 26.84 173.522 25.9467 173.522 24.8V19.6C173.522 18.4267 173.215 17.5333 172.602 16.92C172.015 16.3067 171.162 16 170.042 16C168.949 16 168.095 16.32 167.482 16.96C166.869 17.5733 166.562 18.4533 166.562 19.6V24.8C166.562 25.9467 166.869 26.84 167.482 27.48C168.095 28.0933 168.949 28.4 170.042 28.4ZM189.066 33.6C186.853 33.6 185.093 33 183.786 31.8C182.506 30.6 181.866 28.9733 181.866 26.92C181.866 24.7067 182.626 23.0133 184.146 21.84C185.693 20.64 187.906 20.04 190.786 20.04H195.346V18.4C195.346 17.5467 195.04 16.8667 194.426 16.36C193.84 15.8533 193.04 15.6 192.026 15.6C191.093 15.6 190.32 15.8133 189.706 16.24C189.093 16.6667 188.72 17.2533 188.586 18H182.786C183.026 15.7867 183.986 14.04 185.666 12.76C187.373 11.4533 189.56 10.8 192.226 10.8C195.026 10.8 197.24 11.4933 198.866 12.88C200.52 14.24 201.346 16.08 201.346 18.4V33.2H195.546V29.6H194.586L195.586 28.2C195.586 29.8533 194.986 31.1733 193.786 32.16C192.613 33.12 191.04 33.6 189.066 33.6ZM191.306 29.2C192.48 29.2 193.44 28.8933 194.186 28.28C194.96 27.64 195.346 26.8133 195.346 25.8V23.44H190.906C190 23.44 189.266 23.7067 188.706 24.24C188.146 24.7467 187.866 25.4267 187.866 26.28C187.866 27.1867 188.173 27.9067 188.786 28.44C189.4 28.9467 190.24 29.2 191.306 29.2ZM214.011 33.6C212.064 33.6 210.357 33.24 208.891 32.52C207.424 31.7733 206.291 30.7467 205.491 29.44C204.691 28.1067 204.291 26.56 204.291 24.8V19.6C204.291 17.8133 204.691 16.2667 205.491 14.96C206.291 13.6533 207.424 12.64 208.891 11.92C210.357 11.1733 212.064 10.8 214.011 10.8C216.917 10.8 219.237 11.5333 220.971 13C222.704 14.4667 223.624 16.4667 223.731 19H217.731C217.651 18.0667 217.277 17.3333 216.611 16.8C215.971 16.2667 215.104 16 214.011 16C212.811 16 211.891 16.3067 211.251 16.92C210.611 17.5333 210.291 18.4267 210.291 19.6V24.8C210.291 25.9467 210.611 26.84 211.251 27.48C211.891 28.0933 212.811 28.4 214.011 28.4C215.104 28.4 215.971 28.1467 216.611 27.64C217.277 27.1067 217.651 26.36 217.731 25.4H223.731C223.624 27.9333 222.704 29.9333 220.971 31.4C219.237 32.8667 216.917 33.6 214.011 33.6ZM235.915 33.6C233.968 33.6 232.262 33.24 230.795 32.52C229.355 31.7733 228.235 30.7467 227.435 29.44C226.662 28.1067 226.275 26.56 226.275 24.8V19.6C226.275 17.84 226.662 16.3067 227.435 15C228.235 13.6667 229.355 12.64 230.795 11.92C232.262 11.1733 233.968 10.8 235.915 10.8C237.862 10.8 239.542 11.1733 240.955 11.92C242.395 12.64 243.502 13.6667 244.275 15C245.075 16.3067 245.475 17.84 245.475 19.6V23.6H231.995V24.8C231.995 26.1867 232.328 27.24 232.995 27.96C233.662 28.6533 234.662 29 235.995 29C236.928 29 237.675 28.84 238.235 28.52C238.822 28.2 239.208 27.76 239.395 27.2H245.275C244.795 29.12 243.702 30.6667 241.995 31.84C240.315 33.0133 238.288 33.6 235.915 33.6ZM239.755 20.52V19.52C239.755 18.16 239.435 17.12 238.795 16.4C238.182 15.68 237.222 15.32 235.915 15.32C234.608 15.32 233.622 15.6933 232.955 16.44C232.315 17.1867 231.995 18.24 231.995 19.6V20.2L240.155 20.12L239.755 20.52ZM292.588 33.2V4H298.588V19.52H301.548L306.148 11.2H312.828L306.708 21.96L312.948 33.2H306.148L301.508 24.56H298.588V33.2H292.588ZM314.613 33.2V27.76H322.213V16.6H315.613V11.2H327.813V27.76H334.213V33.2H314.613ZM324.613 7.72C323.519 7.72 322.639 7.44 321.973 6.87999C321.333 6.32 321.013 5.56 321.013 4.6C321.013 3.64 321.333 2.88 321.973 2.32C322.639 1.76 323.519 1.48 324.613 1.48C325.706 1.48 326.573 1.76 327.213 2.32C327.879 2.88 328.213 3.64 328.213 4.6C328.213 5.56 327.879 6.32 327.213 6.87999C326.573 7.44 325.706 7.72 324.613 7.72ZM348.197 33.2C345.957 33.2 344.197 32.56 342.917 31.28C341.637 30 340.997 28.24 340.997 26V16.6H335.197V11.2H340.997V5H346.997V11.2H355.197V16.6H346.997V26C346.997 27.2 347.597 27.8 348.797 27.8H354.797V33.2H348.197Z" fill="#E5E1E4"/>
+            <path d="M266.844 37.6L280.644 -4.76837e-06H286.844L273.044 37.6H266.844ZM248.844 37.6L262.644 -4.76837e-06H268.844L255.044 37.6H248.844Z" fill="#DBA74E"/>
+          </g>
+          <g id="logo 1">
+            <g id="Frame">
+              <path d="M30.425 1.8H15.925C13.923 1.8 12.3 3.42297 12.3 5.425V25.725C12.3 27.727 13.923 29.35 15.925 29.35H30.425C32.427 29.35 34.05 27.727 34.05 25.725V5.425C34.05 3.42297 32.427 1.8 30.425 1.8Z" fill="#161922" stroke="#2A2E3A" stroke-width="1.8"/>
+              <path d="M25.35 5.425H10.85C8.84797 5.425 7.225 7.04797 7.225 9.05V29.35C7.225 31.352 8.84797 32.975 10.85 32.975H25.35C27.352 32.975 28.975 31.352 28.975 29.35V9.05C28.975 7.04797 27.352 5.425 25.35 5.425Z" fill="#161922" stroke="#5FA8A0" stroke-width="1.8"/>
+              <path d="M20.275 9.05H5.775C3.77297 9.05 2.15 10.673 2.15 12.675V32.975C2.15 34.977 3.77297 36.6 5.775 36.6H20.275C22.277 36.6 23.9 34.977 23.9 32.975V12.675C23.9 10.673 22.277 9.05 20.275 9.05Z" fill="#1C2029" stroke="#D4A24C" stroke-width="2.4"/>
+              <path d="M8.2282 24.9358V23.4178L12.0562 21.649C12.2322 21.5698 12.4038 21.5038 12.571 21.451C12.747 21.3894 12.8834 21.3498 12.9802 21.3322C12.8834 21.3146 12.747 21.2838 12.571 21.2398C12.395 21.187 12.2234 21.121 12.0562 21.0418L8.2282 19.2598V17.7154L14.1418 20.5006V22.1506L8.2282 24.9358Z" fill="#D4A24C"/>
+              <path d="M17.23 25H7.37C6.88951 25 6.5 25.3895 6.5 25.87C6.5 26.3505 6.88951 26.74 7.37 26.74H17.23C17.7105 26.74 18.1 26.3505 18.1 25.87C18.1 25.3895 17.7105 25 17.23 25Z" fill="#8B8F9C"/>
+              <path d="M12.88 28.625H7.37C6.88951 28.625 6.5 29.0145 6.5 29.495C6.5 29.9755 6.88951 30.365 7.37 30.365H12.88C13.3605 30.365 13.75 29.9755 13.75 29.495C13.75 29.0145 13.3605 28.625 12.88 28.625Z" fill="#8B8F9C"/>
+              <path d="M18.825 28.625H15.925C15.5246 28.625 15.2 28.9496 15.2 29.35V29.64C15.2 30.0404 15.5246 30.365 15.925 30.365H18.825C19.2254 30.365 19.55 30.0404 19.55 29.64V29.35C19.55 28.9496 19.2254 28.625 18.825 28.625Z" fill="#D4A24C">
+                <animate attributeName="opacity" values="1;1;0;0;1" keyTimes="0;0.45;0.5;0.95;1" dur="1.1s" repeatCount="indefinite"/>
+              </path>
+            </g>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <nav class="pill-nav">
+      <span class="pill-link active"><svg><use href="#icon-bolt"/></svg><span id="navGenerator"></span></span>
+      <span class="pill-link"><svg><use href="#icon-doc"/></svg><span id="navTemplates"></span></span>
+      <span class="pill-link"><svg><use href="#icon-clock"/></svg><span id="navHistory"></span></span>
+      <span class="pill-link"><svg><use href="#icon-gear"/></svg><span id="navSettings"></span></span>
+    </nav>
+
+    <div class="lang-row">
+      <button type="button" class="flag-btn" id="langEn" title="English"><svg aria-hidden="true"><use href="#flag-us"/></svg></button>
+      <button type="button" class="flag-btn" id="langPt" title="Português"><svg aria-hidden="true"><use href="#flag-br"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <h1 id="headerH1"></h1>
+    <p class="hero-tag" id="heroTag"></p>
+    <p class="hero-desc" id="headerP"></p>
+  </div>
+
+  <div class="layout-grid">
+    <div class="col-main">
+
+      <section class="card">
+        <div class="card-head">
+          <span class="icon-wrap"><svg><use href="#icon-blueprint"/></svg></span>
+          <h2 id="card01Title"></h2>
+        </div>
+
+        <div class="field full">
+          <label class="field-label" for="pname" id="pnameLabel"></label>
+          <input type="text" id="pname">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label" for="ptype" id="ptypeLabel"></label>
+            <select id="ptype"></select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="pobj" id="pobjLabel"></label>
+            <input type="text" id="pobj">
+          </div>
+        </div>
+
+        <div class="field full">
+          <label class="field-label" for="pdesc" id="pdescLabel"></label>
+          <textarea id="pdesc"></textarea>
+        </div>
+
+        <div class="field full">
+          <label class="field-label" id="checksTitle" for="chk1"></label>
+          <div class="checks" id="typeChecks">
+            <div class="check-row"><input type="checkbox" id="chk1"><label id="chk1label" for="chk1" style="margin:0"></label></div>
+            <div class="check-row"><input type="checkbox" id="chk2"><label id="chk2label" for="chk2" style="margin:0"></label></div>
+            <div class="check-row"><input type="checkbox" id="chk3"><label id="chk3label" for="chk3" style="margin:0"></label></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head-group">
+          <div class="card-head">
+            <span class="icon-wrap"><svg><use href="#icon-gear"/></svg></span>
+            <h2 id="card02Title"></h2>
+          </div>
+          <p class="subhint" id="card02Sub"></p>
+        </div>
+
+        <div class="field full">
+          <label class="field-label" for="pstack" id="pstackLabel"></label>
+          <textarea id="pstack"></textarea>
+        </div>
+        <div class="field full">
+          <label class="field-label" for="plimits" id="plimitsLabel"></label>
+          <textarea id="plimits"></textarea>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head-group">
+          <div class="card-head">
+            <span class="icon-wrap"><svg><use href="#icon-bot"/></svg></span>
+            <h2 id="card03Title"></h2>
+          </div>
+          <p class="subhint" id="card03Sub"></p>
+        </div>
+
+        <div class="agent-grid">
+          <label class="agent-card" for="agClaude">
+            <input type="checkbox" id="agClaude" checked>
+            <span class="agent-card-name" id="agClaudeLabel"></span>
+            <span class="agent-card-desc">CLAUDE.md</span>
+          </label>
+          <label class="agent-card" for="agAgentsmd">
+            <input type="checkbox" id="agAgentsmd" checked>
+            <span class="agent-card-name" id="agAgentsmdLabel"></span>
+            <span class="agent-card-desc" id="agAgentsmdDesc"></span>
+          </label>
+          <label class="agent-card" for="agCursor">
+            <input type="checkbox" id="agCursor">
+            <span class="agent-card-name" id="agCursorLabel"></span>
+            <span class="agent-card-desc">.cursor/rules/{slug}.mdc</span>
+          </label>
+          <label class="agent-card" for="agCopilot">
+            <input type="checkbox" id="agCopilot">
+            <span class="agent-card-name" id="agCopilotLabel"></span>
+            <span class="agent-card-desc">.github/copilot-instructions.md</span>
+          </label>
+          <label class="agent-card" for="agGemini">
+            <input type="checkbox" id="agGemini">
+            <span class="agent-card-name" id="agGeminiLabel"></span>
+            <span class="agent-card-desc">GEMINI.md</span>
+          </label>
+          <label class="agent-card" for="agWindsurf">
+            <input type="checkbox" id="agWindsurf">
+            <span class="agent-card-name" id="agWindsurfLabel"></span>
+            <span class="agent-card-desc">.windsurf/rules/{slug}.md</span>
+          </label>
+          <label class="agent-card" for="agSkill">
+            <input type="checkbox" id="agSkill">
+            <span class="agent-card-name" id="agSkillLabel"></span>
+            <span class="agent-card-desc">.claude/skills/{slug}/SKILL.md</span>
+          </label>
+        </div>
+
+        <div class="info-box" id="infoBox"></div>
+      </section>
+    </div>
+
+    <aside>
+      <section class="card sticky-card">
+        <div class="preview-head">
+          <div class="left">
+            <span class="icon-wrap"><svg><use href="#icon-folder"/></svg></span>
+            <h2 id="card04Title"></h2>
+          </div>
+          <div class="traffic-dots"><span></span><span></span><span></span></div>
+        </div>
+
+        <div class="preview-body">
+          <pre id="tree"></pre>
+
+          <div class="prompt-block">
+            <div class="prompt-label-row">
+              <span class="field-label" id="card05Title"></span>
+              <button type="button" id="btnCopy"></button>
+            </div>
+            <textarea id="promptOut" readonly></textarea>
+            <p class="hint" id="promptHint"></p>
+          </div>
+        </div>
+
+        <div class="preview-footer">
+          <button class="btn-primary btn-block" id="btnZip"></button>
+          <div class="status" id="zipStatus"></div>
+        </div>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span class="brand-line">© 2026 workspace//kit</span>
+    <div class="footer-links">
+      <a href="#" id="footerLicense">License</a>
+      <a href="https://github.com/atempel/workspace-kit" target="_blank" rel="noopener">Github</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+let LANG = 'en';
+
+const UI = {
+  en: {
+    tagline: 'multi-agent workspace generator',
+    h1: 'Build a workspace ready for any AI agent',
+    heroTag: 'Initialize high-performance AI environments with a project tailored kit.',
+    p: 'Describe the project and generate, in one go, the human context layer (PROJECT.md, DECISIONS.md...) and the AI instruction layer — in the right format for whichever tool you use.',
+    navGenerator: 'Generator', navTemplates: 'Templates', navHistory: 'History', navSettings: 'Settings',
+    card01: 'Project Blueprint',
+    pnameLabel: 'Project name',
+    pnamePh: 'e.g. Infinite List',
+    ptypeLabel: 'Type',
+    pdescLabel: 'Description',
+    pdescPh: 'What the project is about, in 2-3 sentences.',
+    pobjLabel: 'Main goal (optional)',
+    pobjPh: 'e.g. validate whether the app is viable before coding',
+    checksTitle: 'Workspace folders',
+    card02: 'Technical Context',
+    card02sub: 'This becomes the body of the instruction files (CLAUDE.md/AGENTS.md etc.) — the more concrete, the less the AI gets conventions wrong.',
+    pstackLabel: 'Stack & commands',
+    genericPh: 'filled in based on the project type',
+    plimitsLabel: 'Limits — what the AI should not do without asking',
+    card03: 'Agent Configuration',
+    card03sub: 'Choose which AIs to generate an instruction file for. Each one reads a different name and format at the workspace root.',
+    agClaude: 'CLAUDE.md',
+    agAgentsmd: 'AGENTS.md',
+    agAgentsmdDesc: 'Read by Codex, Cursor, Windsurf, Gemini CLI, Devin, Amazon Q and others',
+    agCursor: 'Cursor',
+    agCopilot: 'Copilot',
+    agGemini: 'Gemini CLI',
+    agWindsurf: 'Windsurf',
+    agSkill: 'Skill skeleton',
+    infoBox: '<b>Why two files by default?</b> CLAUDE.md and AGENTS.md hold the same content, but serve different audiences: AGENTS.md is the open format most tools already read natively; CLAUDE.md is what Claude Code/Cowork loads before each session. With both checked, CLAUDE.md just imports AGENTS.md (<code>@AGENTS.md</code>) and leaves room for rules exclusive to Claude — without duplicating text.',
+    card04: 'Workspace Preview',
+    btnZip: 'Download .zip',
+    card05: 'Starter Prompt',
+    btnCopy: 'Copy',
+    copied: 'Copied!',
+    promptHint: 'Paste this as the first message, after uploading the .zip files into the agent\'s working folder.',
+    zipGenerating: 'Generating .zip...',
+    zipDone: (slug)=>`Downloaded: ${slug}.zip`,
+    zipError: (msg)=>`Error generating .zip: ${msg}`,
+    agentListFallback: 'the context files in the root folder',
+    newProject: 'New project',
+    fillIn: '(fill in)',
+    localOnlyTag: '· local only (.gitignore)',
+  },
+  pt: {
+    tagline: 'gerador de workspaces multi-agente',
+    h1: 'Monte um workspace pronto pra qualquer agente de IA',
+    heroTag: 'Inicialize ambientes de IA de alta performance com um kit sob medida pro projeto.',
+    p: 'Descreva o projeto e gere, de uma vez, a camada de contexto pra humano (PROJECT.md, DECISIONS.md...) e a camada de instruções pra IA — no formato certo pra cada ferramenta que você usa.',
+    navGenerator: 'Gerador', navTemplates: 'Modelos', navHistory: 'Histórico', navSettings: 'Config',
+    card01: 'Blueprint do Projeto',
+    pnameLabel: 'Nome do projeto',
+    pnamePh: 'Ex: A Lista Infinita',
+    ptypeLabel: 'Tipo',
+    pdescLabel: 'Descrição',
+    pdescPh: 'Do que se trata o projeto, em 2-3 frases.',
+    pobjLabel: 'Objetivo principal (opcional)',
+    pobjPh: 'Ex: validar se o app é viável antes de codar',
+    checksTitle: 'Pastas do workspace',
+    card02: 'Contexto Técnico',
+    card02sub: 'Isso vira o corpo dos arquivos de instrução (CLAUDE.md/AGENTS.md etc.) — quanto mais concreto, menos a IA erra convenção.',
+    pstackLabel: 'Stack & comandos',
+    genericPh: 'preenchido conforme o tipo de projeto',
+    plimitsLabel: 'Limites — o que a IA não deve fazer sem perguntar',
+    card03: 'Configuração de Agentes',
+    card03sub: 'Escolha pra quais IAs gerar arquivo de instrução. Cada uma lê um nome e formato diferente na raiz do workspace.',
+    agClaude: 'CLAUDE.md',
+    agAgentsmd: 'AGENTS.md',
+    agAgentsmdDesc: 'Lido por Codex, Cursor, Windsurf, Gemini CLI, Devin, Amazon Q e outros',
+    agCursor: 'Cursor',
+    agCopilot: 'Copilot',
+    agGemini: 'Gemini CLI',
+    agWindsurf: 'Windsurf',
+    agSkill: 'Esqueleto de Skill',
+    infoBox: '<b>Por que dois arquivos por padrão?</b> CLAUDE.md e AGENTS.md guardam o mesmo conteúdo, mas servem públicos diferentes: AGENTS.md é o formato aberto que a maioria das ferramentas já lê nativamente; CLAUDE.md é o que o Claude Code/Cowork carrega antes de cada sessão. Com os dois marcados, o CLAUDE.md apenas importa o AGENTS.md (<code>@AGENTS.md</code>) e deixa espaço pra regras exclusivas do Claude — sem duplicar texto.',
+    card04: 'Pré-visualização',
+    btnZip: 'Baixar .zip',
+    card05: 'Prompt Inicial',
+    btnCopy: 'Copiar',
+    copied: 'Copiado!',
+    promptHint: 'Cole isso na primeira mensagem, depois de subir os arquivos do .zip na pasta de trabalho do agente.',
+    zipGenerating: 'Gerando .zip...',
+    zipDone: (slug)=>`Baixado: ${slug}.zip`,
+    zipError: (msg)=>`Erro ao gerar o .zip: ${msg}`,
+    agentListFallback: 'os arquivos de contexto na raiz',
+    newProject: 'Novo projeto',
+    fillIn: '(preencher)',
+    localOnlyTag: '· só local (.gitignore)',
+  }
+};
+
+const TYPE_CONFIG = {
+  produto: {
+    label:{en:'Digital product / App', pt:'Produto digital / App'},
+    checks:[
+      {label:{en:'Research / discovery', pt:'Pesquisa / discovery'}, folder:{en:'research', pt:'pesquisa'}},
+      {label:{en:'Design / assets', pt:'Design / assets'}, folder:{en:'design', pt:'design'}},
+      {label:{en:'Code (/src)', pt:'Código (/src)'}, folder:{en:'src', pt:'src'}}
+    ],
+    defaults:[true,true,true],
+    stackPh:{en:'e.g. Tauri v2 + React + SQLite · pnpm · tests with vitest', pt:'Ex: Tauri v2 + React + SQLite · pnpm · testes com vitest'},
+    limitsPh:{en:"e.g. don't commit directly to main · don't use paid libraries without asking", pt:'Ex: não commitar direto na main · não usar libs pagas sem avisar'},
+    extraFile:{path:{en:'docs/PRD.md', pt:'docs/PRD.md'}, build:(n,lang)=> lang==='en'
+      ? `# PRD — ${n}\n\n## Problem\n\n## Proposed solution\n\n## Scope\n\n## Out of scope\n\n## Success metrics\n`
+      : `# PRD — ${n}\n\n## Problema\n\n## Solução proposta\n\n## Escopo\n\n## Fora de escopo\n\n## Métricas de sucesso\n`}
+  },
+  pesquisa: {
+    label:{en:'Research & analysis', pt:'Pesquisa & análise'},
+    checks:[
+      {label:{en:'Raw data', pt:'Dados brutos'}, folder:{en:'data', pt:'dados'}, localOnly:true},
+      {label:{en:'Source notes', pt:'Notas de fontes'}, folder:{en:'notes', pt:'notas'}},
+      {label:{en:'Results / outputs', pt:'Resultados / outputs'}, folder:{en:'outputs', pt:'outputs'}, localOnly:true}
+    ],
+    defaults:[true,true,true],
+    stackPh:{en:'e.g. Python + pandas + Jupyter · dataset in /data', pt:'Ex: Python + pandas + Jupyter · dataset em /dados'},
+    limitsPh:{en:'e.g. never modify raw data, only copy before processing', pt:'Ex: nunca alterar os dados brutos, só copiar antes de processar'},
+  },
+  escrita: {
+    label:{en:'Writing & content', pt:'Escrita & conteúdo'},
+    checks:[
+      {label:{en:'Drafts', pt:'Rascunhos'}, folder:{en:'drafts', pt:'rascunhos'}},
+      {label:{en:'References', pt:'Referências'}, folder:{en:'references', pt:'referencias'}},
+      {label:{en:'Published', pt:'Publicado'}, folder:{en:'published', pt:'publicado'}}
+    ],
+    defaults:[true,true,false],
+    stackPh:{en:'e.g. Markdown · published on Medium (PT/EN)', pt:'Ex: Markdown · publicação no Medium (PT/EN)'},
+    limitsPh:{en:"e.g. keep a first-person tone · never present the AI as the text's author", pt:'Ex: manter tom em primeira pessoa · nunca apresentar a IA como autora do texto'},
+  },
+  design: {
+    label:{en:'Design (UI/product)', pt:'Design (UI/produto)'},
+    checks:[
+      {label:{en:'References', pt:'Referências'}, folder:{en:'references', pt:'referencias'}},
+      {label:{en:'Assets', pt:'Assets'}, folder:{en:'assets', pt:'assets'}},
+      {label:{en:'Wireframes', pt:'Wireframes'}, folder:{en:'wireframes', pt:'wireframes'}}
+    ],
+    defaults:[true,true,true],
+    stackPh:{en:'e.g. Figma as source of truth · tokens exported to /assets', pt:'Ex: Figma como fonte da verdade · tokens exportados em /assets'},
+    limitsPh:{en:"e.g. don't generate final assets with AI without clearly marking them as drafts", pt:'Ex: não gerar peças finais com IA sem marcar claramente como rascunho'},
+    extraFile:{path:{en:'handoff/SPEC.md', pt:'handoff/SPEC.md'}, build:(n,lang)=> lang==='en'
+      ? `# Handoff spec — ${n}\n\n## Tokens\n\n## Components\n\n## States\n\n## Breakpoints\n`
+      : `# Spec de handoff — ${n}\n\n## Tokens\n\n## Componentes\n\n## Estados\n\n## Breakpoints\n`}
+  },
+  dataml: {
+    label:{en:'Data / ML pipeline', pt:'Dados / ML pipeline'},
+    checks:[
+      {label:{en:'Data', pt:'Dados'}, folder:{en:'data', pt:'dados'}, localOnly:true},
+      {label:{en:'Notebooks', pt:'Notebooks'}, folder:{en:'notebooks', pt:'notebooks'}},
+      {label:{en:'Models / outputs', pt:'Modelos / outputs'}, folder:{en:'models', pt:'modelos'}, localOnly:true}
+    ],
+    defaults:[true,true,true],
+    stackPh:{en:'e.g. Python + PyTorch · data versioned outside git', pt:'Ex: Python + PyTorch · dados versionados fora do git'},
+    limitsPh:{en:'e.g. never push the full dataset to the repository', pt:'Ex: nunca subir dataset completo pro repositório'},
+  },
+  automacao: {
+    label:{en:'Automation / internal script', pt:'Automação / script interno'},
+    checks:[
+      {label:{en:'Scripts', pt:'Scripts'}, folder:{en:'scripts', pt:'scripts'}},
+      {label:{en:'Configuration', pt:'Configuração'}, folder:{en:'config', pt:'config'}, localOnly:true},
+      {label:{en:'Logs', pt:'Logs'}, folder:{en:'logs', pt:'logs'}, localOnly:true}
+    ],
+    defaults:[true,true,false],
+    stackPh:{en:'e.g. Node.js + node-cron · runs via PowerShell 7', pt:'Ex: Node.js + node-cron · roda via PowerShell 7'},
+    limitsPh:{en:'e.g. never commit credentials or tokens in /config', pt:'Ex: nunca commitar credenciais ou tokens em /config'},
+  },
+  jogo: {
+    label:{en:'Digital game (game dev)', pt:'Jogo digital (game dev)'},
+    checks:[
+      {label:{en:'Assets', pt:'Assets'}, folder:{en:'assets', pt:'assets'}},
+      {label:{en:'Builds', pt:'Builds'}, folder:{en:'builds', pt:'builds'}, localOnly:true},
+      {label:{en:'Code (/src)', pt:'Código (/src)'}, folder:{en:'src', pt:'src'}}
+    ],
+    defaults:[true,false,true],
+    stackPh:{en:'e.g. Construct 3 / Unreal Engine 5 · Blueprints only', pt:'Ex: Construct 3 / Unreal Engine 5 · só Blueprints'},
+    limitsPh:{en:'e.g. single mechanic, scope of a few days · no multi-layer systems', pt:'Ex: mecânica única, escopo de poucos dias · nada de sistemas multi-camada'},
+    extraFile:{path:{en:'design/GDD.md', pt:'design/GDD.md'}, build:(n,lang)=> lang==='en'
+      ? `# GDD — ${n}\n\n## One-sentence concept\n\n## Core mechanic (core loop)\n\n## Scope (what fits the timeline)\n\n## Out of scope\n`
+      : `# GDD — ${n}\n\n## Conceito em uma frase\n\n## Mecânica principal (core loop)\n\n## Escopo (o que cabe no prazo)\n\n## Fora de escopo\n`}
+  },
+  boardgame: {
+    label:{en:'Board / card game', pt:'Jogo de tabuleiro / cartas'},
+    checks:[
+      {label:{en:'Prototypes', pt:'Protótipos'}, folder:{en:'prototypes', pt:'prototipos'}},
+      {label:{en:'Playtests', pt:'Playtests'}, folder:{en:'playtests', pt:'playtests'}},
+      {label:{en:'Art / components', pt:'Arte / componentes'}, folder:{en:'art', pt:'arte'}}
+    ],
+    defaults:[true,true,true],
+    stackPh:{en:'e.g. cooperative, WWII aviation theme · print-and-play for testing', pt:'Ex: cooperativo, tema WWII aviação · print-and-play pra testar'},
+    limitsPh:{en:'e.g. every balance change must be logged with a reason', pt:'Ex: todo ajuste de balanceamento precisa ser registrado com o motivo'},
+    extraFile:{path:{en:'rules/RULEBOOK.md', pt:'regras/RULEBOOK.md'}, build:(n,lang)=> lang==='en'
+      ? `# Rulebook — ${n}\n\n## Theme\n\n## Game objective\n\n## Components\n\n## Setup\n\n## Turn / flow\n\n## Win and loss conditions\n`
+      : `# Rulebook — ${n}\n\n## Tema\n\n## Objetivo do jogo\n\n## Componentes\n\n## Setup\n\n## Turno / fluxo\n\n## Condições de vitória e derrota\n`}
+  },
+  site: {
+    label:{en:'Website / landing page', pt:'Site / landing page'},
+    checks:[
+      {label:{en:'Content', pt:'Conteúdo'}, folder:{en:'content', pt:'conteudo'}},
+      {label:{en:'Assets', pt:'Assets'}, folder:{en:'assets', pt:'assets'}},
+      {label:{en:'Code (/src)', pt:'Código (/src)'}, folder:{en:'src', pt:'src'}}
+    ],
+    defaults:[true,true,true],
+    stackPh:{en:'e.g. Astro/Next.js · deployed on Vercel', pt:'Ex: Astro/Next.js · deploy na Vercel'},
+    limitsPh:{en:'e.g. keep Lighthouse performance score above 90', pt:'Ex: manter Lighthouse acima de 90 em performance'},
+  },
+  lib: {
+    label:{en:'Open source library / SDK', pt:'Biblioteca / SDK open source'},
+    checks:[
+      {label:{en:'Examples', pt:'Exemplos'}, folder:{en:'examples', pt:'exemplos'}},
+      {label:{en:'Documentation', pt:'Documentação'}, folder:{en:'docs', pt:'docs'}},
+      {label:{en:'Tests', pt:'Testes'}, folder:{en:'tests', pt:'testes'}}
+    ],
+    defaults:[true,true,true],
+    stackPh:{en:'e.g. TypeScript · published on npm · strict semver', pt:'Ex: TypeScript · publicado no npm · semver estrito'},
+    limitsPh:{en:'e.g. every public API change needs a changelog entry', pt:'Ex: toda mudança pública de API precisa de entrada no changelog'},
+    extraFile:{path:{en:'docs/API.md', pt:'docs/API.md'}, build:(n,lang)=> lang==='en'
+      ? `# API reference — ${n}\n\n## Installation\n\n## Basic usage\n\n## Public API\n\n## Versioning\n`
+      : `# Referência de API — ${n}\n\n## Instalação\n\n## Uso básico\n\n## API pública\n\n## Versionamento\n`}
+  },
+  mobile: {
+    label:{en:'Mobile app (iOS/Android)', pt:'App mobile (iOS/Android)'},
+    checks:[
+      {label:{en:'Assets (icons/screenshots)', pt:'Assets (ícones/screenshots)'}, folder:{en:'assets', pt:'assets'}},
+      {label:{en:'Code (/src)', pt:'Código (/src)'}, folder:{en:'src', pt:'src'}},
+      {label:{en:'Store listing', pt:'Ficha na loja'}, folder:{en:'store', pt:'store'}}
+    ],
+    defaults:[true,true,false],
+    stackPh:{en:'e.g. React Native + Expo · TestFlight for iOS beta · target Android 8+', pt:'Ex: React Native + Expo · TestFlight pra beta iOS · Android 8+ como alvo'},
+    limitsPh:{en:"e.g. don't submit to app stores without review · keep requested permissions minimal", pt:'Ex: não submeter às lojas sem revisão · manter permissões pedidas no mínimo'},
+    extraFile:{path:{en:'store/LISTING.md', pt:'store/LISTING.md'}, build:(n,lang)=> lang==='en'
+      ? `# Store listing — ${n}\n\n## App name\n\n## Short description\n\n## Full description\n\n## Screenshots\n\n## Keywords\n\n## Privacy policy URL\n\n## Support contact\n`
+      : `# Ficha na loja — ${n}\n\n## Nome do app\n\n## Descrição curta\n\n## Descrição completa\n\n## Screenshots\n\n## Palavras-chave\n\n## URL da política de privacidade\n\n## Contato de suporte\n`}
+  },
+  extension: {
+    label:{en:'Browser extension', pt:'Extensão de navegador'},
+    checks:[
+      {label:{en:'Code (/src)', pt:'Código (/src)'}, folder:{en:'src', pt:'src'}},
+      {label:{en:'Icons & assets', pt:'Ícones & assets'}, folder:{en:'assets', pt:'assets'}},
+      {label:{en:'Store listing', pt:'Ficha na loja'}, folder:{en:'store', pt:'store'}}
+    ],
+    defaults:[true,true,false],
+    stackPh:{en:'e.g. Manifest V3 · Chrome Web Store + Firefox Add-ons · TypeScript', pt:'Ex: Manifest V3 · Chrome Web Store + Firefox Add-ons · TypeScript'},
+    limitsPh:{en:"e.g. don't request broader permissions than needed · document every permission's purpose", pt:'Ex: não pedir permissões além do necessário · documentar o motivo de cada permissão'},
+    extraFile:{path:{en:'docs/PERMISSIONS.md', pt:'docs/PERMISSIONS.md'}, build:(n,lang)=> lang==='en'
+      ? `# Permissions — ${n}\n\n## Requested permissions\n\n## Why each one is needed\n\n## Data collected\n\n## Store listing notes\n`
+      : `# Permissões — ${n}\n\n## Permissões solicitadas\n\n## Por que cada uma é necessária\n\n## Dados coletados\n\n## Notas para a ficha da loja\n`}
+  },
+  hardware: {
+    label:{en:'Hardware / IoT', pt:'Hardware / IoT'},
+    checks:[
+      {label:{en:'Firmware', pt:'Firmware'}, folder:{en:'firmware', pt:'firmware'}},
+      {label:{en:'Hardware design (schematics/CAD)', pt:'Design de hardware (esquemas/CAD)'}, folder:{en:'hardware', pt:'hardware'}},
+      {label:{en:'Docs / BOM', pt:'Docs / BOM'}, folder:{en:'docs', pt:'docs'}}
+    ],
+    defaults:[true,true,true],
+    stackPh:{en:'e.g. ESP32 + Arduino framework · KiCad for schematics · 3D-printed enclosure', pt:'Ex: ESP32 + framework Arduino · KiCad pra esquemas · case impresso em 3D'},
+    limitsPh:{en:"e.g. don't change pinout without updating the schematic · flag any part with lead time over 2 weeks", pt:'Ex: não mudar pinagem sem atualizar o esquema · avisar sobre peças com prazo de entrega acima de 2 semanas'},
+    extraFile:{path:{en:'hardware/BOM.md', pt:'hardware/BOM.md'}, build:(n,lang)=> lang==='en'
+      ? `# Bill of materials — ${n}\n\n## Components\n\n## Sourcing / suppliers\n\n## Estimated cost\n\n## Lead-time risks\n`
+      : `# Lista de materiais — ${n}\n\n## Componentes\n\n## Fornecedores\n\n## Custo estimado\n\n## Riscos de prazo de entrega\n`}
+  },
+  course: {
+    label:{en:'Course / educational content', pt:'Curso / conteúdo educacional'},
+    checks:[
+      {label:{en:'Modules / curriculum', pt:'Módulos / currículo'}, folder:{en:'modules', pt:'modules'}},
+      {label:{en:'Materials (slides, worksheets)', pt:'Materiais (slides, exercícios)'}, folder:{en:'materials', pt:'materials'}},
+      {label:{en:'Assessments', pt:'Avaliações'}, folder:{en:'assessments', pt:'assessments'}}
+    ],
+    defaults:[true,true,false],
+    stackPh:{en:'e.g. delivered via Notion + recorded video · cohort-based, 6 weeks', pt:'Ex: entregue via Notion + vídeo gravado · em turma, 6 semanas'},
+    limitsPh:{en:"e.g. don't change learning objectives without updating the syllabus · keep exercises aligned to stated objectives", pt:'Ex: não mudar objetivos de aprendizagem sem atualizar a ementa · manter exercícios alinhados aos objetivos'},
+    extraFile:{path:{en:'docs/SYLLABUS.md', pt:'docs/SYLLABUS.md'}, build:(n,lang)=> lang==='en'
+      ? `# Syllabus — ${n}\n\n## Audience\n\n## Learning objectives\n\n## Module breakdown\n\n## Assessment criteria\n\n## Prerequisites\n`
+      : `# Ementa — ${n}\n\n## Público-alvo\n\n## Objetivos de aprendizagem\n\n## Divisão em módulos\n\n## Critérios de avaliação\n\n## Pré-requisitos\n`}
+  },
+  marketing: {
+    label:{en:'Marketing campaign', pt:'Campanha de marketing'},
+    checks:[
+      {label:{en:'Creative assets', pt:'Assets criativos'}, folder:{en:'assets', pt:'assets'}},
+      {label:{en:'Copy / content', pt:'Copy / conteúdo'}, folder:{en:'copy', pt:'copy'}},
+      {label:{en:'Channel plan / calendar', pt:'Plano de canais / calendário'}, folder:{en:'calendar', pt:'calendar'}}
+    ],
+    defaults:[true,true,true],
+    stackPh:{en:'e.g. Meta Ads + Google Ads · scheduled via Buffer · landing page on Webflow', pt:'Ex: Meta Ads + Google Ads · agendado via Buffer · landing page na Webflow'},
+    limitsPh:{en:"e.g. don't publish paid ads without approval · keep messaging consistent with brand guidelines", pt:'Ex: não publicar anúncios pagos sem aprovação · manter mensagem consistente com as diretrizes de marca'},
+    extraFile:{path:{en:'docs/BRIEF.md', pt:'docs/BRIEF.md'}, build:(n,lang)=> lang==='en'
+      ? `# Campaign brief — ${n}\n\n## Objective\n\n## Target audience\n\n## Key message\n\n## Channels\n\n## Budget\n\n## Success metrics\n\n## Timeline\n`
+      : `# Brief de campanha — ${n}\n\n## Objetivo\n\n## Público-alvo\n\n## Mensagem principal\n\n## Canais\n\n## Orçamento\n\n## Métricas de sucesso\n\n## Cronograma\n`}
+  },
+  podcast: {
+    label:{en:'Podcast / video production', pt:'Podcast / produção de vídeo'},
+    checks:[
+      {label:{en:'Episodes / scripts', pt:'Episódios / roteiros'}, folder:{en:'episodes', pt:'episodes'}},
+      {label:{en:'Raw footage / audio', pt:'Material bruto (áudio/vídeo)'}, folder:{en:'raw', pt:'raw'}, localOnly:true},
+      {label:{en:'Published / distribution', pt:'Publicado / distribuição'}, folder:{en:'published', pt:'published'}}
+    ],
+    defaults:[true,true,false],
+    stackPh:{en:'e.g. recorded in Riverside.fm · edited in Descript · published via Spotify for Podcasters', pt:'Ex: gravado no Riverside.fm · editado no Descript · publicado via Spotify for Podcasters'},
+    limitsPh:{en:"e.g. don't publish an episode without a reviewed transcript · credit guests accurately", pt:'Ex: não publicar episódio sem transcrição revisada · creditar convidados corretamente'},
+    extraFile:{path:{en:'docs/SHOW-BIBLE.md', pt:'docs/SHOW-BIBLE.md'}, build:(n,lang)=> lang==='en'
+      ? `# Show bible — ${n}\n\n## Premise\n\n## Format\n\n## Target audience\n\n## Episode structure\n\n## Tone & voice guidelines\n`
+      : `# Show bible — ${n}\n\n## Premissa\n\n## Formato\n\n## Público-alvo\n\n## Estrutura dos episódios\n\n## Diretrizes de tom e voz\n`}
+  },
+  generico: {
+    label:{en:'Generic', pt:'Genérico'},
+    checks:[
+      {label:{en:'Documents', pt:'Documentos'}, folder:{en:'docs', pt:'docs'}},
+      {label:{en:'Assets', pt:'Assets'}, folder:{en:'assets', pt:'assets'}},
+      {label:{en:'Results / outputs', pt:'Resultados / outputs'}, folder:{en:'outputs', pt:'outputs'}, localOnly:true}
+    ],
+    defaults:[false,false,false],
+    stackPh:{en:'e.g. tools and conventions used in this project', pt:'Ex: ferramentas e convenções usadas neste projeto'},
+    limitsPh:{en:'e.g. what the AI should not decide on its own here', pt:'Ex: o que a IA não deve decidir sozinha aqui'},
+  },
+};
+
+const GITIGNORE_BASE = {
+  en: `# OS\n.DS_Store\nThumbs.db\n\n# Editors\n.vscode/\n.idea/\n*.swp\n*.swo\n\n# Secrets & local overrides\n.env\n.env.local\n.env.*.local\n*.local.*\nCLAUDE.local.md\n\n# Logs\n*.log\n`,
+  pt: `# Sistema operacional\n.DS_Store\nThumbs.db\n\n# Editores\n.vscode/\n.idea/\n*.swp\n*.swo\n\n# Segredos e overrides locais\n.env\n.env.local\n.env.*.local\n*.local.*\nCLAUDE.local.md\n\n# Logs\n*.log\n`,
+};
+
+const els = {
+  name: document.getElementById('pname'),
+  type: document.getElementById('ptype'),
+  desc: document.getElementById('pdesc'),
+  obj: document.getElementById('pobj'),
+  stack: document.getElementById('pstack'),
+  limits: document.getElementById('plimits'),
+  chk1: document.getElementById('chk1'),
+  chk2: document.getElementById('chk2'),
+  chk3: document.getElementById('chk3'),
+  chk1label: document.getElementById('chk1label'),
+  chk2label: document.getElementById('chk2label'),
+  chk3label: document.getElementById('chk3label'),
+  agClaude: document.getElementById('agClaude'),
+  agAgentsmd: document.getElementById('agAgentsmd'),
+  agCursor: document.getElementById('agCursor'),
+  agCopilot: document.getElementById('agCopilot'),
+  agGemini: document.getElementById('agGemini'),
+  agWindsurf: document.getElementById('agWindsurf'),
+  agSkill: document.getElementById('agSkill'),
+  tree: document.getElementById('tree'),
+  prompt: document.getElementById('promptOut'),
+  zipStatus: document.getElementById('zipStatus'),
+  langPt: document.getElementById('langPt'),
+  langEn: document.getElementById('langEn'),
+  navGenerator: document.getElementById('navGenerator'),
+  navTemplates: document.getElementById('navTemplates'),
+  navHistory: document.getElementById('navHistory'),
+  navSettings: document.getElementById('navSettings'),
+  heroTag: document.getElementById('heroTag'),
+  headerH1: document.getElementById('headerH1'),
+  headerP: document.getElementById('headerP'),
+  card01Title: document.getElementById('card01Title'),
+  pnameLabel: document.getElementById('pnameLabel'),
+  ptypeLabel: document.getElementById('ptypeLabel'),
+  pdescLabel: document.getElementById('pdescLabel'),
+  pobjLabel: document.getElementById('pobjLabel'),
+  checksTitle: document.getElementById('checksTitle'),
+  card02Title: document.getElementById('card02Title'),
+  card02Sub: document.getElementById('card02Sub'),
+  pstackLabel: document.getElementById('pstackLabel'),
+  plimitsLabel: document.getElementById('plimitsLabel'),
+  card03Title: document.getElementById('card03Title'),
+  card03Sub: document.getElementById('card03Sub'),
+  agClaudeLabel: document.getElementById('agClaudeLabel'),
+  agAgentsmdLabel: document.getElementById('agAgentsmdLabel'),
+  agAgentsmdDesc: document.getElementById('agAgentsmdDesc'),
+  agCursorLabel: document.getElementById('agCursorLabel'),
+  agCopilotLabel: document.getElementById('agCopilotLabel'),
+  agGeminiLabel: document.getElementById('agGeminiLabel'),
+  agWindsurfLabel: document.getElementById('agWindsurfLabel'),
+  agSkillLabel: document.getElementById('agSkillLabel'),
+  infoBox: document.getElementById('infoBox'),
+  card04Title: document.getElementById('card04Title'),
+  btnZip: document.getElementById('btnZip'),
+  card05Title: document.getElementById('card05Title'),
+  btnCopy: document.getElementById('btnCopy'),
+  promptHint: document.getElementById('promptHint'),
+};
+
+function slugify(s){
+  return (s || 'new-project')
+    .normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .toLowerCase().trim()
+    .replace(/[^a-z0-9]+/g,'-')
+    .replace(/(^-|-$)/g,'') || 'new-project';
+}
+function todayStr(lang){ return new Date().toLocaleDateString(lang==='en' ? 'en-US' : 'pt-BR'); }
+
+function populateTypeSelect(){
+  const prevValue = els.type.value;
+  els.type.innerHTML = '';
+  Object.entries(TYPE_CONFIG).forEach(([key,cfg])=>{
+    const opt = document.createElement('option');
+    opt.value = key; opt.textContent = cfg.label[LANG];
+    els.type.appendChild(opt);
+  });
+  if(prevValue && TYPE_CONFIG[prevValue]) els.type.value = prevValue;
+}
+
+function applyTypeDefaults(){
+  const cfg = TYPE_CONFIG[els.type.value];
+  [els.chk1, els.chk2, els.chk3].forEach((el,i)=>{ el.checked = cfg.defaults[i]; });
+  [els.chk1label, els.chk2label, els.chk3label].forEach((el,i)=>{
+    const base = cfg.checks[i].label[LANG];
+    el.textContent = cfg.checks[i].localOnly ? `${base} ${UI[LANG].localOnlyTag}` : base;
+  });
+  els.stack.placeholder = cfg.stackPh[LANG];
+  els.limits.placeholder = cfg.limitsPh[LANG];
+}
+els.type.addEventListener('change', ()=>{ applyTypeDefaults(); renderAll(); });
+
+function selectedFolders(){
+  const cfg = TYPE_CONFIG[els.type.value];
+  const out = [];
+  [els.chk1, els.chk2, els.chk3].forEach((el,i)=>{ if(el.checked) out.push(cfg.checks[i].folder[LANG]); });
+  return [...new Set(out)];
+}
+
+function selectedLocalOnlyFolders(){
+  const cfg = TYPE_CONFIG[els.type.value];
+  const out = [];
+  [els.chk1, els.chk2, els.chk3].forEach((el,i)=>{ if(el.checked && cfg.checks[i].localOnly) out.push(cfg.checks[i].folder[LANG]); });
+  return [...new Set(out)];
+}
+
+function buildGitignore(){
+  const localOnlyFolders = selectedLocalOnlyFolders();
+  let content = GITIGNORE_BASE[LANG];
+  if(localOnlyFolders.length){
+    content += LANG==='en'
+      ? '\n# Local-only folders (heavy or sensitive) — kept out of version control\n'
+      : '\n# Pastas locais (pesadas ou sensíveis) — fora do controle de versão\n';
+    localOnlyFolders.forEach(f=>{ content += `${f}/*\n!${f}/.gitkeep\n`; });
+  }
+  return content;
+}
+
+function buildAgentBody(d){
+  return LANG==='en'
+    ? `# ${d.name}\n\n${d.desc}\n\n## Stack & commands\n${d.stack || '(fill in: how to build, test, and run this project)'}\n\n## Limits — don't do this without asking\n${d.limits || '- (fill in)'}\n\n## See also\n- PROJECT.md — overview for humans\n- DECISIONS.md — decision history (update on every relevant decision)\n- TASKS.md — active tasks\n`
+    : `# ${d.name}\n\n${d.desc}\n\n## Stack & comandos\n${d.stack || '(preencher: como buildar, testar e rodar este projeto)'}\n\n## Limites — o que não fazer sem perguntar\n${d.limits || '- (preencher)'}\n\n## Ver também\n- PROJECT.md — visão geral para humanos\n- DECISIONS.md — histórico de decisões (atualizar a cada decisão relevante)\n- TASKS.md — tarefas ativas\n`;
+}
+
+function buildSkillFile(d, slug){
+  return LANG==='en'
+    ? `---\nname: ${slug}\ndescription: Support skill for the ${d.name} project. Use when you need context or routines specific to this project.\n---\n\n# ${d.name} — support skill\n\nReusable instructions and procedures for recurring tasks in this project.\n\n## When to use\n- (fill in: in which situations this skill should be loaded)\n\n## Procedure\n1. \n2. \n3. \n`
+    : `---\nname: ${slug}\ndescription: Skill de apoio para o projeto ${d.name}. Use quando precisar de contexto ou rotinas específicas deste projeto.\n---\n\n# ${d.name} — skill de apoio\n\nInstruções e procedimentos reutilizáveis para tarefas recorrentes deste projeto.\n\n## Quando usar\n- (preencher: em que situações esta skill deve ser carregada)\n\n## Procedimento\n1. \n2. \n3. \n`;
+}
+
+function collectData(){
+  const t = UI[LANG];
+  return {
+    name: els.name.value.trim() || t.newProject,
+    type: els.type.value,
+    desc: els.desc.value.trim() || t.fillIn,
+    obj: els.obj.value.trim() || t.fillIn,
+    stack: els.stack.value.trim(),
+    limits: els.limits.value.trim(),
+  };
+}
+
+function buildFileMap(){
+  const d = collectData();
+  const cfg = TYPE_CONFIG[d.type];
+  const date = todayStr(LANG);
+  const slug = slugify(d.name);
+  const files = {};
+
+  const folders = selectedFolders();
+  const localOnlySet = new Set(selectedLocalOnlyFolders());
+  const folderList = folders.map(f=> localOnlySet.has(f)
+    ? `- \`${f}/\` — ${LANG==='en' ? 'local only, see .gitignore' : 'só local, ver .gitignore'}`
+    : `- \`${f}/\``).join('\n');
+
+  if(LANG==='en'){
+    files['README.md'] = `# ${d.name}\n\nIndex of this workspace:\n- \`PROJECT.md\` — overview and goal\n- \`DECISIONS.md\` — decision history\n- \`CONTEXT.md\` — accumulated context for the AI\n- \`TASKS.md\` — active tasks\n${folderList ? '\nFolders:\n'+folderList : ''}\n\n> The AI is a tool that extends human judgment, not a substitute for it. Relevant decisions go into DECISIONS.md.\n`;
+    files['PROJECT.md'] = `# ${d.name}\n\n## Overview\n${d.desc}\n\n## Main goal\n${d.obj}\n\n## Project type\n${cfg.label[LANG]}\n\n## Stack\n${d.stack || '(fill in)'}\n\n## Status\n🟡 In definition\n\n---\nCreated on ${date} via workspace//kit.\n`;
+    files['DECISIONS.md'] = `# Decisions — ${d.name}\n\nChronological record of decisions made in this project. Each entry should contain what, why, and discarded alternatives.\n\n## ${date}\n- **Decision:** —\n- **Reason:** —\n- **Alternatives considered:** —\n`;
+    files['CONTEXT.md'] = `# Context — ${d.name}\n\nContext the AI should know to work well on this project: conventions, constraints, vocabulary, people involved.\n\n## Conventions\n- \n\n## Constraints\n- \n\n## Vocabulary / specific terms\n- \n`;
+    files['TASKS.md'] = `# Tasks — ${d.name}\n\n## In progress\n- [ ] \n\n## Next\n- [ ] \n\n## Done\n- [x] Workspace created (${date})\n`;
+  } else {
+    files['README.md'] = `# ${d.name}\n\nÍndice deste workspace:\n- \`PROJECT.md\` — visão geral e objetivo\n- \`DECISIONS.md\` — histórico de decisões\n- \`CONTEXT.md\` — contexto acumulado para a IA\n- \`TASKS.md\` — tarefas ativas\n${folderList ? '\nPastas:\n'+folderList : ''}\n\n> A IA é uma ferramenta que amplia julgamento humano, não um substituto para ele. Decisões relevantes vão para DECISIONS.md.\n`;
+    files['PROJECT.md'] = `# ${d.name}\n\n## Visão geral\n${d.desc}\n\n## Objetivo principal\n${d.obj}\n\n## Tipo de projeto\n${cfg.label[LANG]}\n\n## Stack\n${d.stack || '(preencher)'}\n\n## Status\n🟡 Em definição\n\n---\nCriado em ${date} via workspace//kit.\n`;
+    files['DECISIONS.md'] = `# Decisões — ${d.name}\n\nRegistro cronológico de decisões tomadas neste projeto. Cada entrada deve conter o quê, por quê, e alternativas descartadas.\n\n## ${date}\n- **Decisão:** —\n- **Motivo:** —\n- **Alternativas consideradas:** —\n`;
+    files['CONTEXT.md'] = `# Contexto — ${d.name}\n\nContexto que a IA deve conhecer para trabalhar bem neste projeto: convenções, restrições, vocabulário, pessoas envolvidas.\n\n## Convenções\n- \n\n## Restrições\n- \n\n## Vocabulário / termos específicos\n- \n`;
+    files['TASKS.md'] = `# Tarefas — ${d.name}\n\n## Em andamento\n- [ ] \n\n## Próximas\n- [ ] \n\n## Concluídas\n- [x] Workspace criado (${date})\n`;
+  }
+
+  folders.forEach(f => { files[`${f}/.gitkeep`] = ''; });
+  if(cfg.extraFile){ files[cfg.extraFile.path[LANG]] = cfg.extraFile.build(d.name, LANG); }
+  files['.gitignore'] = buildGitignore();
+
+  const agentBody = buildAgentBody(d);
+  const wantsAgentsmd = els.agAgentsmd.checked;
+  if(els.agClaude.checked){
+    files['CLAUDE.md'] = wantsAgentsmd
+      ? (LANG==='en'
+          ? `@AGENTS.md\n\n## Specific to Claude Code / Cowork\n- (add rules exclusive to this agent here, e.g. use plan mode before structural changes)\n`
+          : `@AGENTS.md\n\n## Específico para Claude Code / Cowork\n- (adicione aqui regras exclusivas deste agente, ex: usar plan mode antes de mudanças estruturais)\n`)
+      : agentBody;
+  }
+  if(wantsAgentsmd){ files['AGENTS.md'] = agentBody; }
+  if(els.agCursor.checked){
+    files[`.cursor/rules/${slug}.mdc`] = LANG==='en'
+      ? `---\ndescription: Rules for the ${d.name} project\nglobs:\nalwaysApply: true\n---\n\n${agentBody}`
+      : `---\ndescription: Regras do projeto ${d.name}\nglobs:\nalwaysApply: true\n---\n\n${agentBody}`;
+  }
+  if(els.agCopilot.checked){ files['.github/copilot-instructions.md'] = agentBody; }
+  if(els.agGemini.checked){ files['GEMINI.md'] = agentBody; }
+  if(els.agWindsurf.checked){ files[`.windsurf/rules/${slug}.md`] = agentBody; }
+  if(els.agSkill.checked){ files[`.claude/skills/${slug}/SKILL.md`] = buildSkillFile(d, slug); }
+
+  return {files, slug, name: d.name};
+}
+
+function buildTreeStructure(paths){
+  const root = {};
+  paths.forEach(p=>{
+    const parts = p.split('/');
+    let node = root;
+    parts.forEach((part,i)=>{
+      const isLeaf = i === parts.length-1;
+      if(!(part in node)) node[part] = isLeaf ? null : {};
+      if(node[part] !== null) node = node[part];
+    });
+  });
+  return root;
+}
+
+function renderTreeNode(node, prefix, lines){
+  const keys = Object.keys(node);
+  keys.forEach((key,idx)=>{
+    const isLast = idx === keys.length-1;
+    const isFolder = node[key] !== null;
+    const connector = isLast ? '└── ' : '├── ';
+    const cls = isFolder ? 'folder' : 'file';
+    const display = isFolder ? key + '/' : key;
+    lines.push(`${prefix}${connector}<span class="${cls}">${display}</span>`);
+    if(isFolder){
+      renderTreeNode(node[key], prefix + (isLast ? '    ' : '│   '), lines);
+    }
+  });
+}
+
+function renderTree(){
+  const {files, slug} = buildFileMap();
+  const structure = buildTreeStructure(Object.keys(files));
+  const lines = [`<span class="root">${slug}/</span>`];
+  renderTreeNode(structure, '', lines);
+  els.tree.innerHTML = lines.join('\n');
+}
+
+function renderPrompt(){
+  const d = collectData();
+  const cfg = TYPE_CONFIG[d.type];
+  const agentFiles = [];
+  if(els.agClaude.checked) agentFiles.push('CLAUDE.md');
+  if(els.agAgentsmd.checked) agentFiles.push('AGENTS.md');
+  if(els.agCursor.checked) agentFiles.push('.cursor/rules/');
+  if(els.agCopilot.checked) agentFiles.push('.github/copilot-instructions.md');
+  if(els.agGemini.checked) agentFiles.push('GEMINI.md');
+  if(els.agWindsurf.checked) agentFiles.push('.windsurf/rules/');
+  const agentList = agentFiles.length ? agentFiles.join(', ') : UI[LANG].agentListFallback;
+
+  const text = LANG==='en'
+    ? `You'll act as a working partner on this project: "${d.name}".
+
+CONTEXT
+${d.desc}
+Main goal: ${d.obj}
+Project type: ${cfg.label[LANG]}
+
+HOW TO WORK
+- Before taking any action, read ${agentList}, then PROJECT.md, CONTEXT.md, and DECISIONS.md in this folder.
+- Every relevant decision we make should be logged in DECISIONS.md (what, why, discarded alternatives).
+- Update TASKS.md as work progresses.
+- You are a tool that extends my judgment — at points of strategic ambiguity, don't decide on your own: bring options and trade-offs for me to decide.
+- Be explicit about what is fact, inference, or assumption.
+
+Start by reviewing the workspace files and tell me what's missing before we begin.`
+    : `Você vai atuar como parceiro de trabalho neste projeto: "${d.name}".
+
+CONTEXTO
+${d.desc}
+Objetivo principal: ${d.obj}
+Tipo de projeto: ${cfg.label[LANG]}
+
+COMO TRABALHAR
+- Antes de qualquer ação, leia ${agentList}, depois PROJECT.md, CONTEXT.md e DECISIONS.md nesta pasta.
+- Toda decisão relevante que tomarmos deve ser registrada em DECISIONS.md (o quê, por quê, alternativas descartadas).
+- Atualize TASKS.md conforme o trabalho avança.
+- Você é uma ferramenta que amplia meu julgamento — em pontos de ambiguidade estratégica, não decida sozinho: traga opções e trade-offs para eu decidir.
+- Seja explícito sobre o que é fato, inferência ou suposição.
+
+Comece revisando os arquivos do workspace e me diga o que falta preencher antes de começarmos.`;
+
+  els.prompt.value = text;
+}
+
+function syncAgentCardStates(){
+  document.querySelectorAll('.agent-card').forEach(card=>{
+    const input = card.querySelector('input[type=checkbox]');
+    if(input) card.classList.toggle('selected', input.checked);
+  });
+}
+
+function renderAll(){ renderTree(); renderPrompt(); syncAgentCardStates(); }
+
+function applyStaticUI(){
+  const t = UI[LANG];
+  document.documentElement.lang = LANG==='en' ? 'en' : 'pt-BR';
+  els.navGenerator.textContent = t.navGenerator;
+  els.navTemplates.textContent = t.navTemplates;
+  els.navHistory.textContent = t.navHistory;
+  els.navSettings.textContent = t.navSettings;
+  els.heroTag.textContent = t.heroTag;
+  els.headerH1.textContent = t.h1;
+  els.headerP.textContent = t.p;
+  els.card01Title.textContent = t.card01;
+  els.pnameLabel.textContent = t.pnameLabel;
+  els.name.placeholder = t.pnamePh;
+  els.ptypeLabel.textContent = t.ptypeLabel;
+  els.pdescLabel.textContent = t.pdescLabel;
+  els.desc.placeholder = t.pdescPh;
+  els.pobjLabel.textContent = t.pobjLabel;
+  els.obj.placeholder = t.pobjPh;
+  els.checksTitle.textContent = t.checksTitle;
+  els.card02Title.textContent = t.card02;
+  els.card02Sub.textContent = t.card02sub;
+  els.pstackLabel.textContent = t.pstackLabel;
+  els.stack.placeholder = els.stack.placeholder || t.genericPh;
+  els.plimitsLabel.textContent = t.plimitsLabel;
+  els.card03Title.textContent = t.card03;
+  els.card03Sub.textContent = t.card03sub;
+  els.agClaudeLabel.textContent = t.agClaude;
+  els.agAgentsmdLabel.textContent = t.agAgentsmd;
+  els.agAgentsmdDesc.textContent = t.agAgentsmdDesc;
+  els.agCursorLabel.textContent = t.agCursor;
+  els.agCopilotLabel.textContent = t.agCopilot;
+  els.agGeminiLabel.textContent = t.agGemini;
+  els.agWindsurfLabel.textContent = t.agWindsurf;
+  els.agSkillLabel.textContent = t.agSkill;
+  els.infoBox.innerHTML = t.infoBox;
+  els.card04Title.textContent = t.card04;
+  els.btnZip.textContent = t.btnZip;
+  els.card05Title.textContent = t.card05;
+  els.btnCopy.textContent = t.btnCopy;
+  els.promptHint.textContent = t.promptHint;
+  els.langPt.classList.toggle('active', LANG==='pt');
+  els.langEn.classList.toggle('active', LANG==='en');
+}
+
+function setLang(lang){
+  LANG = lang;
+  populateTypeSelect();
+  applyTypeDefaults();
+  applyStaticUI();
+  renderAll();
+}
+els.langPt.addEventListener('click', ()=> setLang('pt'));
+els.langEn.addEventListener('click', ()=> setLang('en'));
+
+[els.name, els.desc, els.obj, els.stack, els.limits,
+ els.chk1, els.chk2, els.chk3,
+ els.agClaude, els.agAgentsmd, els.agCursor, els.agCopilot, els.agGemini, els.agWindsurf, els.agSkill
+].forEach(el=> el.addEventListener('input', renderAll));
+
+document.getElementById('btnCopy').addEventListener('click', ()=>{
+  els.prompt.select();
+  navigator.clipboard.writeText(els.prompt.value).then(()=>{
+    const btn = document.getElementById('btnCopy');
+    const old = btn.textContent;
+    btn.textContent = UI[LANG].copied;
+    setTimeout(()=>btn.textContent = old, 1500);
+  });
+});
+
+document.getElementById('btnZip').addEventListener('click', async ()=>{
+  const status = els.zipStatus;
+  status.textContent = UI[LANG].zipGenerating;
+  try{
+    const {files, slug} = buildFileMap();
+    const zip = new JSZip();
+    const root = zip.folder(slug);
+    Object.entries(files).forEach(([path, content])=>{ root.file(path, content); });
+    const blob = await zip.generateAsync({type:'blob'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${slug}.zip`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+    status.textContent = UI[LANG].zipDone(slug);
+  }catch(err){
+    status.textContent = UI[LANG].zipError(err.message);
+  }
+});
+
+setLang('en');
+</script>
+</body>
+</html>
