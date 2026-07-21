@@ -1,0 +1,24 @@
+services:
+  # ── Dev environment — Claude Code (Node 20 + Python available) ──────────
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: claude-workspace-kit
+    volumes:
+      # Project code (bind mount — editable from the host)
+      - .:/workspace
+      # Claude Code login/config (container home) — kept separate from
+      # project config (.claude/) so it doesn't collide and can have its
+      # own gitignore (see .gitignore).
+      - ./.claude_global:/root/.claude
+    environment:
+      - COLORTERM=truecolor
+      - TERM=xterm-256color
+    # No backend/db/redis today — the artifact is static HTML/CSS/JS with
+    # no build step (see CONTEXT.md "Constraints"). If a dev server is
+    # added later (e.g. the project evolves into a web app), map its port
+    # here, e.g. "5173:5173".
+    tty: true
+    stdin_open: true
+    working_dir: /workspace
