@@ -1,0 +1,117 @@
+[
+  {
+    "name": "produto-en",
+    "input": {
+      "name": "Infinite List",
+      "type": "produto",
+      "lang": "en",
+      "desc": "A test app for verifying core generation output.",
+      "obj": "validate the concept before coding",
+      "stack": "Node + React",
+      "limits": "don't deploy without review",
+      "folders": [
+        {
+          "name": "research",
+          "localOnly": false
+        },
+        {
+          "name": "design",
+          "localOnly": false
+        },
+        {
+          "name": "src",
+          "localOnly": false
+        }
+      ],
+      "agents": {
+        "claude": true,
+        "agentsmd": true,
+        "cursor": false,
+        "copilot": false,
+        "gemini": false,
+        "windsurf": false,
+        "skill": false
+      }
+    },
+    "expected": {
+      "fileMap": {
+        "files": {
+          "README.md": "# Infinite List\n\nIndex of this workspace:\n- `PROJECT.md` — overview and goal\n- `DECISIONS.md` — decision history\n- `CONTEXT.md` — accumulated context for the AI\n- `TASKS.md` — active tasks\n\nFolders:\n- `research/`\n- `design/`\n- `src/`\n\n> The AI is a tool that extends human judgment, not a substitute for it. Relevant decisions go into DECISIONS.md.\n",
+          "PROJECT.md": "# Infinite List\n\n## Overview\nA test app for verifying core generation output.\n\n## Main goal\nvalidate the concept before coding\n\n## Project type\nDigital product / App\n\n## Stack\nNode + React\n\n## Status\n🟡 In definition\n\n---\nCreated on 7/22/2026 via workspace//kit.\n",
+          "DECISIONS.md": "# Decisions — Infinite List\n\nChronological record of decisions made in this project. Each entry should contain what, why, and discarded alternatives.\n\n## 7/22/2026\n- **Decision:** —\n- **Reason:** —\n- **Alternatives considered:** —\n",
+          "CONTEXT.md": "# Context — Infinite List\n\nContext the AI should know to work well on this project: conventions, constraints, vocabulary, people involved.\n\n## Conventions\n- \n\n## Constraints\n- \n\n## Vocabulary / specific terms\n- \n",
+          "TASKS.md": "# Tasks — Infinite List\n\n## In progress\n- [ ] \n\n## Next\n- [ ] \n\n## Done\n- [x] Workspace created (7/22/2026)\n",
+          "research/.gitkeep": "",
+          "design/.gitkeep": "",
+          "src/.gitkeep": "",
+          "docs/PRD.md": "# PRD — Infinite List\n\n## Problem\n\n## Proposed solution\n\n## Scope\n\n## Out of scope\n\n## Success metrics\n",
+          ".gitignore": "# OS\n.DS_Store\nThumbs.db\n\n# Editors\n.vscode/\n.idea/\n*.swp\n*.swo\n\n# Secrets & local overrides\n.env\n.env.local\n.env.*.local\n*.local.*\nCLAUDE.local.md\n\n# Logs\n*.log\n",
+          "CLAUDE.md": "@AGENTS.md\n\n## Specific to Claude Code / Cowork\n- (add rules exclusive to this agent here, e.g. use plan mode before structural changes)\n",
+          "AGENTS.md": "# Infinite List\n\nA test app for verifying core generation output.\n\n## Stack & commands\nNode + React\n\n## Limits — don't do this without asking\ndon't deploy without review\n\n## See also\n- PROJECT.md — overview for humans\n- DECISIONS.md — decision history (update on every relevant decision)\n- TASKS.md — active tasks\n"
+        },
+        "slug": "infinite-list",
+        "name": "Infinite List"
+      },
+      "starterPrompt": "You'll act as a working partner on this project: \"Infinite List\".\n\nCONTEXT\nA test app for verifying core generation output.\nMain goal: validate the concept before coding\nProject type: Digital product / App\n\nHOW TO WORK\n- Before taking any action, read CLAUDE.md, AGENTS.md, then PROJECT.md, CONTEXT.md, and DECISIONS.md in this folder.\n- Every relevant decision we make should be logged in DECISIONS.md (what, why, discarded alternatives).\n- Update TASKS.md as work progresses.\n- You are a tool that extends my judgment — at points of strategic ambiguity, don't decide on your own: bring options and trade-offs for me to decide.\n- Be explicit about what is fact, inference, or assumption.\n\nStart by reviewing the workspace files and tell me what's missing before we begin.",
+      "agentFileList": "CLAUDE.md, AGENTS.md"
+    }
+  },
+  {
+    "name": "jogo-pt",
+    "input": {
+      "name": "Jogo Teste",
+      "type": "jogo",
+      "lang": "pt",
+      "desc": "Um jogo de teste para verificar a saída do core.",
+      "obj": "testar geração",
+      "stack": "Godot",
+      "limits": "sem sistemas multi-camada",
+      "folders": [
+        {
+          "name": "assets",
+          "localOnly": false
+        },
+        {
+          "name": "builds",
+          "localOnly": true
+        },
+        {
+          "name": "src",
+          "localOnly": false
+        }
+      ],
+      "agents": {
+        "claude": true,
+        "agentsmd": false,
+        "cursor": true,
+        "copilot": false,
+        "gemini": false,
+        "windsurf": false,
+        "skill": true
+      }
+    },
+    "expected": {
+      "fileMap": {
+        "files": {
+          "README.md": "# Jogo Teste\n\nÍndice deste workspace:\n- `PROJECT.md` — visão geral e objetivo\n- `DECISIONS.md` — histórico de decisões\n- `CONTEXT.md` — contexto acumulado para a IA\n- `TASKS.md` — tarefas ativas\n\nPastas:\n- `assets/`\n- `builds/` — só local, ver .gitignore\n- `src/`\n\n> A IA é uma ferramenta que amplia julgamento humano, não um substituto para ele. Decisões relevantes vão para DECISIONS.md.\n",
+          "PROJECT.md": "# Jogo Teste\n\n## Visão geral\nUm jogo de teste para verificar a saída do core.\n\n## Objetivo principal\ntestar geração\n\n## Tipo de projeto\nJogo digital (game dev)\n\n## Stack\nGodot\n\n## Status\n🟡 Em definição\n\n---\nCriado em 22/07/2026 via workspace//kit.\n",
+          "DECISIONS.md": "# Decisões — Jogo Teste\n\nRegistro cronológico de decisões tomadas neste projeto. Cada entrada deve conter o quê, por quê, e alternativas descartadas.\n\n## 22/07/2026\n- **Decisão:** —\n- **Motivo:** —\n- **Alternativas consideradas:** —\n",
+          "CONTEXT.md": "# Contexto — Jogo Teste\n\nContexto que a IA deve conhecer para trabalhar bem neste projeto: convenções, restrições, vocabulário, pessoas envolvidas.\n\n## Convenções\n- \n\n## Restrições\n- \n\n## Vocabulário / termos específicos\n- \n",
+          "TASKS.md": "# Tarefas — Jogo Teste\n\n## Em andamento\n- [ ] \n\n## Próximas\n- [ ] \n\n## Concluídas\n- [x] Workspace criado (22/07/2026)\n",
+          "assets/.gitkeep": "",
+          "builds/.gitkeep": "",
+          "src/.gitkeep": "",
+          "design/GDD.md": "# GDD — Jogo Teste\n\n## Conceito em uma frase\n\n## Mecânica principal (core loop)\n\n## Escopo (o que cabe no prazo)\n\n## Fora de escopo\n",
+          ".gitignore": "# Sistema operacional\n.DS_Store\nThumbs.db\n\n# Editores\n.vscode/\n.idea/\n*.swp\n*.swo\n\n# Segredos e overrides locais\n.env\n.env.local\n.env.*.local\n*.local.*\nCLAUDE.local.md\n\n# Logs\n*.log\n\n# Pastas locais (pesadas ou sensíveis) — fora do controle de versão\nbuilds/*\n!builds/.gitkeep\n",
+          "CLAUDE.md": "# Jogo Teste\n\nUm jogo de teste para verificar a saída do core.\n\n## Stack & comandos\nGodot\n\n## Limites — o que não fazer sem perguntar\nsem sistemas multi-camada\n\n## Ver também\n- PROJECT.md — visão geral para humanos\n- DECISIONS.md — histórico de decisões (atualizar a cada decisão relevante)\n- TASKS.md — tarefas ativas\n",
+          ".cursor/rules/jogo-teste.mdc": "---\ndescription: Regras do projeto Jogo Teste\nglobs:\nalwaysApply: true\n---\n\n# Jogo Teste\n\nUm jogo de teste para verificar a saída do core.\n\n## Stack & comandos\nGodot\n\n## Limites — o que não fazer sem perguntar\nsem sistemas multi-camada\n\n## Ver também\n- PROJECT.md — visão geral para humanos\n- DECISIONS.md — histórico de decisões (atualizar a cada decisão relevante)\n- TASKS.md — tarefas ativas\n",
+          ".claude/skills/jogo-teste/SKILL.md": "---\nname: jogo-teste\ndescription: Skill de apoio para o projeto Jogo Teste. Use quando precisar de contexto ou rotinas específicas deste projeto.\n---\n\n# Jogo Teste — skill de apoio\n\nInstruções e procedimentos reutilizáveis para tarefas recorrentes deste projeto.\n\n## Quando usar\n- (preencher: em que situações esta skill deve ser carregada)\n\n## Procedimento\n1. \n2. \n3. \n"
+        },
+        "slug": "jogo-teste",
+        "name": "Jogo Teste"
+      },
+      "starterPrompt": "Você vai atuar como parceiro de trabalho neste projeto: \"Jogo Teste\".\n\nCONTEXTO\nUm jogo de teste para verificar a saída do core.\nObjetivo principal: testar geração\nTipo de projeto: Jogo digital (game dev)\n\nCOMO TRABALHAR\n- Antes de qualquer ação, leia CLAUDE.md, .cursor/rules/, depois PROJECT.md, CONTEXT.md e DECISIONS.md nesta pasta.\n- Toda decisão relevante que tomarmos deve ser registrada em DECISIONS.md (o quê, por quê, alternativas descartadas).\n- Atualize TASKS.md conforme o trabalho avança.\n- Você é uma ferramenta que amplia meu julgamento — em pontos de ambiguidade estratégica, não decida sozinho: traga opções e trade-offs para eu decidir.\n- Seja explícito sobre o que é fato, inferência ou suposição.\n\nComece revisando os arquivos do workspace e me diga o que falta preencher antes de começarmos.",
+      "agentFileList": "CLAUDE.md, .cursor/rules/"
+    }
+  }
+]

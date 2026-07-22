@@ -13,6 +13,10 @@
 
 ### CLI generator (planning — 2026-07-21)
 Foundational surface. Full spec + issue: docs/specs/cli-generator.md → [#20](https://github.com/atempel/workspace-kit/issues/20). Supersedes the older, narrower "CLI init" line (issue #6) with a full MVP scope.
+- [x] ~~Shared-generation-engine blocker~~ — resolved 2026-07-22: `core/generator.js` created as a standalone, copy-derived shared module (see DECISIONS.md, "2026-07-22 — Shared generation module seeded standalone, HTML artifact deferred"). `src/workspace-kit.html` is untouched and keeps its own inline copy; not wired to the module.
+- [ ] Build the actual CLI on top of `core/generator.js` (prompts/flags flow per the spec's P0 list, `--git`, `--force`, output parity checks)
+- [x] ~~Parity test harness~~ — `core/parity-check.js` (jsdom, dev-only dependency) loads the real `src/workspace-kit.html`, drives its actual form/functions, and diffs the output against `core/generator.js` for the same inputs — confirmed passing for the 2 seeded fixture cases (2026-07-22). `core/check-fixtures.js` remains the faster day-to-day smoke test (no jsdom); run `npm run test:parity` after any change to either copy to catch real divergence. Follow-up: extend fixture coverage beyond the 2 seeded cases (more of the 17 types, edge cases like empty fields) as the CLI takes shape.
+- [ ] Standing policy: when `core/generator.js`'s generation logic changes, evaluate whether to manually port the change into `src/workspace-kit.html`'s inline copy too (no automated sync, by owner's explicit call — see DECISIONS.md 2026-07-22)
 
 ### Local Web App (planning — 2026-07-21)
 Foundational surface: generates *and* manages workspaces, hosts capabilities the standalone HTML can't (git, Templates management, Docker spin-up). Full spec + issue: docs/specs/local-web-app.md → [#29](https://github.com/atempel/workspace-kit/issues/29).

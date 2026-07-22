@@ -3,7 +3,9 @@
 AI workspace generator: from a project description, produces the human context layer and the AI instruction layer per tool, packaged into a .zip.
 
 ## Stack & commands
-Plain HTML + CSS + JS, single file (`src/workspace-kit.html`). No build step. External dependency: JSZip 3.10.1 via cdnjs. Fonts via Google Fonts (JetBrains Mono + Inter). To test: open the .html directly in a browser, or use it as a Claude artifact.
+**Standalone artifact (`src/workspace-kit.html`):** plain HTML + CSS + JS, single file. No build step. External dependency: JSZip 3.10.1 via cdnjs. Fonts via Google Fonts (JetBrains Mono + Inter). To test: open the .html directly in a browser, or use it as a Claude artifact.
+
+**Shared generation module (`core/generator.js`):** plain Node-compatible JS (CommonJS `module.exports` for Node, `window.WorkspaceKitCore` for `<script>`), zero dependencies at runtime, no build step. Seeded from the artifact's generation logic for the future CLI/Web App to consume — not wired into the standalone artifact, which keeps its own separate inline copy (see DECISIONS.md, 2026-07-22, for why). To test: `npm run test:fixtures` (fast smoke test against recorded fixture output, guards the module's own behavior) and `npm run test:parity` (jsdom, dev-only dependency — loads the real `src/workspace-kit.html` and diffs its actual output against `core/generator.js` for the same inputs; the real check that the two copies still agree).
 
 ## Limits — don't do this without asking
 - Don't introduce a backend, API keys, or network calls beyond CDN/fonts — the generator needs to stay 100% client-side.

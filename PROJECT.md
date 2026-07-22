@@ -17,7 +17,7 @@ Digital product / App (internal tool, standalone artifact)
 
 ## Stack
 **Standalone HTML artifact (today):** plain HTML + CSS + JS, single-file. JSZip 3.10.1 via cdnjs for in-browser .zip generation. Fonts via Google Fonts (JetBrains Mono + Inter). No build step, no backend — this constraint is scoped to this surface specifically (see CONTEXT.md).
-**CLI and local Web App (planned):** stack not chosen yet; unlike the HTML artifact, both are expected to need their own runtime/local process (e.g. to run git, spin up Docker, persist managed workspaces) — see TASKS.md for open items.
+**CLI and local Web App (planned):** their own runtime/local process is still an open choice (e.g. to run git, spin up Docker, persist managed workspaces — see TASKS.md), but the generation logic they'll build on is decided: `core/generator.js`, a plain Node-compatible JS module (zero dependencies, no build step) seeded from the HTML artifact's generation logic — see DECISIONS.md, 2026-07-22. It is not wired into the HTML artifact itself, which keeps its own separate inline copy.
 
 ## Status
 🟢 v3 live on GitHub — new Figma-referenced visual identity (dark glass-card UI, outlined-wordmark logo, SVG flag language selector) promoted to `src/workspace-kit.html` and pushed on 2026-07-10, full functional parity with v2 (17 project types, PT/EN selector, auto-generated `.gitignore`). Previous version preserved at `src/workspace-kit-v2-archive.html`. README is now bilingual (English + Portuguese).

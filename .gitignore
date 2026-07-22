@@ -1,2 +1,5 @@
 # Claude Code container config (login/credentials) — local-only, never commit
 .claude_global/
+
+# Node (core/generator.js's dev tooling — jsdom for core/parity-check.js)
+node_modules/

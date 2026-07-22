@@ -1,0 +1,15 @@
+{
+  "name": "workspace-kit",
+  "private": true,
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test:fixtures": "node core/check-fixtures.js",
+    "test:parity": "node core/parity-check.js"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
+}
