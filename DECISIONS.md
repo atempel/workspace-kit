@@ -2,43 +2,19 @@
 
 Chronological record of decisions made in this project. Each entry contains what, why, and discarded alternatives.
 
-## v1 — base structure
-- **Decision:** base files always generated: PROJECT.md, DECISIONS.md, CONTEXT.md, TASKS.md, README.md.
-- **Reason:** replicates the context hierarchy already used in other projects ("context is the product").
-- **Alternatives considered:** a single context file — discarded for mixing decision history with active tasks.
+## Archived — v1/v2 foundational decisions
+Rotated out per the ADR-style policy below once this file passed ~15 entries (2026-07-26, docs/specs/context-manager-conventions.md → #34). Full text preserved under `decisions/`:
+- [v1 — base structure](decisions/001-v1-base-structure.md) — base files always generated (PROJECT/DECISIONS/CONTEXT/TASKS/README)
+- [v2 — agent layer (CLAUDE.md + AGENTS.md)](decisions/002-v2-agent-layer.md) — CLAUDE.md imports AGENTS.md, avoids drift
+- [v2 — two file layers (human vs. agent)](decisions/003-v2-two-file-layers.md) — human files vs. agent files split
+- [v2 — 11 project types with anchor file](decisions/004-v2-11-project-types.md) — superseded in count by the 2026-07-02 entry below (11 → 17)
+- [v2 — 100% client-side generation](decisions/005-v2-100-percent-client-side.md) — partially superseded by the 2026-07-21 multi-surface entry below
+- [Final adjustment — workspace//kit](decisions/006-final-adjustment-workspace-kit.md) — repo registered as `workspace-kit`
+- [Renaming — workspace//kit](decisions/007-renaming-workspace-kit.md) — chosen over `ctx//forge`/`Context Forge`
+- [v2 — visual identity](decisions/008-v2-visual-identity.md) — terminal palette, JetBrains Mono/Inter
 
-## v2 — agent layer (CLAUDE.md + AGENTS.md)
-- **Decision:** generate CLAUDE.md and AGENTS.md by default, with CLAUDE.md only importing AGENTS.md (`@AGENTS.md`) and adding a section exclusive to Claude.
-- **Reason:** Claude Code/Cowork does not read AGENTS.md natively (confirmed in April/May 2026 documentation), but AGENTS.md is already read natively by Codex, Cursor, Windsurf, Gemini CLI, Devin, Amazon Q, and others. Duplicating content across both files would risk them drifting out of sync.
-- **Alternatives considered:** generating only CLAUDE.md (loses portability); duplicating the full text in both files (discarded due to drift risk).
-
-## v2 — two file layers (human vs. agent)
-- **Decision:** separate "human" files (PROJECT/DECISIONS/CONTEXT/TASKS, more descriptive) from "agent" files (CLAUDE.md/AGENTS.md/etc., leaner: stack, commands, limits).
-- **Reason:** long architecture/prose sections dilute how well the agent follows instructions; concrete commands and limits work better in instruction files.
-- **Alternatives considered:** a single set of files serving both audiences — discarded for producing files too long for agents.
-
-## v2 — 11 project types with anchor file
-- **Decision:** each project type (product, research, writing, design, data/ML, automation, digital game, board game, website, library, generic) has standard folders and, when it makes sense, an anchor file (PRD, GDD, Rulebook, handoff spec, API reference).
-- **Reason:** reflect the actual project types worked on, without forcing every project into the same software-product structure.
-
-## v2 — 100% client-side generation
-- **Decision:** all file and .zip generation happens in the browser via JSZip, no backend.
-- **Reason:** the artifact needs to work inside Claude.ai without its own infrastructure.
-
-## Final adjustment — workspace//kit
-- **Decision:** the repository was registered on GitHub as `workspace-kit` (full word), not `wrkspc-kit` (abbreviated). All files and the artifact's wordmark were synced to `workspace//kit`.
-- **Reason:** keep the name shown everywhere (docs, artifact, repository) identical to the repository's actual slug, avoiding a mismatch between what's written and what actually exists on GitHub.
-- **Resolved pending item:** the slug availability check, left open in the previous decision, was completed — `workspace-kit` is registered.
-
-## Renaming — workspace//kit
-- **Decision:** the project is now called `workspace//kit` (repository slug: `workspace-kit`), replacing the previous working name `ctx//forge` (and the intermediate idea "Context Forge").
-- **Reason:** "context-forge" already exists as a real GitHub project with an almost identical pitch (`webdevtodayjason/context-forge`, a context-scaffolding CLI for Claude Code). Researching alternatives within the same root made it clear that both `ctx` and `forge` are extremely saturated roots in the AI context-tooling niche in 2026 (ctxloom, lean-ctx, ctx-init, RigForge, WorkForge, among others) — keeping any combination of the two was likely to collide again. `workspace//kit` moves away from both saturated roots, showed no relevant collision in the check, and keeps the same visual language (abbreviation + `//` + word).
-- **Alternatives considered:** `Context Forge` / `context-forge` (discarded for a direct collision); `ctx//forge` (discarded for saturated roots); `ctx//prime` (discarded — the name coincides with a forex broker investigated for fraud, bad search associations); `workspace//boilerplate` (evaluated, no relevant collision, but "boilerplate" was considered a slightly dated term for the intended positioning); `brief//kit` and `wrk//spawn` (viable alternatives, not chosen).
-- **Pending item:** the `workspace-kit` repository slug still needed to be checked and registered on GitHub (the owner/user had to verify exact availability at repo creation time).
-
-## v2 — visual identity
-- **Decision:** "terminal" palette (near-black background, amber + teal), JetBrains Mono/Inter typography, a logo of stacked context cards with a blinking cursor.
-- **Reason:** avoid the three visual "defaults" of AI-generated content (cream+terracotta, black+acid green, broadsheet) and anchor the identity in the user's own terminal environment aesthetic.
+## ADR-style rotation policy
+Once DECISIONS.md passes ~15 entries, older entries move to individual files under `decisions/`, leaving this one-line + link index (this rotation, 2026-07-26, is the first time the policy was executed). The same numeric approach applies to CHANGELOG.md-style narrative history (~3 months pruning window) once CONTEXT.md accumulates one — not created yet, since CONTEXT.md currently holds no narrative history to split out (see docs/specs/context-manager-conventions.md, Open Questions). Full spec: docs/specs/context-manager-conventions.md → #34.
 
 ## 2026-07-01 — Repository translated to English + bilingual generator planned
 - **Decision:** the repository's own documentation (README, PROJECT, DECISIONS, CONTEXT, TASKS, AGENTS, CLAUDE, docs/PRD, research/) is now maintained in English only, replacing the Portuguese versions — no parallel bilingual docs. The generated artifact (`src/workspace-kit.html`) will get a PT/EN language selector covering both UI text and the physical folder names it generates (e.g. "pesquisa" → "research"), not just prose inside files.
@@ -99,3 +75,13 @@ Chronological record of decisions made in this project. Each entry contains what
 - **Alternatives considered:** keep both framings and scope each surface individually (e.g., HTML = Phase 1 only, CLI/Web App = full lifecycle) — discarded; the owner's direction is that the constraint itself should be removed project-wide, not partitioned by surface.
 - **Implication:** `docs/PRD.md` (this repo's own self-generated anchor file, produced by an earlier version of the generator) still listed "Persistence across sessions," "Editing templates through the UI," and parts of "Direct integration to create the workspace remotely" under "Out of scope (for now)" — all now explicitly in scope per the CLI/Web App/Templates specs. Updated in this same pass so it stops contradicting the current direction.
 - **Resolves:** the "Open tension, not resolved here" bullet in the "2026-07-21 — Multi-surface compatibility strategy + context-manager repositioning" decision above, and the corresponding TASKS.md follow-up item.
+
+## 2026-07-26 — Product positioning sharpened; model-agnostic clarified; "project type" renamed to "kit"
+- **Decision:** workspace//kit is positioned explicitly as a **workspace management and versioning tool** — for instructions, prose, and documentation — and explicitly **not** a code-versioning tool (git already does that; workspace//kit's planned Git integration is a user-friendly layer on top, not a replacement). **Model- and tool-agnostic** is now an explicit product principle, not just an implementation detail of the standalone HTML artifact.
+- **Reason:** came out of a 2026-07-26 voice-note brainstorming session ("Notas de Áudio 26/07"), reviewed in this same session against the existing repo state before being logged.
+- **Clarification (owner, 2026-07-26):** the note's line "the model can make commits and PRs" does **not** mean workspace//kit itself calls or hosts an AI model. It refers to whatever agent (Claude Code, Cursor, etc.) is already working inside a generated workspace — that agent commits/opens PRs, the user reviews and merges externally. Workspace//kit's own job is to track file state and prepare git-aware flows/instructions for that agent. This keeps the product consistent with the model-agnostic principle above and with CONTEXT.md's "no backend, no external API calls requiring a key" constraint. See TASKS.md, "Git as the integration layer."
+- **Decision:** the built-in "project type" concept (17 folder/anchor-file presets) is renamed **"kit"** — built-ins become **"system kits"** — rather than "template," which was the other candidate name. **Reason:** "template" would collide with the already-planned, separately-sourced Templates feature (user-authored reusable structures, docs/specs/templates-feature.md, #32); "kit" avoids the collision and reinforces the product's own name, workspace//**kit**.
+- **Timing:** decided to execute the rename now, before the CLI (#20) exposes "project type" in its public flag/prompt surface — renaming after that ships would be a breaking change to a public interface instead of an internal one.
+- **Alternatives considered:** "template" for the rename — discarded for the naming collision above; renaming later alongside the Templates feature build — discarded, the CLI is the more time-sensitive constraint.
+- **Not resolved here:** how the separate "Markdown Orchestrator" project gets folded into workspace//kit (port existing code vs. reimplement fresh) — flagged as open in TASKS.md, owner's call, not blocking anything else in this entry.
+- **Also executed in this same session:** DECISIONS.md itself had passed the ~15-entry rotation trigger recorded in docs/specs/context-manager-conventions.md (#34) — see the "Archived — v1/v2 foundational decisions" section and "ADR-style rotation policy" note at the top of this file for the first execution of that policy (2026-07-26).
