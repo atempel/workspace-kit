@@ -417,6 +417,7 @@ COMO TRABALHAR
 - Atualize TASKS.md conforme o trabalho avança.
 - Você é uma ferramenta que amplia meu julgamento — em pontos de ambiguidade estratégica, não decida sozinho: traga opções e trade-offs para eu decidir.
 - Seja explícito sobre o que é fato, inferência ou suposição.
+- Este chat é em português, mas a documentação gerada (PROJECT.md, DECISIONS.md, etc.) deve continuar em inglês por padrão — só escreva a documentação em português se eu pedir isso explicitamente.
 
 Comece revisando os arquivos do workspace e me diga o que falta preencher antes de começarmos.`;
   }
