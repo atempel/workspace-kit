@@ -13,6 +13,7 @@ Eliminate the manual work of assembling and maintaining context throughout a pro
 ## Pillars
 - **Security & privacy** — the generator and this repository itself should never expose secrets, personal data, or private discussions. Heavy or sensitive content belongs on each user's machine, not in version control.
 - **Collaboration** — the generated context layer should make it easy for multiple people (and agents) to pick up a project without re-litigating past decisions. Local-only, per-user state should be isolated so it doesn't get in the way of shared work.
+- **Non-functional bar** (Notion "Notas de Áudio 26/07", 2026-07-26): every surface is held to being **modern, complete, modular, functional, secure, reliable** — this is why the roadmap now runs as one spec + one issue + one branch per feature (see TASKS.md) instead of a single sequential thread.
 
 ## Project type
 Digital product / App (internal tool, standalone artifact)

@@ -11,6 +11,7 @@ Context the AI should know to work well on this project: conventions, constraint
 - No backend, no external API calls requiring a key — **scoped to the standalone HTML surface** (see DECISIONS.md, 2026-07-21): it needs to keep working as a self-contained artifact inside Claude.ai/the browser. The planned CLI and local Web App surfaces are expected to have their own runtime and are not bound by this.
 - The AI (Claude/Cowork) is treated, in the templates the product itself generates, as a tool that extends human judgment — never as a creative entity with its own agency. This rule applies both to the product and to how it talks about itself.
 - workspace//kit is a workspace **management and versioning** tool for instructions/prose/documentation — explicitly not a code-versioning tool (git already does that). It is **model- and tool-agnostic** as a product principle, not just an implementation detail of the standalone HTML artifact: the planned Git integration layer is a user-friendly layer workspace//kit itself drives, never a wrapper that calls or hosts an AI model (see DECISIONS.md, 2026-07-26).
+- Non-functional bar for every surface (see PROJECT.md pillars): modern, complete, modular, functional, secure, reliable.
 
 ## Vocabulary / specific terms
 - "Human layer" = PROJECT.md/DECISIONS.md/CONTEXT.md/TASKS.md.
