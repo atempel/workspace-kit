@@ -13,8 +13,14 @@ AI workspace generator: from a project description, produces the human context l
 - Don't change the palette/typography defined in v2 without logging the reason in DECISIONS.md.
 - Don't present the AI, in the texts the product itself generates, as anything beyond a tool — this is a product rule, not just a style rule.
 
+## Every session
+- Before ending your session, append one entry to `SESSIONS.md` — tool/surface, what was done, state left behind (see docs/specs/cross-tool-session-log.md). This fires every session, not just at onboarding.
+- If you saved a reference you haven't incorporated yet (a voice note, doc, link), file a stub under `queue/` (see docs/specs/document-ingestion-queue.md). `grep -l "Status: Pending" queue/*.md` lists what's still open.
+
 ## See also
 - PROJECT.md — overview for humans
 - DECISIONS.md — decision history (update on every relevant decision)
 - TASKS.md — active tasks
+- SESSIONS.md — per-session tool-handoff log (append every session, see above)
+- queue/ — saved-but-not-yet-ingested references
 - research/agent-ecosystem.md — research that grounds the file-format choices
