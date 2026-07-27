@@ -1,74 +1,155 @@
-name: Sync TASKS.md to Issues
+name: Sync specs to Issues
+
+# History: this workflow originally synced TASKS.md's "- [ ]" checkboxes to
+# GitHub issues 1:1 — every bullet became its own issue. On 2026-07-26 a single
+# TASKS.md push (ingesting a large batch of new planned features) created ~41
+# granular, raw-titled issues (#36-76) in one go. That's not this repo's actual
+# issue convention: one curated issue per feature/spec (e.g. #20/#29/#32/#33/#34),
+# with granular work tracked as GitHub sub-issues under that parent.
+#
+# This version reads docs/specs/*.md instead of TASKS.md: one parent issue per
+# spec file (title "[Spec] <Title>", matched/created idempotently), and one
+# GitHub sub-issue per Must-Have (P0) requirement bullet in that spec's
+# Requirements section. It only creates missing issues/sub-issues — it never
+# closes/reopens anything automatically, since specs don't have checkboxes to
+# read state from; state changes stay manual.
+#
+# TASKS.md itself is now a lean index (heading + one-line pointer + spec/issue
+# link per feature) and is intentionally NOT parsed by this workflow anymore.
 
 on:
   push:
     paths:
-      - 'TASKS.md'
+      - 'docs/specs/*.md'
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   issues: write
   contents: read
 
 jobs:
-  sync-tasks:
+  sync-specs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Parse TASKS.md and Sync Issues
+      - name: Parse specs and sync issues + sub-issues
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python -c "
-          import os, re, subprocess, json
+          python3 -c "
+          import glob, re, subprocess, json, sys
 
-          # 1. Busca todas as issues existentes (abertas e fechadas) no repositório
-          result = subprocess.run(
-              ['gh', 'issue', 'list', '--state', 'all', '--json', 'title,number,state', '--limit', '500'], 
+          def gh_api(args, method='GET', fields=None, paginate=False):
+              cmd = ['gh', 'api']
+              if paginate:
+                  cmd.append('--paginate')
+              if method != 'GET':
+                  cmd += ['-X', method]
+              if fields:
+                  for k, v in fields.items():
+                      cmd += ['-f', f'{k}={v}']
+              cmd.append(args)
+              if paginate:
+                  cmd += ['--jq', '.[]']
+              result = subprocess.run(cmd, capture_output=True, text=True)
+              if result.returncode != 0:
+                  print(f'gh api failed: {args}\n{result.stderr}', file=sys.stderr)
+                  return None
+              return result.stdout
+
+          repo = subprocess.run(
+              ['gh', 'repo', 'view', '--json', 'nameWithOwner', '-q', '.nameWithOwner'],
               capture_output=True, text=True, check=True
-          )
-          issues = json.loads(result.stdout)
-          
-          # Mapeia as issues pelo título para evitar duplicatas
-          issue_map = {issue['title'].strip(): issue for issue in issues}
+          ).stdout.strip()
 
-          # 2. Lê o arquivo TASKS.md
-          with open('TASKS.md', 'r', encoding='utf-8') as f:
-              lines = f.readlines()
-
-          # 3. Processa cada linha procurando por checkboxes do Markdown
-          for line in lines:
-              match = re.match(r'^\s*-\s*\[([xX ])\]\s*(.*)', line)
-              if not match:
+          # 1. Fetch every existing issue (open + closed), keyed by exact title.
+          raw = gh_api(f'repos/{repo}/issues?state=all&per_page=100', paginate=True) or ''
+          issue_by_title = {}
+          for line in raw.splitlines():
+              if not line.strip():
                   continue
+              obj = json.loads(line)
+              if 'pull_request' in obj:
+                  continue  # PRs also show up in the issues endpoint
+              issue_by_title[obj['title'].strip()] = obj
 
-              is_done = match.group(1).lower() == 'x'
-              full_text = match.group(2).strip()
+          def get_or_create_issue(title, body):
+              existing = issue_by_title.get(title)
+              if existing:
+                  return existing
+              created_raw = gh_api(f'repos/{repo}/issues', method='POST',
+                                    fields={'title': title, 'body': body})
+              if not created_raw:
+                  return None
+              created = json.loads(created_raw)
+              issue_by_title[title] = created
+              print(f'Created issue #{created[\"number\"]}: {title}')
+              return created
 
-              # Formata o título da issue. 
-              # Usa o texto até o primeiro travessão '—' ou trunca em 80 caracteres.
-              title = full_text.split(' — ')[0].strip()
-              if len(title) > 80:
-                  title = title[:77] + '...'
+          def existing_sub_issue_titles(parent_number):
+              raw = gh_api(f'repos/{repo}/issues/{parent_number}/sub_issues', paginate=True) or ''
+              titles = set()
+              for line in raw.splitlines():
+                  if line.strip():
+                      titles.add(json.loads(line)['title'].strip())
+              return titles
 
-              # 4. Lógica de Sincronização
-              if title in issue_map:
-                  issue = issue_map[title]
-                  # Se a tarefa foi marcada como concluída [x], mas a issue está aberta -> Fecha a issue
-                  if is_done and issue['state'] == 'OPEN':
-                      print(f'Fechando issue: {title}')
-                      subprocess.run(['gh', 'issue', 'close', str(issue['number'])])
-                  
-                  # Se a tarefa foi desmarcada [ ], mas a issue está fechada -> Reabre a issue
-                  elif not is_done and issue['state'] == 'CLOSED':
-                      print(f'Reabrindo issue: {title}')
-                      subprocess.run(['gh', 'issue', 'reopen', str(issue['number'])])
-              else:
-                  # Se a issue não existe e a tarefa está pendente [ ] -> Cria a issue
-                  if not is_done:
-                      print(f'Criando issue: {title}')
-                      subprocess.run(['gh', 'issue', 'create', '--title', title, '--body', full_text])
+          def add_sub_issue(parent_number, sub_id):
+              gh_api(f'repos/{repo}/issues/{parent_number}/sub_issues', method='POST',
+                     fields={'sub_issue_id': sub_id})
+
+          # 2. Walk every spec file.
+          for path in sorted(glob.glob('docs/specs/*.md')):
+              with open(path, encoding='utf-8') as f:
+                  text = f.read()
+
+              title_match = re.search(r'^# Spec — (.+)$', text, re.MULTILINE)
+              if not title_match:
+                  continue
+              spec_title = title_match.group(1).strip()
+              parent_title = f'[Spec] {spec_title}'
+
+              # First paragraph of the Problem Statement, as a fallback body for
+              # brand-new parent issues only (never overwrites an existing issue's
+              # hand-curated body).
+              problem_match = re.search(
+                  r'## Problem Statement\s*\n+(.+?)(?:\n\n|\Z)', text, re.DOTALL
+              )
+              problem = problem_match.group(1).strip() if problem_match else ''
+              body = (
+                  f'Full spec: [\`{path}\`](https://github.com/{repo}/blob/main/{path})\n\n'
+                  f'{problem}'
+              )
+
+              parent = get_or_create_issue(parent_title, body)
+              if not parent:
+                  continue
+              parent_number = parent['number']
+
+              # 3. Extract the Must-Have (P0) block and its top-level bullets.
+              p0_match = re.search(
+                  r'\*\*Must-Have \(P0\)\*\*\s*\n(.*?)(?=\n\*\*|\n## |\Z)', text, re.DOTALL
+              )
+              if not p0_match:
+                  continue
+              p0_block = p0_match.group(1)
+
+              bullets = re.findall(r'^- (.+)$', p0_block, re.MULTILINE)
+              existing_titles = existing_sub_issue_titles(parent_number)
+
+              for bullet in bullets:
+                  bullet = bullet.strip()
+                  sub_title = bullet.split(' — ')[0].strip()
+                  if len(sub_title) > 80:
+                      sub_title = sub_title[:77] + '...'
+                  if sub_title in existing_titles or sub_title in issue_by_title:
+                      continue
+                  sub_issue = get_or_create_issue(sub_title, f'{bullet}\nParent spec: #{parent_number}')
+                  if sub_issue:
+                      add_sub_issue(parent_number, sub_issue['id'])
+                      print(f'Linked #{sub_issue[\"number\"]} under #{parent_number}')
           "
