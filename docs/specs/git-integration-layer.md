@@ -77,3 +77,6 @@ This spec is about workspace//kit **itself operating git** — as a local tool s
 
 ## Timeline Considerations
 Blocked on `docs/specs/workspace-inspection-layer.md` reaching enough maturity to provide the read-side file index this feature's git state tracking builds on. Softly coupled to the Markdown Orchestrator work (TASKS.md, "Markdown Orchestrator integration" — no spec file yet), which is the first concrete consumer that needs safe, git-aware edits rather than just read access. No hard deadline otherwise; reasonable to sequence this after the CLI and/or Web App MVPs (`docs/specs/cli-generator.md` → #20, `docs/specs/local-web-app.md` → #29) reach their own baseline, since this feature builds on whichever of those two first supplies the local-process runtime it needs.
+
+## Design Reference
+A Claude Design prototype of the Local Web App dashboard ("Workspace Kit Dashboard") already covers Overview/Health check/Session log/Queue; it has no Git section yet. See `docs/design/git-layer-dashboard-brief.md` for the brief requesting that addition (file-state summary, commit flow, PR flow, worktrees, safe-edit warning) — a visual reference only, not an implementation.
