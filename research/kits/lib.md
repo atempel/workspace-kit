@@ -1,4 +1,4 @@
-# Project type — Open source library / SDK (`lib`)
+# Kit — Open source library / SDK (`lib`)
 
 ## Summary
 For packages published to a registry (npm, PyPI, crates.io, etc.) and consumed by other developers — the type most concerned with API stability and versioning discipline.

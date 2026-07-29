@@ -3,7 +3,7 @@
     "name": "produto-en",
     "input": {
       "name": "Infinite List",
-      "type": "produto",
+      "kit": "produto",
       "lang": "en",
       "desc": "A test app for verifying core generation output.",
       "obj": "validate the concept before coding",
@@ -60,7 +60,7 @@
     "name": "jogo-pt",
     "input": {
       "name": "Jogo Teste",
-      "type": "jogo",
+      "kit": "jogo",
       "lang": "pt",
       "desc": "Um jogo de teste para verificar a saída do core.",
       "obj": "testar geração",

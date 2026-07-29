@@ -1,4 +1,4 @@
-# Project type — Writing & content (`escrita`)
+# Kit — Writing & content (`escrita`)
 
 ## Summary
 For long-form writing projects: blog posts, books, essay collections, newsletters treated as a single body of work rather than a recurring production line.

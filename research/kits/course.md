@@ -1,4 +1,4 @@
-# Project type — Course / educational content (`course`) — PROPOSED
+# Kit — Course / educational content (`course`) — PROPOSED
 
 ## Summary
 For structured educational content: cohort-based courses, workshops, internal training — anything organized into modules with learning objectives and assessments, as opposed to unstructured writing (`escrita`).

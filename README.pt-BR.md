@@ -23,13 +23,13 @@ Sem build, sem backend — é um único arquivo HTML/CSS/JS, 100% client-side.
 
 ## O que é gerado
 
-**Camada humana** — `PROJECT.md`, `DECISIONS.md`, `CONTEXT.md`, `TASKS.md`, `README.md`, além de um arquivo âncora quando o tipo de projeto pede um (PRD, GDD, Rulebook, spec de handoff, referência de API).
+**Camada humana** — `PROJECT.md`, `DECISIONS.md`, `CONTEXT.md`, `TASKS.md`, `README.md`, além de um arquivo âncora quando o kit pede um (PRD, GDD, Rulebook, spec de handoff, referência de API).
 
 **Camada de agentes** — `CLAUDE.md` (importando `AGENTS.md`), `AGENTS.md` (padrão universal, lido nativamente por Codex, Cursor, Windsurf, Gemini CLI, Devin, Amazon Q e outros), além de arquivos dedicados para Cursor, Copilot, Gemini CLI, Windsurf, e um esqueleto de Skill portátil.
 
-17 tipos de projeto, cada um com suas próprias pastas e arquivo âncora: produto digital, pesquisa & análise, escrita & conteúdo, design, dados/ML, automação, jogo digital, jogo de tabuleiro, site, biblioteca/SDK, app mobile, extensão de navegador, hardware/IoT, curso, campanha de marketing, podcast/vídeo, e genérico.
+17 kits nativos ("system kits"), cada um com suas próprias pastas e arquivo âncora: produto digital, pesquisa & análise, escrita & conteúdo, design, dados/ML, automação, jogo digital, jogo de tabuleiro, site, biblioteca/SDK, app mobile, extensão de navegador, hardware/IoT, curso, campanha de marketing, podcast/vídeo, e genérico.
 
-**`.gitignore`** é gerado automaticamente para cada workspace, combinando padrões universais (lixo de SO/editor, `.env*`, logs) com pastas "só locais" por tipo de projeto (ex: dados brutos, modelos, builds) que ficam apenas na sua máquina, sem serem commitadas.
+**`.gitignore`** é gerado automaticamente para cada workspace, combinando padrões universais (lixo de SO/editor, `.env*`, logs) com pastas "só locais" por kit (ex: dados brutos, modelos, builds) que ficam apenas na sua máquina, sem serem commitadas.
 
 **Idioma** — tanto o gerador quanto o conteúdo que ele gera oferecem, até o momento, suporte a inglês e português, cobrindo textos de interface, conteúdo dos arquivos gerados e nomes de pastas geradas (padrão em inglês).
 

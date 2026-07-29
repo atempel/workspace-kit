@@ -23,13 +23,13 @@ No build step, no backend — it's a single HTML/CSS/JS file, 100% client-side.
 
 ## What gets generated
 
-**Human layer** — `PROJECT.md`, `DECISIONS.md`, `CONTEXT.md`, `TASKS.md`, `README.md`, plus an anchor file when the project type calls for one (PRD, GDD, Rulebook, handoff spec, API reference).
+**Human layer** — `PROJECT.md`, `DECISIONS.md`, `CONTEXT.md`, `TASKS.md`, `README.md`, plus an anchor file when the kit calls for one (PRD, GDD, Rulebook, handoff spec, API reference).
 
 **Agent layer** — `CLAUDE.md` (importing `AGENTS.md`), `AGENTS.md` (universal standard, read natively by Codex, Cursor, Windsurf, Gemini CLI, Devin, Amazon Q and others), plus dedicated files for Cursor, Copilot, Gemini CLI, Windsurf, and a portable Skill skeleton.
 
-17 project types with their own folders and anchor file: digital product, research & analysis, writing & content, design, data/ML, automation, digital game, board game, website, library/SDK, mobile app, browser extension, hardware/IoT, course, marketing campaign, podcast/video, and generic.
+17 built-in kits ("system kits"), each with their own folders and anchor file: digital product, research & analysis, writing & content, design, data/ML, automation, digital game, board game, website, library/SDK, mobile app, browser extension, hardware/IoT, course, marketing campaign, podcast/video, and generic.
 
-**`.gitignore`** is generated automatically for every workspace, combining universal patterns (OS/editor cruft, `.env*`, logs) with per-type "local only" folders (e.g. raw data, models, build outputs) that stay on your machine instead of getting committed.
+**`.gitignore`** is generated automatically for every workspace, combining universal patterns (OS/editor cruft, `.env*`, logs) with per-kit "local only" folders (e.g. raw data, models, build outputs) that stay on your machine instead of getting committed.
 
 **Language** — both the generator itself and its generated output support English and Portuguese so far, covering UI text, generated file content, and generated folder names (defaults to English).
 

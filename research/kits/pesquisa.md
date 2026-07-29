@@ -1,4 +1,4 @@
-# Project type — Research & analysis (`pesquisa`)
+# Kit — Research & analysis (`pesquisa`)
 
 ## Summary
 For projects whose output is a finding, not a shipped artifact: market research, user research synthesis, competitive analysis, data investigations that end in a report rather than a product.

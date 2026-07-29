@@ -1,4 +1,4 @@
-# Project type — Board / card game (`boardgame`)
+# Kit — Board / card game (`boardgame`)
 
 ## Summary
 For physical (or print-and-play) tabletop game design: board games, card games — a non-digital sibling of `jogo`.

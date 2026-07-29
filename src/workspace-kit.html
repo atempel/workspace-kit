@@ -445,8 +445,8 @@
 
         <div class="field-row">
           <div class="field">
-            <label class="field-label" for="ptype" id="ptypeLabel"></label>
-            <select id="ptype"></select>
+            <label class="field-label" for="pkit" id="pkitLabel"></label>
+            <select id="pkit"></select>
           </div>
           <div class="field">
             <label class="field-label" for="pobj" id="pobjLabel"></label>
@@ -594,7 +594,7 @@ const UI = {
     card01: 'Project Blueprint',
     pnameLabel: 'Project name',
     pnamePh: 'e.g. Infinite List',
-    ptypeLabel: 'Type',
+    pkitLabel: 'Kit',
     pdescLabel: 'Description',
     pdescPh: 'What the project is about, in 2-3 sentences.',
     pobjLabel: 'Main goal (optional)',
@@ -603,7 +603,7 @@ const UI = {
     card02: 'Technical Context',
     card02sub: 'This becomes the body of the instruction files (CLAUDE.md/AGENTS.md etc.) — the more concrete, the less the AI gets conventions wrong.',
     pstackLabel: 'Stack & commands',
-    genericPh: 'filled in based on the project type',
+    genericPh: 'filled in based on the kit',
     plimitsLabel: 'Limits — what the AI should not do without asking',
     card03: 'Agent Configuration',
     card03sub: 'Choose which AIs to generate an instruction file for. Each one reads a different name and format at the workspace root.',
@@ -639,7 +639,7 @@ const UI = {
     card01: 'Blueprint do Projeto',
     pnameLabel: 'Nome do projeto',
     pnamePh: 'Ex: A Lista Infinita',
-    ptypeLabel: 'Tipo',
+    pkitLabel: 'Kit',
     pdescLabel: 'Descrição',
     pdescPh: 'Do que se trata o projeto, em 2-3 frases.',
     pobjLabel: 'Objetivo principal (opcional)',
@@ -648,7 +648,7 @@ const UI = {
     card02: 'Contexto Técnico',
     card02sub: 'Isso vira o corpo dos arquivos de instrução (CLAUDE.md/AGENTS.md etc.) — quanto mais concreto, menos a IA erra convenção.',
     pstackLabel: 'Stack & comandos',
-    genericPh: 'preenchido conforme o tipo de projeto',
+    genericPh: 'preenchido conforme o kit',
     plimitsLabel: 'Limites — o que a IA não deve fazer sem perguntar',
     card03: 'Configuração de Agentes',
     card03sub: 'Escolha pra quais IAs gerar arquivo de instrução. Cada uma lê um nome e formato diferente na raiz do workspace.',
@@ -677,7 +677,7 @@ const UI = {
   }
 };
 
-const TYPE_CONFIG = {
+const KIT_CONFIG = {
   produto: {
     label:{en:'Digital product / App', pt:'Produto digital / App'},
     checks:[
@@ -907,7 +907,7 @@ const GITIGNORE_BASE = {
 
 const els = {
   name: document.getElementById('pname'),
-  type: document.getElementById('ptype'),
+  kit: document.getElementById('pkit'),
   desc: document.getElementById('pdesc'),
   obj: document.getElementById('pobj'),
   stack: document.getElementById('pstack'),
@@ -939,7 +939,7 @@ const els = {
   headerP: document.getElementById('headerP'),
   card01Title: document.getElementById('card01Title'),
   pnameLabel: document.getElementById('pnameLabel'),
-  ptypeLabel: document.getElementById('ptypeLabel'),
+  pkitLabel: document.getElementById('pkitLabel'),
   pdescLabel: document.getElementById('pdescLabel'),
   pobjLabel: document.getElementById('pobjLabel'),
   checksTitle: document.getElementById('checksTitle'),
@@ -974,19 +974,19 @@ function slugify(s){
 }
 function todayStr(lang){ return new Date().toLocaleDateString(lang==='en' ? 'en-US' : 'pt-BR'); }
 
-function populateTypeSelect(){
-  const prevValue = els.type.value;
-  els.type.innerHTML = '';
-  Object.entries(TYPE_CONFIG).forEach(([key,cfg])=>{
+function populateKitSelect(){
+  const prevValue = els.kit.value;
+  els.kit.innerHTML = '';
+  Object.entries(KIT_CONFIG).forEach(([key,cfg])=>{
     const opt = document.createElement('option');
     opt.value = key; opt.textContent = cfg.label[LANG];
-    els.type.appendChild(opt);
+    els.kit.appendChild(opt);
   });
-  if(prevValue && TYPE_CONFIG[prevValue]) els.type.value = prevValue;
+  if(prevValue && KIT_CONFIG[prevValue]) els.kit.value = prevValue;
 }
 
-function applyTypeDefaults(){
-  const cfg = TYPE_CONFIG[els.type.value];
+function applyKitDefaults(){
+  const cfg = KIT_CONFIG[els.kit.value];
   [els.chk1, els.chk2, els.chk3].forEach((el,i)=>{ el.checked = cfg.defaults[i]; });
   [els.chk1label, els.chk2label, els.chk3label].forEach((el,i)=>{
     const base = cfg.checks[i].label[LANG];
@@ -995,17 +995,17 @@ function applyTypeDefaults(){
   els.stack.placeholder = cfg.stackPh[LANG];
   els.limits.placeholder = cfg.limitsPh[LANG];
 }
-els.type.addEventListener('change', ()=>{ applyTypeDefaults(); renderAll(); });
+els.kit.addEventListener('change', ()=>{ applyKitDefaults(); renderAll(); });
 
 function selectedFolders(){
-  const cfg = TYPE_CONFIG[els.type.value];
+  const cfg = KIT_CONFIG[els.kit.value];
   const out = [];
   [els.chk1, els.chk2, els.chk3].forEach((el,i)=>{ if(el.checked) out.push(cfg.checks[i].folder[LANG]); });
   return [...new Set(out)];
 }
 
 function selectedLocalOnlyFolders(){
-  const cfg = TYPE_CONFIG[els.type.value];
+  const cfg = KIT_CONFIG[els.kit.value];
   const out = [];
   [els.chk1, els.chk2, els.chk3].forEach((el,i)=>{ if(el.checked && cfg.checks[i].localOnly) out.push(cfg.checks[i].folder[LANG]); });
   return [...new Set(out)];
@@ -1039,7 +1039,7 @@ function collectData(){
   const t = UI[LANG];
   return {
     name: els.name.value.trim() || t.newProject,
-    type: els.type.value,
+    kit: els.kit.value,
     desc: els.desc.value.trim() || t.fillIn,
     obj: els.obj.value.trim() || t.fillIn,
     stack: els.stack.value.trim(),
@@ -1049,7 +1049,7 @@ function collectData(){
 
 function buildFileMap(){
   const d = collectData();
-  const cfg = TYPE_CONFIG[d.type];
+  const cfg = KIT_CONFIG[d.kit];
   const date = todayStr(LANG);
   const slug = slugify(d.name);
   const files = {};
@@ -1140,7 +1140,7 @@ function renderTree(){
 
 function renderPrompt(){
   const d = collectData();
-  const cfg = TYPE_CONFIG[d.type];
+  const cfg = KIT_CONFIG[d.kit];
   const agentFiles = [];
   if(els.agClaude.checked) agentFiles.push('CLAUDE.md');
   if(els.agAgentsmd.checked) agentFiles.push('AGENTS.md');
@@ -1208,7 +1208,7 @@ function applyStaticUI(){
   els.card01Title.textContent = t.card01;
   els.pnameLabel.textContent = t.pnameLabel;
   els.name.placeholder = t.pnamePh;
-  els.ptypeLabel.textContent = t.ptypeLabel;
+  els.pkitLabel.textContent = t.pkitLabel;
   els.pdescLabel.textContent = t.pdescLabel;
   els.desc.placeholder = t.pdescPh;
   els.pobjLabel.textContent = t.pobjLabel;
@@ -1241,8 +1241,8 @@ function applyStaticUI(){
 
 function setLang(lang){
   LANG = lang;
-  populateTypeSelect();
-  applyTypeDefaults();
+  populateKitSelect();
+  applyKitDefaults();
   applyStaticUI();
   renderAll();
 }
