@@ -3,3 +3,10 @@
 
 # Node (core/generator.js's dev tooling — jsdom for core/parity-check.js)
 node_modules/
+
+# Claude Design prototype exports — only the .dc.html markup under docs/design/
+# is versioned as the visual reference (see DECISIONS.md, 2026-07-28); the full
+# project export (shadcn bundle, ~850KB self-contained page, thumbnails) is not.
+docs/design/*.zip
+docs/design/_ds/
+docs/design/workspace-kit-prototipo.html
