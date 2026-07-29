@@ -27,10 +27,14 @@ AI workspace generator: from a project description, produces the human context l
 - Before ending your session, append one entry to `SESSIONS.md` — tool/surface, what was done, state left behind (see docs/specs/cross-tool-session-log.md). This fires every session, not just at onboarding.
 - If you saved a reference you haven't incorporated yet (a voice note, doc, link), file a stub under `queue/` (see docs/specs/document-ingestion-queue.md). `grep -l "Status: Pending" queue/*.md` lists what's still open.
 
+## Reports
+- When the owner asks for a report, write it as a self-contained HTML file in `reports/` (naming + house rules in `reports/README.md`) instead of answering only in the chat. Summarize the headline in the chat too, but the report is the deliverable.
+
 ## See also
 - PROJECT.md — overview for humans
 - DECISIONS.md — decision history (update on every relevant decision)
 - TASKS.md — active tasks
 - SESSIONS.md — per-session tool-handoff log (append every session, see above)
 - queue/ — saved-but-not-yet-ingested references
+- reports/ — generated point-in-time reports for the owner (HTML, on request)
 - research/agent-ecosystem.md — research that grounds the file-format choices

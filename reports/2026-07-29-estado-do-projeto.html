@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estado do projeto — workspace//kit — 2026-07-29</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#131315;
+    --panel:#1c1b1d;
+    --panel-2:#191819;
+    --card-border:rgba(255,255,255,0.07);
+    --hairline:rgba(69,70,82,0.35);
+    --text:#e5e1e4;
+    --text-dim:#c6c5d5;
+    --text-mute:#9aa0ab;
+    --accent:#dba74e;
+    --accent2:#5fa8a0;
+    --danger:#d4694c;
+    --ok:#6fa86a;
+    --code-bg:#0e0e10;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#f7f6f4;
+      --panel:#ffffff;
+      --panel-2:#fbfaf9;
+      --card-border:rgba(20,20,25,0.10);
+      --hairline:rgba(20,20,25,0.12);
+      --text:#1b1a1c;
+      --text-dim:#3c3b42;
+      --text-mute:#6b6a75;
+      --accent:#a5762a;
+      --accent2:#3d7d76;
+      --danger:#b34a2e;
+      --ok:#4a7a45;
+      --code-bg:#f0eeec;
+    }
+  }
+  *{box-sizing:border-box;}
+  html{background:var(--bg);}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    font-size:15px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:940px;margin:0 auto;padding:48px 24px 96px;}
+
+  header.top{border-bottom:1px solid var(--hairline);padding-bottom:28px;margin-bottom:40px;}
+  .eyebrow{
+    font-family:'JetBrains Mono',ui-monospace,monospace;
+    font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent);margin:0 0 12px;
+  }
+  h1{font-size:30px;line-height:1.25;font-weight:700;margin:0 0 12px;letter-spacing:-0.01em;}
+  .meta{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;color:var(--text-mute);margin:0;}
+
+  h2{
+    font-size:19px;font-weight:600;margin:48px 0 6px;letter-spacing:-0.01em;
+    padding-top:20px;border-top:1px solid var(--hairline);
+  }
+  h2:first-of-type{border-top:none;padding-top:0;}
+  h2 .num{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:var(--accent);margin-right:10px;font-weight:700;}
+  h3{font-size:15px;font-weight:600;margin:28px 0 8px;color:var(--text);}
+  p{margin:0 0 14px;color:var(--text-dim);}
+  .lede{color:var(--text-mute);margin:0 0 22px;font-size:14px;}
+
+  code{
+    font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;
+    background:var(--code-bg);border:1px solid var(--card-border);
+    padding:1px 5px;border-radius:4px;color:var(--text-dim);
+  }
+  pre{
+    font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;line-height:1.65;
+    background:var(--code-bg);border:1px solid var(--card-border);border-radius:8px;
+    padding:16px 18px;overflow-x:auto;color:var(--text-dim);margin:0 0 18px;
+  }
+  pre code{background:none;border:none;padding:0;font-size:inherit;}
+
+  .card{
+    background:var(--panel);border:1px solid var(--card-border);border-radius:10px;
+    padding:20px 22px;margin:0 0 18px;
+  }
+  .card.accent{border-left:3px solid var(--accent);}
+  .card.ok{border-left:3px solid var(--ok);}
+  .card.warn{border-left:3px solid var(--accent);}
+  .card h3{margin-top:0;}
+  .card p:last-child{margin-bottom:0;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:0 0 22px;}
+  .stat{background:var(--panel);border:1px solid var(--card-border);border-radius:10px;padding:16px 18px;}
+  .stat .k{
+    font-family:'JetBrains Mono',ui-monospace,monospace;
+    font-size:26px;font-weight:700;color:var(--text);display:block;line-height:1.2;
+  }
+  .stat .k.good{color:var(--ok);}
+  .stat .k.warn{color:var(--accent);}
+  .stat .l{font-size:12px;color:var(--text-mute);margin-top:6px;display:block;}
+
+  .tablewrap{overflow-x:auto;margin:0 0 20px;border:1px solid var(--card-border);border-radius:10px;background:var(--panel);}
+  table{border-collapse:collapse;width:100%;min-width:520px;}
+  th,td{text-align:left;padding:11px 16px;border-bottom:1px solid var(--hairline);vertical-align:top;font-size:13.5px;}
+  th{
+    font-family:'JetBrains Mono',ui-monospace,monospace;
+    font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--text-mute);background:var(--panel-2);
+  }
+  tr:last-child td{border-bottom:none;}
+  td.mono,th.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;}
+  td.num{text-align:right;font-family:'JetBrains Mono',ui-monospace,monospace;}
+
+  .badge{
+    display:inline-block;font-family:'JetBrains Mono',ui-monospace,monospace;
+    font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:2px 7px;border-radius:4px;border:1px solid;white-space:nowrap;
+  }
+  .badge.pass{color:var(--ok);border-color:var(--ok);}
+  .badge.warn{color:var(--accent);border-color:var(--accent);}
+  .badge.block{color:var(--danger);border-color:var(--danger);}
+  .badge.info{color:var(--accent2);border-color:var(--accent2);}
+  .badge.mute{color:var(--text-mute);border-color:var(--text-mute);}
+
+  ul,ol{margin:0 0 16px;padding-left:22px;color:var(--text-dim);}
+  li{margin-bottom:9px;}
+  li::marker{color:var(--text-mute);}
+  strong{color:var(--text);font-weight:600;}
+  a{color:var(--accent2);}
+
+  .q{
+    background:var(--panel);border:1px solid var(--card-border);border-left:3px solid var(--danger);
+    border-radius:10px;padding:16px 20px;margin:0 0 14px;
+  }
+  .q .qt{font-weight:600;color:var(--text);margin:0 0 6px;}
+  .q p{margin:0;font-size:13.5px;}
+
+  footer{
+    margin-top:56px;padding-top:20px;border-top:1px solid var(--hairline);
+    font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11.5px;color:var(--text-mute);
+  }
+  footer p{color:var(--text-mute);font-family:inherit;font-size:inherit;margin:0 0 6px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <p class="eyebrow">workspace//kit — relatório</p>
+  <h1>Estado do projeto e próximos passos</h1>
+  <p class="meta">2026-07-29 &nbsp;·&nbsp; Claude Code &nbsp;·&nbsp; branch <code>main</code> @ 97a943d &nbsp;·&nbsp; verificado por execução</p>
+</header>
+
+<p class="lede">
+  Relatório do que foi construído até agora, com resultado real de execução — a suíte de testes, os quatro comandos
+  do CLI rodados contra este próprio repositório, e o servidor testado por HTTP. Nada aqui é leitura de código sem execução.
+</p>
+
+<div class="grid">
+  <div class="stat"><span class="k good">61/61</span><span class="l">testes passando (6 suítes)</span></div>
+  <div class="stat"><span class="k">5</span><span class="l">módulos em <code>core/</code></span></div>
+  <div class="stat"><span class="k">4</span><span class="l">comandos de CLI funcionando</span></div>
+  <div class="stat"><span class="k warn">4</span><span class="l">decisões travando trabalho</span></div>
+</div>
+
+<h2><span class="num">01</span>O que existe hoje</h2>
+
+<p>
+  O projeto tem <strong>duas metades</strong>. A de escrita — que gera workspaces — já existia. A de leitura,
+  que abre e avalia um workspace existente, foi construída inteira em 29/07, em seis PRs mergeados em <code>main</code>.
+</p>
+
+<h3>Metade de escrita — gera workspaces</h3>
+<div class="card">
+  <p>
+    <code>src/workspace-kit.html</code> — o artefato standalone, arquivo único, sem build.<br>
+    <code>core/generator.js</code> — cópia compartilhada da lógica de geração, para o CLI e o Web App consumirem.
+  </p>
+  <p>
+    As duas cópias são deliberadamente separadas (ver <code>DECISIONS.md</code>, 2026-07-22). O que impede elas de
+    divergirem é o teste de paridade: ele carrega o HTML <em>real</em> num jsdom e compara a saída dos dois, byte a byte,
+    para os mesmos inputs.
+  </p>
+</div>
+
+<h3>Metade de leitura — abre e avalia um workspace</h3>
+<div class="tablewrap">
+<table>
+  <thead>
+    <tr><th class="mono">Módulo</th><th>O que faz</th><th class="num">Testes</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="mono">core/inspect.js</td>
+      <td>Indexa a pasta: métricas por arquivo, instruções parseadas em unidades de ID estável, grafo de referências
+          cruzadas. Também parseia <code>queue/*.md</code> e <code>SESSIONS.md</code>.
+          <strong>É o único módulo do código que toca o disco.</strong></td>
+      <td class="num">21</td>
+    </tr>
+    <tr>
+      <td class="mono">core/doctor.js</td>
+      <td>A camada de julgamento: thresholds, veredito e sugestões concretas. Recebe o índice pronto, nunca um caminho
+          de pasta — é isso que mantém a fronteira com o <code>inspect</code> nítida.</td>
+      <td class="num">16</td>
+    </tr>
+    <tr>
+      <td class="mono">core/git.js</td>
+      <td>Estado dos arquivos, checagem de edição segura, resumo de mudanças em linguagem simples e mensagem de commit
+          templatada. Model-agnostic é regra de produto aqui: um teste garante que o módulo não faz nenhuma chamada externa.</td>
+      <td class="num">11</td>
+    </tr>
+    <tr>
+      <td class="mono">core/server.js</td>
+      <td>Superfície JSON read-only que o dashboard vai consumir. Zero dependência, só <code>127.0.0.1</code>,
+          recusa caminhos que escapem da raiz e recusa todo método que não seja GET.</td>
+      <td class="num">9</td>
+    </tr>
+    <tr>
+      <td class="mono">bin/workspace-kit.js</td>
+      <td>O CLI: <code>doctor</code>, <code>status</code>, <code>serve</code>, <code>inspect</code>.</td>
+      <td class="num">—</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h2><span class="num">02</span>O que eu testei, e o resultado</h2>
+
+<h3>Suíte completa <span class="badge pass">61/61 pass</span></h3>
+<div class="tablewrap">
+<table>
+  <thead><tr><th class="mono">Suíte</th><th>Cobre</th><th class="num">Casos</th><th>Estado</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">test:fixtures</td><td>Saída gravada do gerador (smoke test rápido)</td><td class="num">2</td><td><span class="badge pass">pass</span></td></tr>
+    <tr><td class="mono">test:inspect</td><td>Um caso por critério de aceite P0 do spec #77</td><td class="num">21</td><td><span class="badge pass">pass</span></td></tr>
+    <tr><td class="mono">test:doctor</td><td>Thresholds, veredito, sugestões, exit code (#78)</td><td class="num">16</td><td><span class="badge pass">pass</span></td></tr>
+    <tr><td class="mono">test:git</td><td>Estado de arquivos, edição segura, guardrails (#79)</td><td class="num">11</td><td><span class="badge pass">pass</span></td></tr>
+    <tr><td class="mono">test:server</td><td>Endpoints, read-only, path escape (#29/#169)</td><td class="num">9</td><td><span class="badge pass">pass</span></td></tr>
+    <tr><td class="mono">test:parity</td><td>HTML real × <code>core/generator.js</code>, saída idêntica</td><td class="num">2</td><td><span class="badge pass">pass</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>O CLI rodado contra este próprio repositório</h3>
+
+<div class="card warn">
+  <p><strong><code>workspace-kit doctor .</code></strong> &nbsp; <span class="badge warn">needs-attention</span> &nbsp; <span class="badge mute">exit 0</span></p>
+  <p>
+    Funciona. O veredito <code>NEEDS-ATTENTION</code> com exit code 0 está correto — só sai não-zero em
+    <code>UNHEALTHY</code>, que é o que torna o comando usável em CI sem falsos positivos.
+  </p>
+<pre><code>Verdict: NEEDS-ATTENTION
+
+Always-loaded context budget
+  41 lines across 2 files  (~1557 tokens, 14% of the 300-line target)  [ok]
+
+Always-loaded files
+  [ok] AGENTS.md      36 lines   ~1463 tokens
+  [ok] CLAUDE.md       5 lines     ~94 tokens
+
+History growth
+  [!!] DECISIONS.md   15/15 entries before rotation
+
+Cross-references: 321 total, 0 broken</code></pre>
+  <p>
+    <strong>Achado real:</strong> <code>DECISIONS.md</code> está exatamente em 15/15 entradas. A próxima entrada
+    dispara a rotação de ADR.
+  </p>
+</div>
+
+<div class="card warn">
+  <p><strong><code>workspace-kit status .</code></strong> &nbsp; <span class="badge pass">funciona</span></p>
+  <p>
+    <strong>Achado real:</strong> reportou <code>.claude/worktrees/</code> como arquivo novo. Essa pasta não está no
+    <code>.gitignore</code> e vai acabar entrando num commit por acidente. Vale corrigir.
+  </p>
+</div>
+
+<div class="card ok">
+  <p><strong><code>workspace-kit serve .</code></strong> &nbsp; <span class="badge pass">funciona</span></p>
+  <p>
+    Subiu e serviu <code>/api/dashboard</code> com as nove chaves esperadas — <code>root</code>, <code>isWorkspace</code>,
+    <code>detection</code>, <code>overview</code>, <code>health</code>, <code>sessions</code>, <code>queue</code>,
+    <code>git</code>, <code>capabilities</code> — numa varredura só, que é o que impede as seções de discordarem entre si.
+    <code>POST</code> devolve 405; endpoint desconhecido devolve 404.
+  </p>
+  <p>
+    <strong>Nota de design a confirmar:</strong> <code>/api/sessions</code> e <code>/api/queue</code> <em>não</em> são
+    endpoints — devolvem 404. Eles vêm como seções dentro de <code>/api/dashboard</code>. Se a expectativa era ter rotas
+    separadas, isso é uma decisão a tomar, não um defeito.
+  </p>
+</div>
+
+<h3>Para reproduzir</h3>
+<pre><code>npm test
+node bin/workspace-kit.js doctor .
+node bin/workspace-kit.js status .
+node bin/workspace-kit.js serve .
+curl http://127.0.0.1:4319/api/dashboard</code></pre>
+
+<h2><span class="num">03</span>Pendências travadas em decisão sua</h2>
+<p class="lede">
+  Construir qualquer uma destas antes da resposta significa jogar uma versão fora. Nenhuma foi iniciada, de propósito.
+</p>
+
+<div class="q">
+  <p class="qt"><span class="badge block">bloqueado</span> &nbsp; Fluxo de PR &nbsp;<span class="badge mute">#79</span></p>
+  <p>Só GitHub via <code>gh</code>, ou agnóstico de provedor?</p>
+</div>
+<div class="q">
+  <p class="qt"><span class="badge block">bloqueado</span> &nbsp; Worktrees &nbsp;<span class="badge mute">#79</span></p>
+  <p>Posição e nomenclatura automáticas por convenção, ou perguntadas a cada vez?</p>
+</div>
+<div class="q">
+  <p class="qt"><span class="badge block">bloqueado</span> &nbsp; Markdown Orchestrator</p>
+  <p>
+    Portar/vendorizar o código do seu projeto existente, ou reimplementar dentro das convenções do workspace//kit?
+    Nenhum spec foi escrito até isso ser respondido.
+  </p>
+</div>
+<div class="q">
+  <p class="qt"><span class="badge block">bloqueado</span> &nbsp; Biblioteca de instruções compartilhada</p>
+  <p>
+    Contradiz diretamente o Non-Goal do spec de Templates (<span class="badge mute">#32</span>) — "sem link vivo entre
+    um template e os workspaces gerados a partir dele". Precisa ser reconciliado antes de virar spec.
+  </p>
+</div>
+
+<h2><span class="num">04</span>Próximos passos desbloqueados</h2>
+
+<div class="card accent">
+  <h3>1. O front-end do dashboard <span class="badge info">#169</span></h3>
+  <p>
+    <strong>É o próximo passo natural.</strong> A camada de dados está 100% pronta: todo número que
+    <code>docs/specs/web-app-dashboard.md</code> renderiza já é servido pelo <code>core/server.js</code>. O que falta é
+    converter <code>docs/design/workspace-kit-dashboard.dc.html</code> — o export do Claude Design — para
+    React + Tailwind + shadcn.
+  </p>
+  <p>
+    Os flags <code>capabilities</code> no payload existem exatamente para o UI mostrar os controles de PR e worktree
+    como indisponíveis, em vez de desenhá-los como se funcionassem.
+  </p>
+</div>
+
+<div class="card">
+  <h3>2. A metade de geração de <span class="badge info">#80</span> <span class="badge info">#81</span></h3>
+  <p>
+    Emitir <code>SESSIONS.md</code>, a instrução permanente e a convenção <code>queue/</code> nos workspaces gerados.
+    A metade de leitura já está pronta; esta não foi feita <em>de propósito</em>: muda a saída gerada nas três superfícies,
+    exige regravar as fixtures e um backport manual para a cópia inline do <code>src/workspace-kit.html</code> — que o
+    <code>CLAUDE.md</code> pede que seja revisado, não aplicado sem supervisão.
+  </p>
+</div>
+
+<div class="card ok">
+  <h3>3. Push travado por credencial <span class="badge pass">corrigido — não era verdade</span></h3>
+  <p>
+    <strong>Este item estava errado na primeira versão deste relatório e foi corrigido.</strong> A primeira versão dizia
+    que o branch <code>worktree-workflow-sync-fix</code> estava travado por falta do escopo <code>workflow</code> no token,
+    e pedia um <code>gh auth refresh</code>. Isso não era mais verdade quando o relatório foi escrito.
+  </p>
+  <p>
+    <strong>O que é fato:</strong> o fix já está em <code>main</code> — commit <code>562e78a</code>, mergeado pelo PR #183.
+    <code>.github/scripts/sync_specs_to_issues.py</code> está no lugar e o workflow dispara por push em <code>main</code>.
+    Não havia nada para enviar.
+  </p>
+  <p>
+    <strong>Origem do erro:</strong> o item foi copiado de uma entrada do <code>SESSIONS.md</code> escrita antes daquele
+    merge, e não foi verificado contra o estado real do repositório — exatamente o que a regra
+    "diga o que foi verificado rodando" em <code>reports/README.md</code> existe para impedir.
+  </p>
+</div>
+
+<footer>
+  <p>workspace//kit — relatório gerado por Claude Code em 2026-07-29.</p>
+  <p>Todos os resultados vêm de execução real neste repositório, não de leitura de código.</p>
+</footer>
+
+</div>
+</body>
+</html>
