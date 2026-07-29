@@ -10,3 +10,7 @@ node_modules/
 docs/design/*.zip
 docs/design/_ds/
 docs/design/workspace-kit-prototipo.html
+
+# Python bytecode (core/ and .github/scripts/ are run directly, never packaged)
+__pycache__/
+*.py[cod]
