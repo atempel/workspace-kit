@@ -46,6 +46,8 @@ A per-session log recording what happened where across tools (Claude Design/Cowo
 
 ### Git as the integration layer (planning — ingested from voice note, 2026-07-26)
 Workspace//kit itself operating git (file-state tracking, worktrees, user-friendly commit/PR flows) — strictly model-agnostic (see DECISIONS.md, 2026-07-26), CLI/Web-App-only. Full spec + issue: docs/specs/git-integration-layer.md → [#79](https://github.com/atempel/workspace-kit/issues/79). Design brief for a Claude Design prototype (no UI existed yet for this spec): docs/design/git-layer-dashboard-brief.md.
+- [x] ~~File-state tracking, safe-edit substrate, change summary, commit message~~ — `core/git.js` + `workspace-kit status` landed 2026-07-29 (`npm run test:git`, 11 cases).
+- [ ] **Blocked on owner decisions:** the PR flow (GitHub-only via `gh`, or provider-agnostic?) and worktree create/list/remove (auto-placed by convention, or prompted each time?). Both are flagged "(Product — Alexandre)" in the spec's Open Questions; building either before the answer means throwing one version away.
 
 ### Document ingestion queue (planning — ingested from voice note, 2026-07-26)
 A per-workspace queue for references saved but not yet incorporated; dogfooded immediately in this repo's own `queue/` folder. Full spec + issue: docs/specs/document-ingestion-queue.md → [#80](https://github.com/atempel/workspace-kit/issues/80).

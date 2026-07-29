@@ -80,3 +80,15 @@ Blocked on `docs/specs/workspace-inspection-layer.md` reaching enough maturity t
 
 ## Design Reference
 A Claude Design prototype of the Local Web App dashboard ("Workspace Kit Dashboard") already covers Overview/Health check/Session log/Queue; it has no Git section yet. See `docs/design/git-layer-dashboard-brief.md` for the brief requesting that addition (file-state summary, commit flow, PR flow, worktrees, safe-edit warning) — a visual reference only, not an implementation.
+
+## Implementation status
+**Partly implemented 2026-07-29** as `core/git.js` plus `workspace-kit status` (tests: `npm run test:git`, 11 cases).
+
+Done: file-state tracking (untracked / modified-unstaged / staged / committed-clean, joined onto #77's index), the safe-edit substrate, the plain-language change summary, the templated commit message, and both guardrail criteria — a test asserts no outbound AI call exists in the module, and another asserts `src/workspace-kit.html` is untouched.
+
+**Deliberately not built, pending owner decisions flagged in Open Questions above:**
+- **The PR flow** — blocked on hosting-provider scope (GitHub-only via `gh`, or provider-agnostic). That answer determines the implementation, so building either version first would mean throwing one away.
+- **Worktree create/list/remove** — blocked on placement/naming (auto-placed by convention, or prompted each time). This is a UX decision with no reversible default.
+
+Note on ordering: staged-plus-further-unstaged reports as `modified-unstaged`, because the unrecorded change is the one a caller about to overwrite the file needs to know about. That ordering is what makes the safe-edit check trustworthy.
+

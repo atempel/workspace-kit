@@ -19,6 +19,7 @@ const path = require('path');
 
 const inspector = require('../core/inspect.js');
 const doctor = require('../core/doctor.js');
+const gitLayer = require('../core/git.js');
 
 const HELP = [
   'workspace//kit — workspace management and versioning for instructions and docs',
@@ -29,6 +30,7 @@ const HELP = [
   '  doctor [dir]     Check a workspace\'s context health. Defaults to the current',
   '                   directory. Exits non-zero when the verdict is unhealthy, so it',
   '                   is usable in CI.',
+  '  status [dir]     Show what has changed in the workspace, in plain language.',
   '  inspect [dir]    Dump the raw workspace index as JSON (debugging aid).',
   '',
   'Options:',
@@ -64,6 +66,34 @@ function main(argv) {
   }
 
   const dir = path.resolve(args.dir || process.cwd());
+
+  if (args.command === 'status') {
+    const index = inspector.inspect(dir);
+    const summary = gitLayer.changeSummary(dir, index);
+    if (args.json) {
+      process.stdout.write(JSON.stringify(summary, null, 2) + '\n');
+      return 0;
+    }
+    if (!summary.isRepo) {
+      process.stdout.write('Not a git repository — no change tracking available here.\n');
+      return 0;
+    }
+    if (!summary.files.length) {
+      process.stdout.write('On ' + summary.branch + ': nothing has changed since the last commit.\n');
+      return 0;
+    }
+    const out = ['On ' + summary.branch + ': ' + summary.files.length
+      + (summary.files.length === 1 ? ' file has changed' : ' files have changed') + '.', ''];
+    summary.files.forEach(function (f) {
+      out.push('  ' + f.path + '  (' + f.what + ')');
+    });
+    out.push('', 'Suggested commit message:', '');
+    gitLayer.buildCommitMessage(summary).split('\n').forEach(function (line) {
+      out.push(line ? '  ' + line : '');
+    });
+    process.stdout.write(out.join('\n') + '\n');
+    return 0;
+  }
 
   if (args.command === 'inspect') {
     process.stdout.write(JSON.stringify(inspector.inspect(dir), null, 2) + '\n');
