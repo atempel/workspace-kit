@@ -6,12 +6,16 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "npm run test:fixtures && npm run test:inspect && npm run test:parity",
+    "test": "npm run test:fixtures && npm run test:inspect && npm run test:doctor && npm run test:parity",
     "test:fixtures": "node core/check-fixtures.js",
     "test:inspect": "node core/check-inspect.js",
+    "test:doctor": "node core/check-doctor.js",
     "test:parity": "node core/parity-check.js"
   },
   "devDependencies": {
     "jsdom": "^29.1.1"
+  },
+  "bin": {
+    "workspace-kit": "bin/workspace-kit.js"
   }
 }
