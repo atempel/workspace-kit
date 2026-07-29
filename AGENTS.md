@@ -13,7 +13,9 @@ AI workspace generator: from a project description, produces the human context l
 
 **Git integration layer (`core/git.js`):** file-state tracking, the safe-edit check, a plain-language change summary and a templated commit message (docs/specs/git-integration-layer.md → #79). Builds on the inspection index rather than re-walking the folder. Model-agnostic is a product rule here, not a preference: every string it emits is a deterministic template over file names and diff counts, and a test asserts the module makes no outbound call. Git is driven with explicit argument arrays, never a shell string. Run `node bin/workspace-kit.js status [dir]`. To test: `npm run test:git`. **Not implemented, on purpose:** the PR flow and worktree management, both gated on open product questions in the spec (hosting-provider scope; worktree placement/naming).
 
-`npm test` runs all five suites.
+**Local server (`core/server.js`):** the read-only JSON surface the Web App dashboard consumes (docs/specs/local-web-app.md → #29, docs/specs/web-app-dashboard.md → #169). Zero-dependency — Node's own `http` is enough, and a framework here would put a dependency underneath every `core/` consumer; the React/Tailwind/shadcn build step decided 2026-07-28 is scoped to the front end that *consumes* this, not to this server. It owns no domain logic: every endpoint is a thin envelope over `inspect`/`doctor`/`git`, which is what keeps the CLI and Web App producing identical answers. Binds to 127.0.0.1, refuses paths escaping its root, and rejects every non-GET method. Run `node bin/workspace-kit.js serve [dir]`. To test: `npm run test:server`.
+
+`npm test` runs all six suites.
 
 ## Limits — don't do this without asking
 - Don't introduce a backend, API keys, or network calls beyond CDN/fonts — the generator needs to stay 100% client-side.
