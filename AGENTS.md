@@ -9,7 +9,7 @@ AI workspace generator: from a project description, produces the human context l
 
 ## Limits — don't do this without asking
 - Don't introduce a backend, API keys, or network calls beyond CDN/fonts — the generator needs to stay 100% client-side.
-- Don't add a build framework (React/Vite/etc.) without an explicit decision — today it's plain HTML on purpose.
+- Don't add a build framework (React/Vite/etc.) to `src/workspace-kit.html` or `core/` — the artifact is plain single-file HTML on purpose, and `core/` stays zero-dependency so both the CLI and Web App can consume it. The Local Web App surface is the documented exception: React + Tailwind + shadcn/ui with a build step, decided 2026-07-28 (see DECISIONS.md).
 - Don't change the palette/typography defined in v2 without logging the reason in DECISIONS.md.
 - Don't present the AI, in the texts the product itself generates, as anything beyond a tool — this is a product rule, not just a style rule.
 

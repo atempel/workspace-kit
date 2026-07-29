@@ -35,6 +35,6 @@ Neutral-first, shadcn-token-shaped (`background`/`foreground`/`card`/`muted`/`bo
 Persistent left sidebar (workspace nav: Overview / Health / Session Log / Queue, plus a workspace switcher if multiple are ever opened) + main content area. No top mega-nav. Command-palette-style quick actions (⌘K) are a nice-to-have worth prototyping if time allows, since it fits the Cursor/Notion reference point directly.
 
 ## Open Questions
-- **(Product — Alexandre)** Does this new direction stay scoped to the Local Web App, or does it eventually replace/reconcile with the standalone HTML artifact's terminal identity too? Not resolved here — see the scope note above.
-- **(Product — Alexandre)** Accent color: keep a version of the existing teal for continuity, or pick fresh since this is visually a new surface?
-- **(Design, resolve inside Claude Design)** Exact token values (hex/OKLCH), spacing scale, radius scale — this file gives direction, not final numbers.
+- **(Resolved 2026-07-28, see DECISIONS.md)** Scope: this direction stays **scoped to the Local Web App**. The standalone HTML artifact keeps its v3 terminal identity (`decisions/008-v2-visual-identity.md`) unchanged, and the two surfaces are explicitly allowed to read as related-but-distinct products — a one-shot artifact and an ongoing management app. Nothing here overrides that earlier decision.
+- **(Resolved 2026-07-28, see DECISIONS.md)** Accent: amber/teal — a continuity nod to the existing identity rather than a fresh pick, over a neutral shadcn token base, with Inter for UI text and JetBrains Mono for paths/metrics.
+- **(Resolved by the prototype)** Exact token values (hex/OKLCH), spacing scale, radius scale — settled inside Claude Design and now versioned as markup at `docs/design/workspace-kit-dashboard.dc.html`. This file stays the direction; that file is the reference for numbers.

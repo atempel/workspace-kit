@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/shadcn-ui-50af1833-7cea-4de5-b5ff-68b24c99d9f2/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/shadcn-ui-50af1833-7cea-4de5-b5ff-68b24c99d9f2/tokens/colors.css">
+<link rel="stylesheet" href="_ds/shadcn-ui-50af1833-7cea-4de5-b5ff-68b24c99d9f2/tokens/radius.css">
+<link rel="stylesheet" href="_ds/shadcn-ui-50af1833-7cea-4de5-b5ff-68b24c99d9f2/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/shadcn-ui-50af1833-7cea-4de5-b5ff-68b24c99d9f2/tokens/shadows.css">
+<link rel="stylesheet" href="_ds/shadcn-ui-50af1833-7cea-4de5-b5ff-68b24c99d9f2/tokens/typography.css">
+<link rel="stylesheet" href="_ds/shadcn-ui-50af1833-7cea-4de5-b5ff-68b24c99d9f2/base.css">
+<link rel="stylesheet" href="_ds/shadcn-ui-50af1833-7cea-4de5-b5ff-68b24c99d9f2/styles.css">
+<script src="_ds/shadcn-ui-50af1833-7cea-4de5-b5ff-68b24c99d9f2/_ds_bundle.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<template id="__bundler_thumbnail">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#18181b"/><g fill="none" stroke-width="2.4"><rect x="38" y="26" width="30" height="38" rx="5" stroke="#3f3f46"/><rect x="31" y="31" width="30" height="38" rx="5" stroke="#5FA8A0"/><rect x="24" y="36" width="30" height="38" rx="5" stroke="#D4A24C" stroke-width="3"/></g><path d="M32 60v-2.1l8.2-4-8.2-3.9v-2.1l10.6 5v2.2z" fill="#D4A24C"/></svg>
+</template>
+<style>
+html,body{margin:0;padding:0;height:100%;font-family:Inter,system-ui,sans-serif;font-size:14px;overflow:hidden}
+*{box-sizing:border-box}
+a{color:var(--brand,#5FA8A0);text-decoration:none}
+a:hover{color:var(--brand,#5FA8A0);text-decoration:underline}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:color-mix(in oklab,var(--muted-foreground) 30%,transparent);border-radius:8px;border:3px solid transparent;background-clip:content-box}
+button:focus-visible,input:focus-visible{outline:3px solid color-mix(in oklab,var(--ring) 50%,transparent);outline-offset:1px}
+@keyframes wkFade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes wkPop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+@keyframes wkPulse{0%,100%{opacity:1}50%{opacity:.35}}
+</style>
+</helmet>
+
+<div style="display:flex;height:100vh;width:100%;background:var(--background);color:var(--foreground);font-family:Inter,system-ui,sans-serif">
+
+<sc-if value="{{ showSidebar }}" hint-placeholder-val="{{ true }}">
+<aside style="width:268px;flex:none;display:flex;flex-direction:column;background:var(--sidebar);border-right:1px solid var(--sidebar-border)">
+
+<div style="padding:16px 14px 12px;display:flex;align-items:center;gap:9px">
+<svg width="22" height="22" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+<rect x="12.3" y="1.8" width="21.75" height="27.55" rx="3.6" fill="none" stroke="currentColor" stroke-opacity=".28" stroke-width="1.8"/>
+<rect x="7.2" y="5.4" width="21.75" height="27.55" rx="3.6" fill="none" stroke="#5FA8A0" stroke-width="1.8"/>
+<rect x="2.1" y="9" width="21.75" height="27.55" rx="3.6" fill="none" stroke="var(--brand,#D4A24C)" stroke-width="2.2"/>
+<path d="M8.2 24.9v-1.5l5.9-2.9-5.9-2.8v-1.5l7.6 3.6v1.6z" fill="var(--brand,#D4A24C)"/>
+</svg>
+<span style="font-size:14px;font-weight:600;letter-spacing:-.01em">workspace<span style="color:var(--brand,#D4A24C);font-weight:700">//</span>kit</span>
+<span style="margin-left:auto;font:500 10px/1 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground);border:1px solid var(--border);border-radius:5px;padding:4px 5px">local</span>
+</div>
+
+<div style="padding:0 12px 10px;position:relative">
+<button onClick="{{ toggleSwitcher }}" style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:8px;border:1px solid var(--border);background:var(--background);color:var(--foreground);cursor:pointer;text-align:left" style-hover="background:var(--accent)">
+<span style="width:22px;height:22px;flex:none;border-radius:6px;background:{{ wsSwatch }};display:flex;align-items:center;justify-content:center;font:700 10px Inter,sans-serif;color:#0b0b0c">{{ wsInitial }}</span>
+<span style="min-width:0;flex:1">
+<span style="display:block;font-size:12.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ ws.name }}</span>
+<span style="display:block;font:400 10.5px/1.4 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ ws.path }}</span>
+</span>
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.5;flex:none"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+</button>
+</div>
+
+<nav style="padding:4px 12px;display:flex;flex-direction:column;gap:2px">
+<button onClick="{{ goOverview }}" style="display:flex;align-items:center;gap:10px;padding:7px 9px;border:0;border-radius:7px;cursor:pointer;font:500 13px Inter,sans-serif;text-align:left;background:{{ navOverviewBg }};color:{{ navOverviewFg }}" style-hover="background:var(--accent)">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h6"/><path d="M9 13h6"/><path d="M9 17h4"/></svg>
+Overview
+</button>
+<button onClick="{{ goHealth }}" style="display:flex;align-items:center;gap:10px;padding:7px 9px;border:0;border-radius:7px;cursor:pointer;font:500 13px Inter,sans-serif;text-align:left;background:{{ navHealthBg }};color:{{ navHealthFg }}" style-hover="background:var(--accent)">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+Health check
+<sc-if value="{{ ws.valid }}" hint-placeholder-val="{{ true }}">
+<span style="margin-left:auto;display:flex;align-items:center;gap:5px;font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;color:{{ verdictColor }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ verdictColor }}"></span>{{ verdictShort }}</span>
+</sc-if>
+</button>
+<button onClick="{{ goSessions }}" style="display:flex;align-items:center;gap:10px;padding:7px 9px;border:0;border-radius:7px;cursor:pointer;font:500 13px Inter,sans-serif;text-align:left;background:{{ navSessionsBg }};color:{{ navSessionsFg }}" style-hover="background:var(--accent)">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+Session log
+</button>
+<button onClick="{{ goQueue }}" style="display:flex;align-items:center;gap:10px;padding:7px 9px;border:0;border-radius:7px;cursor:pointer;font:500 13px Inter,sans-serif;text-align:left;background:{{ navQueueBg }};color:{{ navQueueFg }}" style-hover="background:var(--accent)">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+Queue
+<sc-if value="{{ hasPending }}" hint-placeholder-val="{{ true }}">
+<span style="margin-left:auto;min-width:18px;height:18px;padding:0 6px;border-radius:9px;background:var(--brand,#5FA8A0);color:#0b0b0c;font:600 10.5px/18px 'JetBrains Mono',ui-monospace,monospace;text-align:center">{{ pendingCount }}</span>
+</sc-if>
+</button>
+<button onClick="{{ goGit }}" style="display:flex;align-items:center;gap:10px;padding:7px 9px;border:0;border-radius:7px;cursor:pointer;font:500 13px Inter,sans-serif;text-align:left;background:{{ navGitBg }};color:{{ navGitFg }}" style-hover="background:var(--accent)">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
+Git
+<sc-if value="{{ hasChanges }}" hint-placeholder-val="{{ true }}">
+<span style="margin-left:auto;display:flex;align-items:center;gap:5px;font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;color:#f59e0b"><span style="width:6px;height:6px;border-radius:50%;background:#f59e0b"></span>{{ changedCount }}</span>
+</sc-if>
+</button>
+</nav>
+
+<div style="margin-top:18px;padding:0 12px">
+<div style="padding:6px 9px 6px;font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground)">Recent</div>
+<sc-for list="{{ recents }}" as="r" hint-placeholder-count="3">
+<button onClick="{{ r.pick }}" style="width:100%;display:flex;align-items:center;gap:8px;padding:6px 9px;border:0;border-radius:7px;background:transparent;cursor:pointer;text-align:left;color:var(--muted-foreground)" style-hover="background:var(--accent);color:var(--foreground)">
+<span style="width:6px;height:6px;border-radius:50%;background:{{ r.dot }};flex:none"></span>
+<span style="min-width:0;flex:1;font:400 12px 'JetBrains Mono',ui-monospace,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.short }}</span>
+<span style="font-size:10.5px;flex:none;opacity:.7">{{ r.ago }}</span>
+</button>
+</sc-for>
+</div>
+
+<div style="margin-top:auto;padding:10px 12px;border-top:1px solid var(--sidebar-border);display:flex;align-items:center;gap:8px">
+<button onClick="{{ openPalette }}" style="flex:1;display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted-foreground);cursor:pointer;font-size:12.5px;text-align:left" style-hover="background:var(--accent);color:var(--foreground)">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+Search
+<span style="margin-left:auto;font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;border:1px solid var(--border);border-radius:5px;padding:2px 5px">⌘K</span>
+</button>
+<button onClick="{{ toggleTheme }}" title="Toggle theme" style="width:34px;height:34px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted-foreground);cursor:pointer" style-hover="background:var(--accent);color:var(--foreground)">
+<sc-if value="{{ isDark }}" hint-placeholder-val="{{ true }}">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+</sc-if>
+<sc-if value="{{ isLight }}" hint-placeholder-val="{{ false }}">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+</sc-if>
+</button>
+</div>
+</aside>
+</sc-if>
+
+<sc-if value="{{ showRail }}" hint-placeholder-val="{{ false }}">
+<aside style="width:56px;flex:none;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 0;background:var(--sidebar);border-right:1px solid var(--sidebar-border)">
+<svg width="22" height="22" viewBox="0 0 40 40" fill="none" style="margin-bottom:10px" aria-hidden="true">
+<rect x="7.2" y="5.4" width="21.75" height="27.55" rx="3.6" fill="none" stroke="#5FA8A0" stroke-width="1.8"/>
+<rect x="2.1" y="9" width="21.75" height="27.55" rx="3.6" fill="none" stroke="var(--brand,#D4A24C)" stroke-width="2.2"/>
+<path d="M8.2 24.9v-1.5l5.9-2.9-5.9-2.8v-1.5l7.6 3.6v1.6z" fill="var(--brand,#D4A24C)"/>
+</svg>
+<button onClick="{{ toggleSwitcher }}" title="Switch workspace" style="width:30px;height:30px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;padding:0" style-hover="background:var(--accent)">
+<span style="width:20px;height:20px;border-radius:5px;background:{{ wsSwatch }};display:flex;align-items:center;justify-content:center;font:700 10px Inter,sans-serif;color:#0b0b0c">{{ wsInitial }}</span>
+</button>
+<button onClick="{{ goOverview }}" title="Overview" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:0;border-radius:8px;cursor:pointer;background:{{ navOverviewBg }};color:{{ navOverviewFg }}" style-hover="background:var(--accent)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h6"/></svg></button>
+<button onClick="{{ goHealth }}" title="Health check" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:0;border-radius:8px;cursor:pointer;background:{{ navHealthBg }};color:{{ navHealthFg }}" style-hover="background:var(--accent)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></button>
+<button onClick="{{ goSessions }}" title="Session log" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:0;border-radius:8px;cursor:pointer;background:{{ navSessionsBg }};color:{{ navSessionsFg }}" style-hover="background:var(--accent)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg></button>
+<button onClick="{{ goQueue }}" title="Queue" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:0;border-radius:8px;cursor:pointer;background:{{ navQueueBg }};color:{{ navQueueFg }}" style-hover="background:var(--accent)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></button>
+<button onClick="{{ goGit }}" title="Git" style="position:relative;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:0;border-radius:8px;cursor:pointer;background:{{ navGitBg }};color:{{ navGitFg }}" style-hover="background:var(--accent)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
+<sc-if value="{{ hasChanges }}" hint-placeholder-val="{{ true }}"><span style="position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:#f59e0b"></span></sc-if>
+</button>
+<div style="margin-top:auto;display:flex;flex-direction:column;gap:4px">
+<button onClick="{{ openPalette }}" title="Search (⌘K)" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:0;border-radius:8px;background:transparent;color:var(--muted-foreground);cursor:pointer" style-hover="background:var(--accent);color:var(--foreground)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
+<button onClick="{{ toggleTheme }}" title="Toggle theme" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:0;border-radius:8px;background:transparent;color:var(--muted-foreground);cursor:pointer" style-hover="background:var(--accent);color:var(--foreground)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button>
+</div>
+</aside>
+</sc-if>
+
+<main style="flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden">
+
+<sc-if value="{{ showTopbar }}" hint-placeholder-val="{{ false }}">
+<div style="flex:none;display:flex;align-items:center;gap:14px;padding:0 24px;height:52px;border-bottom:1px solid var(--border);background:var(--sidebar)">
+<span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600">
+<svg width="20" height="20" viewBox="0 0 40 40" fill="none" aria-hidden="true"><rect x="7.2" y="5.4" width="21.75" height="27.55" rx="3.6" fill="none" stroke="#5FA8A0" stroke-width="1.8"/><rect x="2.1" y="9" width="21.75" height="27.55" rx="3.6" fill="none" stroke="var(--brand,#D4A24C)" stroke-width="2.2"/></svg>
+workspace<span style="color:var(--brand,#D4A24C)">//</span>kit</span>
+<div style="width:1px;height:20px;background:var(--border)"></div>
+<button onClick="{{ toggleSwitcher }}" style="display:flex;align-items:center;gap:8px;padding:5px 9px 5px 6px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--foreground);cursor:pointer" style-hover="background:var(--accent)">
+<span style="width:19px;height:19px;flex:none;border-radius:5px;background:{{ wsSwatch }};display:flex;align-items:center;justify-content:center;font:700 9.5px Inter,sans-serif;color:#0b0b0c">{{ wsInitial }}</span>
+<span style="font:500 12.5px Inter,sans-serif">{{ ws.name }}</span>
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.5"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+</button>
+<div style="width:1px;height:20px;background:var(--border)"></div>
+<nav style="display:flex;gap:2px">
+<button onClick="{{ goOverview }}" style="padding:6px 11px;border:0;border-radius:7px;cursor:pointer;font:500 13px Inter,sans-serif;background:{{ navOverviewBg }};color:{{ navOverviewFg }}" style-hover="background:var(--accent)">Overview</button>
+<button onClick="{{ goHealth }}" style="padding:6px 11px;border:0;border-radius:7px;cursor:pointer;font:500 13px Inter,sans-serif;background:{{ navHealthBg }};color:{{ navHealthFg }}" style-hover="background:var(--accent)">Health check</button>
+<button onClick="{{ goSessions }}" style="padding:6px 11px;border:0;border-radius:7px;cursor:pointer;font:500 13px Inter,sans-serif;background:{{ navSessionsBg }};color:{{ navSessionsFg }}" style-hover="background:var(--accent)">Session log</button>
+<button onClick="{{ goQueue }}" style="padding:6px 11px;border:0;border-radius:7px;cursor:pointer;font:500 13px Inter,sans-serif;background:{{ navQueueBg }};color:{{ navQueueFg }}" style-hover="background:var(--accent)">Queue</button>
+<button onClick="{{ goGit }}" style="display:flex;align-items:center;gap:7px;padding:6px 11px;border:0;border-radius:7px;cursor:pointer;font:500 13px Inter,sans-serif;background:{{ navGitBg }};color:{{ navGitFg }}" style-hover="background:var(--accent)">Git<sc-if value="{{ hasChanges }}" hint-placeholder-val="{{ true }}"><span style="width:6px;height:6px;border-radius:50%;background:#f59e0b"></span></sc-if></button>
+</nav>
+<div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+<button onClick="{{ openPalette }}" style="display:flex;align-items:center;gap:8px;padding:6px 9px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted-foreground);cursor:pointer;font-size:12.5px" style-hover="background:var(--accent);color:var(--foreground)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Search<span style="font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;border:1px solid var(--border);border-radius:5px;padding:2px 5px">⌘K</span></button>
+<button onClick="{{ toggleTheme }}" title="Toggle theme" style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted-foreground);cursor:pointer" style-hover="background:var(--accent);color:var(--foreground)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button>
+</div>
+</div>
+</sc-if>
+
+<header style="flex:none;padding:18px 28px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:18px">
+<div style="min-width:0;flex:1">
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:5px">
+<h1 style="margin:0;font-size:19px;font-weight:600;letter-spacing:-.015em">{{ ws.name }}</h1>
+<sc-if value="{{ ws.valid }}" hint-placeholder-val="{{ true }}">
+<span style="font:500 11px 'JetBrains Mono',ui-monospace,monospace;padding:3px 7px;border-radius:6px;background:var(--muted);color:var(--muted-foreground)">{{ ws.kit }}</span>
+</sc-if>
+</div>
+<div style="display:flex;align-items:center;gap:12px;font:400 12px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">
+<span>{{ ws.path }}</span>
+<sc-if value="{{ ws.valid }}" hint-placeholder-val="{{ true }}">
+<span style="opacity:.4">·</span><span>{{ ws.fileCount }} files</span><span style="opacity:.4">·</span><span>updated {{ ws.updated }}</span>
+</sc-if>
+</div>
+</div>
+<sc-if value="{{ ws.valid }}" hint-placeholder-val="{{ true }}">
+<button onClick="{{ goHealth }}" style="flex:none;display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;border:1px solid {{ verdictBorder }};background:{{ verdictBg }};color:{{ verdictColor }};cursor:pointer;font:500 12.5px Inter,sans-serif" style-hover="filter:brightness(1.12)">
+<span style="width:7px;height:7px;border-radius:50%;background:{{ verdictColor }}"></span>{{ verdictLabel }}
+</button>
+</sc-if>
+</header>
+
+<div style="flex:1;overflow:auto;padding:24px 28px 48px">
+
+<sc-if value="{{ invalid }}" hint-placeholder-val="{{ false }}">
+<div style="max-width:520px;margin:9vh auto 0;text-align:center;animation:wkFade .2s ease-out">
+<div style="width:52px;height:52px;margin:0 auto 18px;border:1px solid var(--border);border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--muted-foreground)">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/><path d="M12 10v4M12 17h.01"/></svg>
+</div>
+<h2 style="margin:0 0 8px;font-size:16px;font-weight:600">Not a workspace//kit workspace</h2>
+<p style="margin:0 0 6px;font-size:13.5px;line-height:1.6;color:var(--muted-foreground);text-wrap:pretty">This folder has none of the files a generated workspace is expected to contain — no <span style="font-family:'JetBrains Mono',ui-monospace,monospace">PROJECT.md</span>, <span style="font-family:'JetBrains Mono',ui-monospace,monospace">CLAUDE.md</span>, or <span style="font-family:'JetBrains Mono',ui-monospace,monospace">AGENTS.md</span>.</p>
+<p style="margin:0 0 20px;font:400 11.5px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground);opacity:.75">{{ ws.path }} · 41 files scanned · 0 matched</p>
+<div style="display:flex;gap:9px;justify-content:center">
+<button style="padding:8px 14px;border:0;border-radius:8px;background:var(--primary);color:var(--primary-foreground);cursor:pointer;font:500 13px Inter,sans-serif" style-hover="filter:brightness(.92)">Generate a workspace here</button>
+<button style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--foreground);cursor:pointer;font:500 13px Inter,sans-serif" style-hover="background:var(--accent)">Pick another folder</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+<div style="animation:wkFade .18s ease-out">
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px">
+<sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+<div style="border:1px solid var(--border);border-radius:12px;background:var(--card);padding:14px 16px">
+<div style="font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground);margin-bottom:7px">{{ s.label }}</div>
+<div style="display:flex;align-items:baseline;gap:6px">
+<span style="font:600 22px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:-.02em">{{ s.value }}</span>
+<span style="font-size:11.5px;color:var(--muted-foreground)">{{ s.sub }}</span>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin:-12px 0 20px;font:400 11.5px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">
+<span style="display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:#f59e0b"></span>{{ gitSummaryLine }}</span>
+<span style="opacity:.4">·</span>
+<span>token counts are estimates — chars ÷ 4, approximate</span>
+</div>
+
+<sc-for list="{{ groups }}" as="g" hint-placeholder-count="3">
+<section style="margin-bottom:20px">
+<div style="display:flex;align-items:center;gap:9px;margin-bottom:9px">
+<h2 style="margin:0;font-size:13px;font-weight:600">{{ g.title }}</h2>
+<span style="font:400 11px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">{{ g.meta }}</span>
+</div>
+<div style="border:1px solid var(--border);border-radius:12px;background:var(--card);overflow-x:auto">
+<div style="display:grid;grid-template-columns:minmax(200px,1fr) 80px 92px 56px 66px 86px;gap:8px;min-width:max-content;padding:8px 16px;border-bottom:1px solid var(--border);font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground)">
+<span>File</span><span>Status</span><span>Git</span><span style="text-align:right">Lines</span><span style="text-align:right">Size</span><span style="text-align:right" title="Estimated: characters divided by 4">Est. tokens</span>
+</div>
+<sc-for list="{{ g.files }}" as="f" hint-placeholder-count="4">
+<div style="display:grid;grid-template-columns:minmax(200px,1fr) 80px 92px 56px 66px 86px;gap:8px;min-width:max-content;align-items:center;padding:{{ rowPad }} 16px;border-top:1px solid color-mix(in oklab,var(--border) 60%,transparent);cursor:default" style-hover="background:var(--accent)">
+<span style="display:flex;align-items:center;gap:9px;min-width:0">
+<span style="color:{{ f.iconColor }};display:flex;flex:none">{{ f.icon }}</span>
+<span style="font:{{ f.weight }} 12.5px 'JetBrains Mono',ui-monospace,monospace;color:{{ f.nameColor }};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ f.name }}</span>
+<sc-if value="{{ f.broken }}" hint-placeholder-val="{{ false }}">
+<span title="{{ f.brokenTitle }}" style="flex:none;display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:999px;border:1px dashed color-mix(in oklab,#ef4444 45%,transparent);color:#ef4444;font:500 10.5px Inter,sans-serif"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>broken ref</span>
+</sc-if>
+</span>
+<span><span style="display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;background:{{ f.badgeBg }};color:{{ f.badgeFg }};font:500 11px Inter,sans-serif">{{ f.badge }}</span></span>
+<span><span style="display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;background:{{ f.gitBg }};color:{{ f.gitFg }};border:1px {{ f.gitBorderStyle }} {{ f.gitBorder }};font:500 11px Inter,sans-serif;white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:{{ f.gitDot }};flex:none"></span>{{ f.gitLabel }}</span></span>
+<span style="text-align:right;font:400 12px 'JetBrains Mono',ui-monospace,monospace;color:{{ f.numColor }}">{{ f.lines }}</span>
+<span style="text-align:right;font:400 12px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">{{ f.size }}</span>
+<span style="text-align:right;font:400 12px 'JetBrains Mono',ui-monospace,monospace;color:{{ f.numColor }}">{{ f.tokens }}</span>
+</div>
+</sc-for>
+</div>
+</section>
+</sc-for>
+
+<section style="margin-top:26px">
+<div style="display:flex;align-items:baseline;gap:9px;margin-bottom:4px">
+<h2 style="margin:0;font-size:13px;font-weight:600">Cross-reference graph</h2>
+<span style="font:400 11px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">{{ graphMeta }}</span>
+</div>
+<p style="margin:0 0 11px;font-size:12.5px;color:var(--muted-foreground);max-width:640px;text-wrap:pretty">Which file points at which. Agents follow these links on demand instead of loading everything — each file stays small and references only what's relevant.</p>
+<div style="border:1px solid var(--border);border-radius:12px;background:var(--card);padding:18px 16px">
+<sc-if value="{{ isAtlasGraph }}" hint-placeholder-val="{{ false }}">
+<svg viewBox="0 0 720 300" style="width:100%;height:auto;display:block;font-family:'JetBrains Mono',ui-monospace,monospace" role="img" aria-label="Cross-reference graph">
+<path d="M150 138 H180" stroke="var(--brand,#5FA8A0)" stroke-width="1.5" fill="none"/>
+<path d="M310 138 C325 138 325 78 340 78" stroke="var(--brand,#5FA8A0)" stroke-width="1.5" fill="none"/>
+<path d="M310 138 C325 138 325 208 340 208" stroke="var(--brand,#5FA8A0)" stroke-width="1.5" fill="none"/>
+<path d="M470 78 C500 78 500 28 530 28" stroke="var(--brand,#5FA8A0)" stroke-width="1.5" fill="none"/>
+<path d="M470 78 C500 78 500 80 530 80" stroke="var(--brand,#5FA8A0)" stroke-width="1.5" fill="none"/>
+<path d="M470 78 C500 78 500 132 530 132" stroke="var(--brand,#5FA8A0)" stroke-width="1.5" fill="none"/>
+<path d="M470 208 C500 208 500 194 530 194" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+<path d="M470 208 C500 208 500 246 530 246" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+<g fill="var(--brand,#5FA8A0)"><circle cx="180" cy="138" r="3"/><circle cx="340" cy="78" r="3"/><circle cx="340" cy="208" r="3"/><circle cx="530" cy="28" r="3"/><circle cx="530" cy="80" r="3"/><circle cx="530" cy="132" r="3"/></g>
+<g fill="#ef4444"><circle cx="530" cy="194" r="3"/><circle cx="530" cy="246" r="3"/></g>
+<rect x="20" y="120" width="130" height="36" rx="8" fill="var(--muted)" stroke="var(--border)"/>
+<text x="85" y="143" text-anchor="middle" font-size="12.5" fill="var(--foreground)">CLAUDE.md</text>
+<rect x="180" y="120" width="130" height="36" rx="8" fill="var(--muted)" stroke="var(--border)"/>
+<text x="245" y="143" text-anchor="middle" font-size="12.5" fill="var(--foreground)">AGENTS.md</text>
+<rect x="340" y="60" width="130" height="36" rx="8" fill="var(--muted)" stroke="var(--brand,#5FA8A0)" stroke-width="1.5"/>
+<text x="405" y="83" text-anchor="middle" font-size="12.5" fill="var(--foreground)">PROJECT.md</text>
+<rect x="340" y="190" width="130" height="36" rx="8" fill="var(--muted)" stroke="var(--border)"/>
+<text x="405" y="213" text-anchor="middle" font-size="12.5" fill="var(--foreground)">CONTEXT.md</text>
+<rect x="530" y="10" width="176" height="36" rx="8" fill="var(--muted)" stroke="var(--border)"/>
+<text x="618" y="33" text-anchor="middle" font-size="12.5" fill="var(--foreground)">DECISIONS.md</text>
+<rect x="530" y="62" width="176" height="36" rx="8" fill="var(--muted)" stroke="var(--border)"/>
+<text x="618" y="85" text-anchor="middle" font-size="12.5" fill="var(--foreground)">TASKS.md</text>
+<rect x="530" y="114" width="176" height="36" rx="8" fill="var(--muted)" stroke="var(--border)"/>
+<text x="618" y="137" text-anchor="middle" font-size="12.5" fill="var(--foreground)">CHANGELOG.md</text>
+<rect x="530" y="176" width="176" height="36" rx="8" fill="none" stroke="#ef4444" stroke-dasharray="4 4"/>
+<text x="618" y="199" text-anchor="middle" font-size="11.5" fill="#ef4444">notes/2026-05-interviews/</text>
+<rect x="530" y="228" width="176" height="36" rx="8" fill="none" stroke="#ef4444" stroke-dasharray="4 4"/>
+<text x="618" y="251" text-anchor="middle" font-size="11.5" fill="#ef4444">sources/keyword-map.csv</text>
+<text x="20" y="290" font-size="11" fill="var(--muted-foreground)">entry point</text>
+<text x="340" y="290" font-size="11" fill="var(--muted-foreground)">human layer index</text>
+<text x="530" y="286" font-size="11" fill="#ef4444">2 broken references</text>
+</svg>
+</sc-if>
+<sc-if value="{{ isKitGraph }}" hint-placeholder-val="{{ true }}">
+<svg viewBox="0 0 720 300" style="width:100%;height:auto;display:block;font-family:'JetBrains Mono',ui-monospace,monospace" role="img" aria-label="Cross-reference graph">
+<path d="M158 150 H196" stroke="var(--brand,#5FA8A0)" stroke-width="1.5" fill="none"/>
+<path d="M330 150 H368" stroke="var(--brand,#5FA8A0)" stroke-width="1.5" fill="none"/>
+<path d="M502 150 C525 150 525 60 548 60" stroke="var(--brand,#5FA8A0)" stroke-width="1.5" fill="none"/>
+<path d="M502 150 H548" stroke="var(--brand,#5FA8A0)" stroke-width="1.5" fill="none"/>
+<path d="M502 150 C525 150 525 210 548 210" stroke="var(--brand,#5FA8A0)" stroke-width="1.5" fill="none"/>
+<path d="M502 150 C525 150 525 262 548 262" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+<g fill="var(--brand,#5FA8A0)"><circle cx="196" cy="150" r="3"/><circle cx="368" cy="150" r="3"/><circle cx="548" cy="60" r="3"/><circle cx="548" cy="150" r="3"/><circle cx="548" cy="210" r="3"/></g>
+<circle cx="548" cy="262" r="3" fill="#ef4444"/>
+<g>
+<rect x="28" y="132" width="130" height="36" rx="8" fill="var(--muted)" stroke="var(--border)"/>
+<text x="93" y="155" text-anchor="middle" font-size="12.5" fill="var(--foreground)">CLAUDE.md</text>
+<rect x="200" y="132" width="130" height="36" rx="8" fill="var(--muted)" stroke="var(--border)"/>
+<text x="265" y="155" text-anchor="middle" font-size="12.5" fill="var(--foreground)">AGENTS.md</text>
+<rect x="372" y="132" width="130" height="36" rx="8" fill="var(--muted)" stroke="var(--brand,#5FA8A0)" stroke-width="1.5"/>
+<text x="437" y="155" text-anchor="middle" font-size="12.5" fill="var(--foreground)">PROJECT.md</text>
+<rect x="552" y="42" width="140" height="36" rx="8" fill="var(--muted)" stroke="var(--border)"/>
+<text x="622" y="65" text-anchor="middle" font-size="12.5" fill="var(--foreground)">DECISIONS.md</text>
+<rect x="552" y="132" width="140" height="36" rx="8" fill="var(--muted)" stroke="var(--border)"/>
+<text x="622" y="155" text-anchor="middle" font-size="12.5" fill="var(--foreground)">CONTEXT.md</text>
+<rect x="552" y="192" width="140" height="36" rx="8" fill="var(--muted)" stroke="var(--border)"/>
+<text x="622" y="215" text-anchor="middle" font-size="12.5" fill="var(--foreground)">TASKS.md</text>
+<rect x="552" y="244" width="140" height="36" rx="8" fill="none" stroke="#ef4444" stroke-dasharray="4 4"/>
+<text x="622" y="267" text-anchor="middle" font-size="12.5" fill="#ef4444">docs/PRD.md</text>
+</g>
+<text x="28" y="292" font-size="11" fill="var(--muted-foreground)">entry point</text>
+<text x="372" y="292" font-size="11" fill="var(--muted-foreground)">human layer index</text>
+<text x="552" y="296" font-size="11" fill="#ef4444">broken reference</text>
+</svg>
+</sc-if>
+</div>
+</section>
+</div>
+</sc-if>
+
+<sc-if value="{{ isHealth }}" hint-placeholder-val="{{ false }}">
+<div style="animation:wkFade .18s ease-out">
+<div style="display:grid;grid-template-columns:1.35fr 1fr;gap:14px;margin-bottom:22px">
+<div style="border:1px solid {{ verdictBorder }};border-radius:12px;background:var(--card);padding:18px 20px">
+<div style="display:flex;align-items:center;gap:11px;margin-bottom:10px">
+<span style="width:34px;height:34px;border-radius:9px;background:{{ verdictBg }};color:{{ verdictColor }};display:flex;align-items:center;justify-content:center;flex:none">{{ verdictIcon }}</span>
+<div>
+<div style="font-size:16px;font-weight:600;color:{{ verdictColor }};line-height:1.25">{{ verdictLabel }}</div>
+<div style="font:400 11.5px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">last checked {{ ws.updated }}</div>
+</div>
+</div>
+<p style="margin:0;font-size:13px;line-height:1.6;color:var(--muted-foreground);text-wrap:pretty">{{ verdictBlurb }}</p>
+</div>
+<div style="border:1px solid var(--border);border-radius:12px;background:var(--card);padding:18px 20px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:9px">
+<span style="font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground)">Always-loaded context budget</span>
+</div>
+<div style="display:flex;align-items:baseline;gap:7px;margin-bottom:12px">
+<span style="font:600 26px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:-.02em;color:{{ budgetColor }}">~{{ budgetTokens }}</span>
+<span style="font-size:12px;color:var(--muted-foreground)">est. tokens (chars ÷ 4, approx.) / {{ budgetCap }} target</span>
+</div>
+<div style="position:relative">
+<div style="height:8px;border-radius:999px;background:var(--muted);overflow:hidden;display:flex">
+<sc-for list="{{ budgetSegments }}" as="b" hint-placeholder-count="3">
+<span title="{{ b.title }}" style="width:{{ b.pct }};background:{{ b.color }};border-right:1.5px solid var(--card)"></span>
+</sc-for>
+</div>
+<span style="position:absolute;top:-4px;bottom:-4px;left:{{ budgetTargetPct }};width:2px;background:var(--foreground);border-radius:1px"></span>
+<span style="position:absolute;top:12px;left:{{ budgetTargetPct }};transform:translateX(-50%);font:500 10px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground);white-space:nowrap">target</span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:24px">
+<sc-for list="{{ budgetSegments }}" as="b" hint-placeholder-count="3">
+<span style="display:flex;align-items:center;gap:6px;font:400 11px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)"><span style="width:7px;height:7px;border-radius:2px;background:{{ b.color }}"></span>{{ b.title }}</span>
+</sc-for>
+</div>
+</div>
+</div>
+
+<section style="margin-bottom:22px">
+<h2 style="margin:0 0 9px;font-size:13px;font-weight:600">Per-file status</h2>
+<div style="border:1px solid var(--border);border-radius:12px;background:var(--card);overflow:hidden">
+<div style="display:grid;grid-template-columns:1fr 84px 104px 288px;gap:8px;padding:8px 16px;border-bottom:1px solid var(--border);font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground)">
+<span>File</span><span style="text-align:right">Lines</span><span style="text-align:right" title="Estimated: characters divided by 4">Est. tokens ~</span><span style="padding-left:16px">Status</span>
+</div>
+<sc-for list="{{ healthFiles }}" as="h" hint-placeholder-count="5">
+<div style="display:grid;grid-template-columns:1fr 84px 104px 288px;gap:8px;align-items:center;padding:{{ rowPad }} 16px;border-top:1px solid color-mix(in oklab,var(--border) 60%,transparent)" style-hover="background:var(--accent)">
+<span style="font:500 12.5px 'JetBrains Mono',ui-monospace,monospace">{{ h.file }}</span>
+<span style="text-align:right;font:400 12px 'JetBrains Mono',ui-monospace,monospace;color:{{ h.numColor }}">{{ h.lines }}</span>
+<span style="text-align:right;font:400 12px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">{{ h.tokens }}</span>
+<span style="padding-left:16px;display:flex;align-items:center;gap:7px;min-width:0">
+<span style="color:{{ h.color }};display:flex;flex:none">{{ h.icon }}</span>
+<span style="flex:none;white-space:nowrap;font-size:12.5px;color:{{ h.color }};font-weight:500">{{ h.status }}</span>
+<span style="min-width:0;font-size:11.5px;color:var(--muted-foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ h.note }}</span>
+</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="margin-bottom:22px">
+<div style="display:flex;align-items:baseline;gap:9px;margin-bottom:4px">
+<h2 style="margin:0;font-size:13px;font-weight:600">History growth</h2>
+<span style="font:400 11px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">{{ growthMeta }}</span>
+</div>
+<p style="margin:0 0 11px;font-size:12.5px;color:var(--muted-foreground);max-width:640px;text-wrap:pretty">Append-only files grow every session. These counts say how close each one is to its rotation point, before it starts costing context on every load.</p>
+<div style="border:1px solid var(--border);border-radius:12px;background:var(--card);overflow:hidden">
+<sc-for list="{{ growth }}" as="gr" hint-placeholder-count="3">
+<div style="display:grid;grid-template-columns:minmax(140px,200px) minmax(90px,1fr) minmax(140px,230px);gap:16px;align-items:center;padding:{{ rowPad }} 16px;border-top:1px solid color-mix(in oklab,var(--border) 60%,transparent)" style-hover="background:var(--accent)">
+<span style="font:500 12.5px 'JetBrains Mono',ui-monospace,monospace">{{ gr.file }}</span>
+<span style="display:flex;align-items:center;gap:10px;min-width:0">
+<span style="flex:1;min-width:60px;height:6px;border-radius:999px;background:var(--muted);overflow:hidden;display:block"><span style="display:block;height:100%;width:{{ gr.pct }};background:{{ gr.color }};border-radius:999px"></span></span>
+<span style="flex:none;font:500 12px 'JetBrains Mono',ui-monospace,monospace;color:{{ gr.color }}">{{ gr.count }}</span>
+</span>
+<span style="font-size:12px;color:var(--muted-foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ gr.note }}</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section>
+<div style="display:flex;align-items:baseline;gap:9px;margin-bottom:9px">
+<h2 style="margin:0;font-size:13px;font-weight:600">Suggestions</h2>
+<span style="font:400 11px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">{{ suggestionMeta }}</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<sc-for list="{{ suggestions }}" as="s" hint-placeholder-count="3">
+<div style="border:1px solid var(--border);border-radius:12px;background:var(--card);padding:14px 16px;display:flex;gap:12px" style-hover="border-color:color-mix(in oklab,var(--muted-foreground) 35%,transparent)">
+<span style="width:26px;height:26px;flex:none;border-radius:7px;background:{{ s.bg }};color:{{ s.color }};display:flex;align-items:center;justify-content:center">{{ s.icon }}</span>
+<div style="min-width:0;flex:1">
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+<span style="font:600 12.5px 'JetBrains Mono',ui-monospace,monospace">{{ s.file }}</span>
+<span style="font:500 10.5px Inter,sans-serif;padding:2px 7px;border-radius:999px;background:{{ s.bg }};color:{{ s.color }}">{{ s.tag }}</span>
+</div>
+<p style="margin:0 0 7px;font-size:13px;line-height:1.6;color:var(--muted-foreground);text-wrap:pretty">{{ s.body }}</p>
+<div style="display:flex;align-items:center;gap:9px">
+<button style="padding:5px 11px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--foreground);cursor:pointer;font:500 12px Inter,sans-serif" style-hover="background:var(--accent)">{{ s.action }}</button>
+<button style="padding:5px 9px;border:0;border-radius:7px;background:transparent;color:var(--muted-foreground);cursor:pointer;font:400 12px Inter,sans-serif" style-hover="background:var(--accent);color:var(--foreground)">Dismiss</button>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+</div>
+</sc-if>
+
+<sc-if value="{{ isSessions }}" hint-placeholder-val="{{ false }}">
+<div style="animation:wkFade .18s ease-out;max-width:860px">
+<div style="display:flex;align-items:baseline;gap:9px;margin-bottom:4px">
+<h2 style="margin:0;font-size:13px;font-weight:600">Session log</h2>
+<span style="font:400 11px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">{{ sessionMeta }}</span>
+</div>
+<p style="margin:0 0 18px;font-size:12.5px;color:var(--muted-foreground);max-width:620px;text-wrap:pretty">Append-only handoff record — who touched this workspace, in what tool, and what state it was left in. Never the <em>why</em>; that lives in DECISIONS.md.</p>
+<div style="display:flex;gap:7px;margin-bottom:18px">
+<sc-for list="{{ sessionFilters }}" as="s" hint-placeholder-count="3">
+<button onClick="{{ s.pick }}" style="display:flex;align-items:center;gap:6px;padding:5px 11px;border:1px solid {{ s.border }};border-radius:999px;background:{{ s.bg }};color:{{ s.fg }};cursor:pointer;font:500 12px Inter,sans-serif" style-hover="filter:brightness(1.1)">
+<sc-if value="{{ s.hasDot }}" hint-placeholder-val="{{ true }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ s.dot }}"></span></sc-if>
+{{ s.label }}
+</button>
+</sc-for>
+</div>
+<div style="display:flex;flex-direction:column">
+<sc-for list="{{ sessions }}" as="e" hint-placeholder-count="4">
+<div style="display:grid;grid-template-columns:132px 1fr;gap:18px;position:relative;padding-bottom:22px">
+<div style="text-align:right;padding-top:1px">
+<div style="font:500 12px 'JetBrains Mono',ui-monospace,monospace;color:var(--foreground)">{{ e.date }}</div>
+<div style="font:400 11px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">{{ e.ago }}</div>
+</div>
+<div style="position:relative;padding-left:22px;border-left:1px solid var(--border)">
+<span style="position:absolute;left:-5px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--background);border:2px solid {{ e.dot }}"></span>
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;background:{{ e.bg }};color:{{ e.fg }};border:1px solid {{ e.border }};font:600 11.5px Inter,sans-serif">
+<span style="width:6px;height:6px;border-radius:50%;background:{{ e.dot }}"></span>{{ e.tool }}</span>
+<span style="font:400 11px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">{{ e.duration }}</span>
+</div>
+<div style="border:1px solid var(--border);border-radius:12px;background:var(--card);padding:13px 15px">
+<div style="display:flex;gap:9px;margin-bottom:9px">
+<span style="flex:none;font:600 10.5px/1.7 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground);width:52px">Did</span>
+<p style="margin:0;font-size:13px;line-height:1.65;text-wrap:pretty">{{ e.did }}</p>
+</div>
+<div style="display:flex;gap:9px;padding-top:9px;border-top:1px solid color-mix(in oklab,var(--border) 60%,transparent)">
+<span style="flex:none;font:600 10.5px/1.7 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground);width:52px">Left at</span>
+<p style="margin:0;font-size:13px;line-height:1.65;color:var(--muted-foreground);text-wrap:pretty">{{ e.left }}</p>
+</div>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isQueue }}" hint-placeholder-val="{{ false }}">
+<div style="animation:wkFade .18s ease-out">
+<div style="display:flex;align-items:baseline;gap:9px;margin-bottom:4px">
+<h2 style="margin:0;font-size:13px;font-weight:600">Document queue</h2>
+<span style="font:400 11px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">{{ queueMeta }}</span>
+</div>
+<p style="margin:0 0 14px;font-size:12.5px;color:var(--muted-foreground);max-width:620px;text-wrap:pretty">References saved but not yet folded into the project's own docs. Pending items float to the top.</p>
+<div style="display:flex;gap:7px;margin-bottom:12px">
+<sc-for list="{{ queueFilters }}" as="q" hint-placeholder-count="3">
+<button onClick="{{ q.pick }}" style="padding:5px 11px;border:1px solid {{ q.border }};border-radius:999px;background:{{ q.bg }};color:{{ q.fg }};cursor:pointer;font:500 12px Inter,sans-serif" style-hover="filter:brightness(1.1)">{{ q.label }}</button>
+</sc-for>
+</div>
+<div style="border:1px solid var(--border);border-radius:12px;background:var(--card);overflow:hidden">
+<div style="display:grid;grid-template-columns:26px 108px 1fr 106px 168px;gap:10px;padding:8px 16px;border-bottom:1px solid var(--border);font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground)">
+<span></span><span>Type</span><span>Source</span><span>Added</span><span>Status</span>
+</div>
+<sc-for list="{{ queueItems }}" as="q" hint-placeholder-count="4">
+<div>
+<div onClick="{{ q.toggle }}" style="display:grid;grid-template-columns:26px 108px 1fr 106px 168px;gap:10px;align-items:center;padding:{{ rowPad }} 16px;border-top:1px solid color-mix(in oklab,var(--border) 60%,transparent);cursor:pointer" style-hover="background:var(--accent)">
+<span style="color:var(--muted-foreground);display:flex;transform:{{ q.caret }};transition:transform .15s ease"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+<span style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted-foreground)">{{ q.typeIcon }}{{ q.type }}</span>
+<span style="min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ q.source }}</span>
+<span style="font:400 12px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">{{ q.added }}</span>
+<span style="display:flex;align-items:center;gap:7px">
+<span style="display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:999px;background:{{ q.bg }};color:{{ q.color }};font:500 11.5px Inter,sans-serif">{{ q.statusIcon }}{{ q.status }}</span>
+<span style="font:400 11px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">{{ q.statusDate }}</span>
+</span>
+</div>
+<sc-if value="{{ q.open }}" hint-placeholder-val="{{ false }}">
+<div style="padding:2px 16px 16px 62px;border-top:1px solid color-mix(in oklab,var(--border) 40%,transparent);background:color-mix(in oklab,var(--muted) 45%,transparent);animation:wkFade .15s ease-out">
+<div style="display:flex;gap:9px;padding-top:12px">
+<span style="flex:none;font:600 10.5px/1.7 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground);width:70px">Notes</span>
+<p style="margin:0;font-size:13px;line-height:1.65;max-width:640px;text-wrap:pretty">{{ q.notes }}</p>
+</div>
+<div style="display:flex;gap:9px;padding-top:10px">
+<span style="flex:none;font:600 10.5px/1.7 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground);width:70px">{{ q.destLabel }}</span>
+<p style="margin:0;font:400 12px/1.75 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground);max-width:640px;text-wrap:pretty">{{ q.dest }}</p>
+</div>
+<div style="display:flex;gap:9px;padding-top:12px;padding-left:79px">
+<button style="padding:5px 11px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--foreground);cursor:pointer;font:500 12px Inter,sans-serif" style-hover="background:var(--accent)">{{ q.primaryAction }}</button>
+<button style="padding:5px 11px;border:0;border-radius:7px;background:transparent;color:var(--muted-foreground);cursor:pointer;font:400 12px Inter,sans-serif" style-hover="background:var(--accent);color:var(--foreground)">Open source</button>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-for>
+<sc-if value="{{ queueEmpty }}" hint-placeholder-val="{{ false }}">
+<div style="padding:44px 16px;text-align:center">
+<div style="font-size:13.5px;font-weight:500;margin-bottom:5px">No items match this filter.</div>
+<div style="font-size:12.5px;color:var(--muted-foreground)">Everything saved here has already been ingested.</div>
+</div>
+</sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isGit }}" hint-placeholder-val="{{ false }}">
+<div style="animation:wkFade .18s ease-out;max-width:1040px">
+
+<div style="display:flex;align-items:baseline;gap:9px;margin-bottom:4px">
+<h2 style="margin:0;font-size:13px;font-weight:600">Source control</h2>
+<span style="font:400 11px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">{{ gitMeta }}</span>
+</div>
+<p style="margin:0 0 14px;font-size:12.5px;color:var(--muted-foreground);max-width:660px;text-wrap:pretty">What has changed in this workspace since the last commit, in plain terms. No commands, no staging area to manage — the actions below do the git work for you.</p>
+
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:20px">
+<sc-for list="{{ gitCounts }}" as="c" hint-placeholder-count="4">
+<span style="display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;background:{{ c.bg }};border:1px {{ c.borderStyle }} {{ c.border }};color:{{ c.fg }};font:500 12px Inter,sans-serif"><span style="width:6px;height:6px;border-radius:50%;background:{{ c.dot }}"></span>{{ c.label }}</span>
+</sc-for>
+<span style="margin-left:4px;font:400 11.5px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">on {{ gitBranch }}</span>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-bottom:22px;align-items:start">
+
+<div style="border:1px solid var(--border);border-radius:12px;background:var(--card);padding:18px 20px">
+<div style="display:flex;align-items:center;gap:9px;margin-bottom:8px">
+<h3 style="margin:0;font-size:13px;font-weight:600">Ready to commit</h3>
+<span style="font:400 11px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">{{ commitMeta }}</span>
+</div>
+<p style="margin:0 0 14px;font-size:13px;line-height:1.65;color:var(--muted-foreground);text-wrap:pretty">{{ commitBlurb }}</p>
+<div style="display:flex;flex-direction:column;gap:1px;margin-bottom:16px;border:1px solid color-mix(in oklab,var(--border) 70%,transparent);border-radius:9px;overflow:hidden">
+<sc-for list="{{ commitFiles }}" as="cf" hint-placeholder-count="4">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 88px;gap:12px;align-items:center;padding:8px 12px;background:color-mix(in oklab,var(--muted) 40%,transparent)">
+<span style="min-width:0">
+<span style="display:block;font:500 12.5px 'JetBrains Mono',ui-monospace,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ cf.file }}</span>
+<span style="display:block;font-size:11px;color:var(--muted-foreground)">{{ cf.what }}</span>
+</span>
+<span style="display:flex;align-items:center;justify-content:flex-end;gap:8px;font:500 11.5px 'JetBrains Mono',ui-monospace,monospace"><span style="color:#22c55e">{{ cf.add }}</span><span style="color:#ef4444">{{ cf.del }}</span></span>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ notCommitted }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+<button onClick="{{ doCommit }}" style="padding:9px 16px;border:0;border-radius:8px;background:var(--brand,#D4A24C);color:#0b0b0c;cursor:pointer;font:600 13px Inter,sans-serif" style-hover="filter:brightness(1.08)">Commit changes</button>
+<span style="font-size:12px;color:var(--muted-foreground)">Message written from the diff. You can edit it after.</span>
+</div>
+</sc-if>
+<sc-if value="{{ committed }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;background:color-mix(in oklab,#22c55e 12%,transparent);color:#22c55e;animation:wkFade .18s ease-out">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M20 6 9 17l-5-5"/></svg>
+<span style="font:500 12.5px Inter,sans-serif">Committed — {{ commitCount }} files. Nothing left uncommitted.</span>
+<button onClick="{{ undoCommit }}" style="margin-left:auto;padding:4px 9px;border:0;border-radius:7px;background:transparent;color:var(--muted-foreground);cursor:pointer;font:400 12px Inter,sans-serif" style-hover="background:var(--accent);color:var(--foreground)">Reset demo</button>
+</div>
+</sc-if>
+</div>
+
+<div style="border:1px solid var(--border);border-radius:12px;background:var(--card);padding:18px 20px">
+<div style="display:flex;align-items:center;gap:9px;margin-bottom:12px;flex-wrap:wrap">
+<h3 style="margin:0;font-size:13px;font-weight:600">Pull request</h3>
+<span style="display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;background:var(--muted);color:var(--muted-foreground);font:500 10.5px Inter,sans-serif;white-space:nowrap"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M4 7h16M4 12h10M4 17h7"/></svg>from the diff, not a model</span>
+</div>
+<div style="font:400 11.5px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground);margin-bottom:12px">{{ prBranch }} → {{ gitBranch }}</div>
+<div style="margin-bottom:6px;font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground)">Title</div>
+<div style="font-size:13.5px;font-weight:500;line-height:1.5;margin-bottom:14px;text-wrap:pretty">{{ prTitle }}</div>
+<div style="margin-bottom:6px;font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground)">Description</div>
+<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">
+<sc-for list="{{ prBullets }}" as="pb" hint-placeholder-count="3">
+<div style="display:flex;gap:9px;font-size:12.5px;line-height:1.55;color:var(--muted-foreground)"><span style="color:var(--brand,#D4A24C);flex:none">—</span><span style="text-wrap:pretty">{{ pb.text }}</span></div>
+</sc-for>
+</div>
+<sc-if value="{{ prClosed }}" hint-placeholder-val="{{ true }}">
+<button onClick="{{ openPr }}" style="padding:9px 16px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--foreground);cursor:pointer;font:500 13px Inter,sans-serif" style-hover="background:var(--accent)">Open Pull Request</button>
+</sc-if>
+<sc-if value="{{ prOpened }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:9px;background:var(--muted);animation:wkFade .18s ease-out">
+<span style="width:7px;height:7px;border-radius:50%;background:#22c55e;flex:none"></span>
+<span style="font:500 12.5px Inter,sans-serif">Opened as {{ prNumber }} — review and merge happen on the host.</span>
+</div>
+</sc-if>
+</div>
+</div>
+
+<section style="margin-bottom:22px">
+<div style="display:flex;align-items:baseline;gap:9px;margin-bottom:4px">
+<h2 style="margin:0;font-size:13px;font-weight:600">Worktrees</h2>
+<span style="font:400 11px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">{{ wtMeta }}</span>
+</div>
+<p style="margin:0 0 11px;font-size:12.5px;color:var(--muted-foreground);max-width:660px;text-wrap:pretty">One checkout per agent, so two tools never edit the same files at once.</p>
+<div style="border:1px solid var(--border);border-radius:12px;background:var(--card);overflow-x:auto">
+<div style="display:grid;grid-template-columns:140px 232px 232px 220px 96px 84px;gap:10px;min-width:1086px;padding:8px 16px;border-bottom:1px solid var(--border);font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground)">
+<span>Name</span><span>Path</span><span>Branch / agent</span><span>Agent status</span><span>Created</span><span></span>
+</div>
+<sc-for list="{{ worktrees }}" as="w" hint-placeholder-count="3">
+<div>
+<div style="display:grid;grid-template-columns:140px 232px 232px 220px 96px 84px;gap:10px;min-width:1086px;align-items:center;padding:{{ rowPad }} 16px;border-top:1px solid color-mix(in oklab,var(--border) 60%,transparent)" style-hover="background:var(--accent)">
+<span style="display:flex;align-items:center;gap:8px;min-width:0"><span style="width:6px;height:6px;border-radius:50%;background:{{ w.dot }};flex:none"></span><span style="font:500 12.5px 'JetBrains Mono',ui-monospace,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ w.name }}</span></span>
+<span style="min-width:0;font:400 12px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ w.path }}</span>
+<span style="min-width:0">
+<span style="display:block;font:400 12px 'JetBrains Mono',ui-monospace,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ w.branch }}</span>
+<span style="display:block;font-size:11.5px;color:var(--muted-foreground)">{{ w.agent }}</span>
+</span>
+<span style="min-width:0">
+<span style="display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;background:{{ w.statusBg }};border:1px solid {{ w.statusBorder }};color:{{ w.statusColor }};font:500 11px Inter,sans-serif;white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:{{ w.statusColor }};animation:{{ w.pulse }}"></span>{{ w.statusLabel }}</span>
+<span style="display:block;margin-top:3px;font-size:11px;line-height:1.35;color:var(--muted-foreground);white-space:normal;text-wrap:pretty">{{ w.activity }}</span>
+</span>
+<span style="font:400 12px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">{{ w.created }}</span>
+<span style="text-align:right">
+<sc-if value="{{ w.removable }}" hint-placeholder-val="{{ true }}">
+<button onClick="{{ w.remove }}" style="padding:4px 10px;border:1px solid var(--border);border-radius:7px;background:transparent;color:var(--muted-foreground);cursor:pointer;font:500 11.5px Inter,sans-serif" style-hover="background:color-mix(in oklab,#ef4444 12%,transparent);color:#ef4444;border-color:color-mix(in oklab,#ef4444 40%,transparent)">Remove</button>
+</sc-if>
+<sc-if value="{{ w.isMain }}" hint-placeholder-val="{{ false }}">
+<span style="font:400 11.5px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground);opacity:.7">main</span>
+</sc-if>
+</span>
+</div>
+<sc-if value="{{ w.overlap }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:9px;padding:8px 16px 10px 40px;min-width:1086px;background:color-mix(in oklab,#f59e0b 9%,transparent);color:#f59e0b;font-size:12px">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="m10.29 3.86-8.19 14A2 2 0 0 0 3.81 21h16.38a2 2 0 0 0 1.71-3.14l-8.19-14a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4M12 17h.01"/></svg>
+<span>{{ w.overlapText }}</span>
+</div>
+</sc-if>
+</div>
+</sc-for>
+<div style="padding:11px 16px;min-width:1086px;border-top:1px solid color-mix(in oklab,var(--border) 60%,transparent);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+<button onClick="{{ addWorktree }}" style="display:flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--foreground);cursor:pointer;font:500 12.5px Inter,sans-serif" style-hover="background:var(--accent)">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M12 5v14"/></svg>New worktree
+</button>
+<span style="font-size:12px;color:var(--muted-foreground)">Creates a checkout under .worktrees/ and hands it to the agent you pick.</span>
+</div>
+</div>
+</section>
+
+<section>
+<div style="display:flex;align-items:baseline;gap:9px;margin-bottom:4px">
+<h2 style="margin:0;font-size:13px;font-weight:600">Safe-edit warning</h2>
+<span style="font:400 11px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground)">example</span>
+</div>
+<p style="margin:0 0 11px;font-size:12.5px;color:var(--muted-foreground);max-width:660px;text-wrap:pretty">What an agent shows before it writes over work you have not committed.</p>
+<div style="border:1px solid color-mix(in oklab,#f59e0b 38%,transparent);border-radius:12px;background:var(--card);overflow:hidden;max-width:680px">
+<div style="display:flex;gap:12px;padding:16px 18px">
+<span style="width:28px;height:28px;flex:none;border-radius:8px;background:color-mix(in oklab,#f59e0b 14%,transparent);color:#f59e0b;display:flex;align-items:center;justify-content:center">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10.29 3.86-8.19 14A2 2 0 0 0 3.81 21h16.38a2 2 0 0 0 1.71-3.14l-8.19-14a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4M12 17h.01"/></svg>
+</span>
+<div style="min-width:0;flex:1">
+<div style="font-size:13.5px;font-weight:600;margin-bottom:5px">{{ safeTitle }}</div>
+<p style="margin:0 0 10px;font-size:13px;line-height:1.65;color:var(--muted-foreground);text-wrap:pretty">{{ safeBody }}</p>
+<div style="font:400 12px/1.7 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground);padding:9px 11px;border-radius:8px;background:color-mix(in oklab,var(--muted) 55%,transparent);margin-bottom:12px">{{ safeDetail }}</div>
+<div style="display:flex;flex-wrap:wrap;gap:9px">
+<button style="padding:7px 13px;border:0;border-radius:8px;background:var(--brand,#D4A24C);color:#0b0b0c;cursor:pointer;font:600 12.5px Inter,sans-serif" style-hover="filter:brightness(1.08)">Commit first, then edit</button>
+<button style="padding:7px 13px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--foreground);cursor:pointer;font:500 12.5px Inter,sans-serif" style-hover="background:var(--accent)">Edit in a new worktree</button>
+<button style="padding:7px 11px;border:0;border-radius:8px;background:transparent;color:var(--muted-foreground);cursor:pointer;font:400 12.5px Inter,sans-serif" style-hover="background:var(--accent);color:var(--foreground)">Cancel the edit</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+</div>
+</sc-if>
+
+</div>
+</main>
+
+<sc-if value="{{ switcherOpen }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ toggleSwitcher }}" style="position:fixed;inset:0;z-index:60"></div>
+<div style="position:fixed;z-index:61;{{ switcherPos }};background:var(--popover);border:1px solid var(--border);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.3);padding:5px;animation:wkPop .14s ease-out">
+<div style="padding:6px 8px 4px;font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground)">Open workspaces</div>
+<sc-for list="{{ workspaces }}" as="w" hint-placeholder-count="3">
+<button onClick="{{ w.pick }}" style="width:100%;display:flex;align-items:center;gap:9px;padding:7px 8px;border:0;border-radius:7px;background:{{ w.rowBg }};color:var(--foreground);cursor:pointer;text-align:left" style-hover="background:var(--accent)">
+<span style="width:20px;height:20px;flex:none;border-radius:5px;background:{{ w.swatch }};display:flex;align-items:center;justify-content:center;font:700 9.5px Inter,sans-serif;color:#0b0b0c">{{ w.initial }}</span>
+<span style="min-width:0;flex:1">
+<span style="display:block;font-size:12.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ w.name }}</span>
+<span style="display:block;font:400 10.5px/1.4 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ w.path }}</span>
+</span>
+<span style="font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;color:{{ w.dot }};flex:none;display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:{{ w.dot }}"></span>{{ w.verdict }}</span>
+</button>
+</sc-for>
+<div style="height:1px;background:var(--border);margin:5px 2px"></div>
+<button style="width:100%;display:flex;align-items:center;gap:9px;padding:7px 8px;border:0;border-radius:7px;background:transparent;color:var(--muted-foreground);cursor:pointer;font-size:12.5px;text-align:left" style-hover="background:var(--accent);color:var(--foreground)">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+Open a folder…
+<span style="margin-left:auto;font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;border:1px solid var(--border);border-radius:5px;padding:2px 5px">⌘O</span>
+</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ paletteOpen }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closePalette }}" style="position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.5);display:flex;align-items:flex-start;justify-content:center;padding-top:14vh">
+<div onClick="{{ stop }}" style="width:min(560px,92vw);background:var(--popover);border:1px solid var(--border);border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,.35);overflow:hidden;animation:wkPop .14s ease-out">
+<div style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--border)">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted-foreground);flex:none"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+<input value="{{ query }}" onChange="{{ onQuery }}" ref="{{ paletteInput }}" placeholder="Jump to a section, file, or action…" style="flex:1;border:0;outline:0;background:transparent;color:var(--foreground);font:400 14px Inter,sans-serif"/>
+<span style="font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground);border:1px solid var(--border);border-radius:5px;padding:2px 6px;flex:none">esc</span>
+</div>
+<div style="max-height:card;max-height:44vh;overflow:auto;padding:6px">
+<sc-for list="{{ paletteGroups }}" as="pg" hint-placeholder-count="2">
+<div>
+<div style="padding:8px 10px 4px;font:500 10.5px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground)">{{ pg.title }}</div>
+<sc-for list="{{ pg.items }}" as="it" hint-placeholder-count="3">
+<button onClick="{{ it.run }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border:0;border-radius:8px;background:transparent;color:var(--foreground);cursor:pointer;text-align:left" style-hover="background:var(--accent)">
+<span style="color:var(--muted-foreground);display:flex;flex:none">{{ it.icon }}</span>
+<span style="flex:1;min-width:0;font:{{ it.font }};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ it.label }}</span>
+<span style="font:400 11px 'JetBrains Mono',ui-monospace,monospace;color:var(--muted-foreground);flex:none">{{ it.hint }}</span>
+</button>
+</sc-for>
+</div>
+</sc-for>
+<sc-if value="{{ paletteEmpty }}" hint-placeholder-val="{{ false }}">
+<div style="padding:34px 10px;text-align:center;font-size:13px;color:var(--muted-foreground)">No results found.</div>
+</sc-if>
+</div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Teal&quot;,&quot;Amber&quot;,&quot;Neutral&quot;],&quot;default&quot;:&quot;Amber&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Exploration&quot;},&quot;shell&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Sidebar&quot;,&quot;Icon rail&quot;,&quot;Top bar&quot;],&quot;default&quot;:&quot;Sidebar&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Exploration&quot;},&quot;density&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Comfortable&quot;,&quot;Compact&quot;],&quot;default&quot;:&quot;Comfortable&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Exploration&quot;}}">
+const OK = '#22c55e', WARN = '#f59e0b', BAD = '#ef4444';
+const mix = (c, p) => 'color-mix(in oklab, ' + c + ' ' + p + '%, transparent)';
+const ACCENTS = { Teal: '#5FA8A0', Amber: '#D4A24C', Neutral: 'var(--primary)' };
+
+const ic = {
+  file: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h6"/></svg>',
+  folder: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>',
+  missing: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12h6"/></svg>',
+  check: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  warn: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10.29 3.86-8.19 14A2 2 0 0 0 3.81 21h16.38a2 2 0 0 0 1.71-3.14l-8.19-14a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4M12 17h.01"/></svg>',
+  bad: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15 9-6 6M9 9l6 6"/></svg>',
+  link: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
+  mic: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4"/></svg>',
+  doc: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h6"/></svg>',
+  clock: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  tick: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  sec: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>',
+  act: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"/></svg>'
+};
+const svg = (s) => React.createElement('span', { style: { display: 'flex' }, dangerouslySetInnerHTML: { __html: s } });
+
+const f = (name, lines, bytes, tokens, exists) => ({ name: name, lines: lines, bytes: bytes, tokens: tokens, exists: exists !== false });
+
+const WS = {
+  kit: {
+    id: 'kit', name: 'workspace//kit', path: '~/dev/workspace-kit', kit: 'Digital product',
+    updated: '2 hours ago', ago: '2h', valid: true, verdict: 'warn', swatch: '#D4A24C', initial: 'W',
+    groups: [
+      { title: 'Human layer', files: [f('PROJECT.md', 118, 5103, 1240), f('DECISIONS.md', 412, 23973, 2700), f('CONTEXT.md', 62, 2705, 660), f('TASKS.md', 298, 13178, 3210), f('SESSIONS.md', 24, 1736, 420), f('README.md', 96, 4178, 1020)] },
+      { title: 'Agent layer', files: [f('CLAUDE.md', 210, 377, 1400), f('AGENTS.md', 287, 2544, 1900), f('.cursor/rules/workspace.mdc', 44, 1820, 480), f('.github/copilot-instructions.md', 0, 0, 0, false), f('GEMINI.md', 0, 0, 0, false)] },
+      { title: 'Generated folders', files: [f('docs/specs/', 10, 89310, 22400), f('decisions/', 8, 4783, 1180), f('research/', 18, 29144, 7300), f('queue/', 2, 1662, 410)] }
+    ],
+    health: [
+      { file: 'CLAUDE.md', lines: 210, tokens: '~1,400', status: 'Healthy', note: '' },
+      { file: 'AGENTS.md', lines: 287, tokens: '~1,900', status: 'Warning', note: 'approaching 300-line threshold' },
+      { file: 'DECISIONS.md', lines: 412, tokens: '~2,700', status: 'Over-budget', note: '21 entries, rotation due' },
+      { file: 'PROJECT.md', lines: 118, tokens: '~1,240', status: 'Healthy', note: '' },
+      { file: 'CONTEXT.md', lines: 62, tokens: '~660', status: 'Healthy', note: '' },
+      { file: 'TASKS.md', lines: 298, tokens: '~3,210', status: 'Warning', note: '2 lines from the threshold' }
+    ],
+    budget: 11110, cap: '~8,000',
+    suggestions: [
+      { sev: 'bad', file: 'DECISIONS.md', tag: 'Over-budget', body: '412 lines and 21 entries — past the ~15-entry rotation trigger. Move the oldest entries to decisions/*.md with an index, following the ADR-rotation pattern already in use in this workspace.', action: 'Preview rotation' },
+      { sev: 'warn', file: 'AGENTS.md', tag: 'Warning', body: '287 lines, approaching the 300-line always-loaded budget. Consider moving a less-frequently-needed section — the per-type folder conventions look like the best candidate — to an on-demand file.', action: 'Show sections by size' },
+      { sev: 'bad', file: 'PROJECT.md', tag: 'Broken reference', body: 'Links to docs/PRD.md, which does not exist in this workspace. Either restore the file or drop the reference — agents following the link will find nothing.', action: 'Locate file' },
+      { sev: 'warn', file: 'TASKS.md', tag: 'Warning', body: '298 lines and growing every session. Completed items are never pruned; archiving the 2026-06 batch would bring it back under 200.', action: 'Preview prune' }
+    ],
+    sessions: [
+      { date: '2026-07-27', ago: 'today', tool: 'Cowork', duration: '48 min', did: 'Resolved the CHANGELOG.md vs. SESSIONS.md boundary; created this file; populated queue/ with two real voice-note references; refreshed docs/PRD.md and PROJECT.md; added standing instructions to AGENTS.md.', left: 'No code touched — planning/docs only. Repo ready for Claude Code to start implementing the specs.' },
+      { date: '2026-07-26', ago: 'yesterday', tool: 'Claude Code', duration: '2h 10min', did: 'Wrote five specs: workspace inspection layer, health check, git integration layer, document ingestion queue, cross-tool session log. Logged the "project type" → "kit" rename in DECISIONS.md.', left: 'All five specs in docs/specs/, status "draft, pending review". No implementation started.' },
+      { date: '2026-07-21', ago: '6 days ago', tool: 'Cursor', duration: '55 min', did: 'Full project review. Split the multi-surface direction (HTML artifact / CLI / Local Web App) into separate specs and logged the shared-generation-engine decision.', left: 'core/generator.js extracted but not yet wired into the HTML artifact — parity check script still failing on 3 of 17 types.' },
+      { date: '2026-07-14', ago: '13 days ago', tool: 'Claude Code', duration: '1h 25min', did: 'v3 interface rework against the Figma reference: pill nav, sticky workspace preview sidebar, outlined wordmark. Archived the previous UI to src/workspace-kit-v2-archive.html.', left: 'Generator functionality untouched and verified identical. Fonts still loaded from Google Fonts CDN.' }
+    ],
+    queue: [
+      { type: 'Voice note', source: 'Notion — "Notas de Áudio 26/07"', added: '2026-07-26', status: 'Ingested', statusDate: '2026-07-26', notes: 'Workspace//Kit "evolving into a robust, complete, model- and tool-agnostic AI workspace management tool." Source for the 5 new 2026-07-26 specs, the model-agnostic clarification, and the "project type" → "kit" rename decision.', dest: 'docs/specs/workspace-inspection-layer.md · workspace-health-check.md · git-integration-layer.md · document-ingestion-queue.md · cross-tool-session-log.md · DECISIONS.md · TASKS.md' },
+      { type: 'Voice note', source: 'Notion — "Notas de áudio Workspace Kit 14/07"', added: '2026-07-14', status: 'Ingested', statusDate: '2026-07-21', notes: 'Connects to the context-engineering / memory-sessions concept; floated the CLI + Web App + Templates + Docker direction later formalized in the 2026-07-21 specs.', dest: 'docs/specs/cli-generator.md · local-web-app.md · templates-feature.md · docker-environment-generation.md · context-manager-conventions.md' },
+      { type: 'Article', source: 'Anthropic — "Effective context engineering for AI agents"', added: '2026-07-25', status: 'Pending', statusDate: '', notes: 'Read for the health-check thresholds — may justify moving the always-loaded budget off a line count and onto a token count instead. Decide before implementing #78.', dest: 'Health check spec (#78) — threshold definition' },
+      { type: 'Transcript', source: 'Call with Rafa — CLI surface scope', added: '2026-07-24', status: 'Pending', statusDate: '', notes: 'Argues the CLI should own workspace management too, not just generation. Directly contradicts the current spec split; needs a DECISIONS.md entry either way.', dest: 'docs/specs/cli-generator.md · DECISIONS.md' }
+    ]
+  },
+  atlas: {
+    id: 'atlas', name: 'atlas-research', path: '~/dev/atlas-research', kit: 'Research & analysis',
+    updated: '3 days ago', ago: '3d', valid: true, verdict: 'bad', swatch: '#5FA8A0', initial: 'A',
+    groups: [
+      { title: 'Human layer', files: [f('PROJECT.md', 244, 11020, 2740), f('DECISIONS.md', 631, 38112, 9400), f('CONTEXT.md', 189, 8402, 2100), f('TASKS.md', 522, 24880, 6180), f('SESSIONS.md', 96, 6210, 1550), f('README.md', 132, 6044, 1500), f('CHANGELOG.md', 218, 9930, 2470)] },
+      { title: 'Agent layer', files: [f('CLAUDE.md', 388, 18220, 4520), f('AGENTS.md', 341, 15980, 3970), f('.cursor/rules/research.mdc', 128, 5210, 1300), f('.cursor/rules/writing.mdc', 74, 3011, 750), f('.github/copilot-instructions.md', 96, 4120, 1030), f('GEMINI.md', 88, 3740, 930), f('.windsurfrules', 61, 2480, 620), f('.claude/skills/lit-review/SKILL.md', 142, 6890, 1720)] },
+      { title: 'Generated folders', files: [f('docs/', 14, 182400, 45600), f('sources/', 96, 1240000, 310000), f('notes/', 212, 486200, 121500), f('decisions/', 22, 41300, 10300), f('queue/', 9, 18400, 4600), f('data/raw/', 41, 2100000, 0)] }
+    ],
+    health: [
+      { file: 'CLAUDE.md', lines: 388, tokens: '~4,520', status: 'Over-budget', note: 'inlines what AGENTS.md already says' },
+      { file: 'AGENTS.md', lines: 341, tokens: '~3,970', status: 'Over-budget', note: '41 lines past the threshold' },
+      { file: 'DECISIONS.md', lines: 631, tokens: '~9,400', status: 'Over-budget', note: '38 entries, never rotated' },
+      { file: 'PROJECT.md', lines: 244, tokens: '~2,740', status: 'Warning', note: 'approaching 300-line threshold' },
+      { file: 'CONTEXT.md', lines: 189, tokens: '~2,100', status: 'Healthy', note: '' },
+      { file: 'TASKS.md', lines: 522, tokens: '~6,180', status: 'Over-budget', note: '184 completed items unpruned' },
+      { file: '.cursor/rules/research.mdc', lines: 128, tokens: '~1,300', status: 'Healthy', note: '' }
+    ],
+    budget: 30210, cap: '~8,000',
+    suggestions: [
+      { sev: 'bad', file: 'CLAUDE.md', tag: 'Over-budget', body: '388 lines that largely restate AGENTS.md. The convention in this workspace is for CLAUDE.md to import AGENTS.md rather than duplicate it — collapsing it would cut roughly 3,600 tokens from every session start.', action: 'Preview collapse' },
+      { sev: 'bad', file: 'DECISIONS.md', tag: 'Over-budget', body: '631 lines and 38 entries, never rotated. Move everything before 2026-05 to decisions/*.md with an index; the last six entries are the only ones referenced by other files.', action: 'Preview rotation' },
+      { sev: 'bad', file: 'TASKS.md', tag: 'Over-budget', body: '522 lines, 184 of them completed items. Nothing here has been pruned since the project started — archiving completed work would take this under 200 lines.', action: 'Preview prune' },
+      { sev: 'warn', file: 'CONTEXT.md', tag: 'Broken reference', body: 'Links to notes/2026-05-interviews/ and sources/keyword-map.csv — neither exists. Both were likely moved during the 2026-06 restructure.', action: 'Locate files' },
+      { sev: 'warn', file: 'data/raw/', tag: 'Warning', body: '41 files, 2.1 MB, and listed in .gitignore as local-only — but PROJECT.md references it as if it were shared. Any agent reading PROJECT.md will look for files it cannot see.', action: 'Review reference' }
+    ],
+    sessions: [
+      { date: '2026-07-24', ago: '3 days ago', tool: 'Claude Code', duration: '3h 40min', did: 'Restructured notes/ into per-theme folders and regenerated the lit-review skill. Added 62 new sources.', left: 'CONTEXT.md still points at the pre-restructure paths — needs fixing before the next session.' },
+      { date: '2026-07-19', ago: '8 days ago', tool: 'Gemini CLI', duration: '35 min', did: 'Bulk-summarised 41 raw interview transcripts into notes/summaries/.', left: 'Summaries unreviewed. Three transcripts failed on encoding and were skipped (listed in TASKS.md).' },
+      { date: '2026-07-11', ago: '16 days ago', tool: 'Cursor', duration: '1h 05min', did: 'Drafted the coding-frame section of docs/methodology.md and logged two decisions about sampling.', left: 'Methodology doc at ~70%. Sampling decision #34 marked provisional pending Rafa\u2019s review.' }
+    ],
+    queue: [
+      { type: 'Paper', source: 'Zotero — Tversky & Kahneman 1974 (re-read)', added: '2026-07-25', status: 'Pending', statusDate: '', notes: 'Needed for the framing section of the coding frame. Flagged by Rafa as the anchor citation.', dest: 'docs/methodology.md — coding frame' },
+      { type: 'Transcript', source: 'Interview 42 — municipal planner', added: '2026-07-23', status: 'Pending', statusDate: '', notes: 'Failed encoding in the Gemini CLI bulk run. Needs manual conversion before summarising.', dest: 'notes/summaries/' },
+      { type: 'Voice note', source: 'Otter — "field notes 2026-07-20"', added: '2026-07-20', status: 'Pending', statusDate: '', notes: 'Twelve minutes, mostly about sampling bias in the second cohort. Probably a DECISIONS.md entry.', dest: 'DECISIONS.md · docs/methodology.md' },
+      { type: 'Article', source: 'Nature — "Reproducibility in qualitative coding"', added: '2026-07-16', status: 'Ingested', statusDate: '2026-07-19', notes: 'Informed the double-coding requirement now written into the methodology.', dest: 'docs/methodology.md — reliability' },
+      { type: 'Dataset', source: 'IBGE — municipal indicators 2025', added: '2026-07-09', status: 'Ingested', statusDate: '2026-07-11', notes: 'Downloaded to data/raw/, local-only per .gitignore.', dest: 'data/raw/ibge-2025/ · CONTEXT.md' }
+    ]
+  },
+  scratch: {
+    id: 'scratch', name: 'scratch-notes', path: '~/Documents/scratch-notes', kit: '', updated: '', ago: '1w',
+    valid: false, verdict: 'none', swatch: '#8B8F9C', initial: 'S',
+    groups: [], health: [], budget: 0, cap: '', suggestions: [], sessions: [], queue: []
+  }
+};
+
+const BROKEN = {
+  kit: { 'PROJECT.md': 'Links to docs/PRD.md, which does not exist' },
+  atlas: { 'CONTEXT.md': 'Links to notes/2026-05-interviews/ and sources/keyword-map.csv — neither exists' }
+};
+
+const GROWTH = {
+  kit: [
+    { file: 'DECISIONS.md', count: '12 / 15', pct: 80, note: 'entries before rotation', sev: 'warn' },
+    { file: 'SESSIONS.md', count: '4 / 20', pct: 20, note: 'sessions before archive', sev: 'ok' },
+    { file: 'CHANGELOG.md', count: '—', pct: 0, note: 'not present in this workspace', sev: 'none' },
+    { file: 'TASKS.md', count: '148 / 200', pct: 74, note: 'open + completed items before prune', sev: 'warn' }
+  ],
+  atlas: [
+    { file: 'DECISIONS.md', count: '38 / 15', pct: 100, note: 'past rotation by 23 entries', sev: 'bad' },
+    { file: 'SESSIONS.md', count: '17 / 20', pct: 85, note: 'sessions before archive', sev: 'warn' },
+    { file: 'CHANGELOG.md', count: '61 / 80', pct: 76, note: 'releases before split by year', sev: 'warn' },
+    { file: 'TASKS.md', count: '291 / 200', pct: 100, note: '184 completed items never pruned', sev: 'bad' }
+  ]
+};
+
+const GIT_STATE_META = {
+  modified: { label: 'modified', color: WARN, solid: false },
+  staged: { label: 'staged', color: 'var(--brand,#D4A24C)', solid: false },
+  untracked: { label: 'untracked', color: 'var(--muted-foreground)', solid: true },
+  clean: { label: 'clean', color: 'var(--muted-foreground)', solid: false }
+};
+
+const WT_STATUS = {
+  active: { label: 'active', color: OK },
+  idle: { label: 'idle', color: WARN },
+  stopped: { label: 'stopped', color: 'var(--muted-foreground)' },
+  you: { label: 'your checkout', color: 'var(--brand,#D4A24C)' },
+  none: { label: 'unassigned', color: 'var(--muted-foreground)' }
+};
+
+const GIT = {
+  kit: {
+    branch: 'main', tracked: 42,
+    states: { 'PROJECT.md': 'modified', 'TASKS.md': 'modified', 'DECISIONS.md': 'modified', 'SESSIONS.md': 'staged', 'queue/': 'untracked' },
+    commitBlurb: 'Five files changed since the last commit — four documents updated and one new folder added. Roughly 159 lines written, 15 removed. No code touched.',
+    files: [
+      { file: 'PROJECT.md', add: '+18', del: '−4', what: 'updated' },
+      { file: 'TASKS.md', add: '+42', del: '−11', what: 'updated' },
+      { file: 'DECISIONS.md', add: '+26', del: '−0', what: 'two new entries' },
+      { file: 'SESSIONS.md', add: '+9', del: '−0', what: 'staged' },
+      { file: 'queue/2026-07-27-voice-note.md', add: '+64', del: '−0', what: 'new file' }
+    ],
+    prBranch: 'workspace-kit/specs-inspection', prNumber: '#124',
+    prTitle: 'Add the workspace inspection and health-check specs',
+    prBullets: [
+      'Five new specs under docs/specs/, all marked draft, pending review.',
+      'DECISIONS.md gains two entries: the “project type” → “kit” rename and the shared-generation-engine choice.',
+      'TASKS.md updated with the implementation order the specs imply. No source files changed.'
+    ],
+    worktrees: [
+      { name: 'workspace-kit', path: '~/dev/workspace-kit', branch: 'main', agent: 'you', created: '12 days ago', main: true, status: 'you', when: '14 min ago', activity: 'last edit by you' },
+      { name: 'specs-review', path: '~/dev/.worktrees/specs-review', branch: 'workspace-kit/specs-inspection', agent: 'Claude Code', created: '2 days ago', status: 'active', when: '3 min ago', activity: 'writing docs/specs/health-check.md' },
+      { name: 'health-check', path: '~/dev/.worktrees/health-check', branch: 'feature/health-check', agent: 'Cursor', created: '5 hours ago', status: 'idle', when: '40 min', activity: 'session open, no writes', overlap: 'Also editing TASKS.md, which specs-review has open. Whichever commits second will have to resolve it.' }
+    ],
+    safeTitle: 'TASKS.md has uncommitted changes',
+    safeBody: 'The queue ingest wants to rewrite a section of TASKS.md, but you have edits there that were never committed. Continuing would overwrite them with no way back.',
+    safeDetail: 'TASKS.md · lines 210–248 · your edits from 14 minutes ago'
+  },
+  atlas: {
+    branch: 'main', tracked: 68,
+    states: { 'CONTEXT.md': 'modified', 'CLAUDE.md': 'modified', 'TASKS.md': 'modified', 'DECISIONS.md': 'staged', 'notes/': 'modified', 'data/raw/': 'untracked', 'queue/': 'untracked' },
+    commitBlurb: 'Seven paths changed since the last commit — five documents updated, two folders never tracked. Roughly 812 lines written, 340 removed, most of it the notes/ restructure.',
+    files: [
+      { file: 'CONTEXT.md', add: '+31', del: '−58', what: 'paths rewritten' },
+      { file: 'CLAUDE.md', add: '+12', del: '−0', what: 'updated' },
+      { file: 'TASKS.md', add: '+74', del: '−19', what: 'updated' },
+      { file: 'DECISIONS.md', add: '+22', del: '−0', what: 'staged' },
+      { file: 'notes/', add: '+673', del: '−263', what: '62 files moved' }
+    ],
+    prBranch: 'atlas/notes-restructure', prNumber: '#88',
+    prTitle: 'Restructure notes/ into per-theme folders',
+    prBullets: [
+      'notes/ split into per-theme folders; 62 files moved, none deleted.',
+      'CONTEXT.md paths updated to match — two references still point at files that no longer exist.',
+      'DECISIONS.md records the sampling decision as provisional, pending review.'
+    ],
+    worktrees: [
+      { name: 'atlas-research', path: '~/dev/atlas-research', branch: 'main', agent: 'you', created: '4 months ago', main: true, status: 'you', when: '3 days ago', activity: 'last edit by you' },
+      { name: 'notes-restructure', path: '~/dev/.worktrees/notes-restructure', branch: 'atlas/notes-restructure', agent: 'Claude Code', created: '3 days ago', status: 'stopped', when: '3 days ago', activity: 'session ended, 2 files left uncommitted', overlap: 'Also editing CONTEXT.md, which summaries has open. Whichever commits second will have to resolve it.' },
+      { name: 'summaries', path: '~/dev/.worktrees/summaries', branch: 'atlas/bulk-summaries', agent: 'Gemini CLI', created: '8 days ago', status: 'active', when: '1 min ago', activity: 'summarising notes/interviews/42' }
+    ],
+    safeTitle: 'CONTEXT.md has uncommitted changes',
+    safeBody: 'The path-fix suggestion wants to rewrite the references in CONTEXT.md, but the notes-restructure worktree has uncommitted edits in the same file. Continuing would overwrite them.',
+    safeDetail: 'CONTEXT.md · lines 41–68 · edits from the notes-restructure worktree, 3 days ago'
+  }
+};
+
+const VERDICTS = {
+  ok: { label: 'Healthy', short: 'ok', color: OK, blurb: 'Every always-loaded file is under the 300-line threshold and the total context budget is within target. Nothing needs attention.' },
+  warn: { label: 'Needs attention', short: '2 issues', color: WARN, blurb: 'One file is over the always-loaded budget and two are approaching it. Nothing is broken, but every session currently starts about 3,100 tokens heavier than it needs to.' },
+  bad: { label: 'Unhealthy', short: '5 issues', color: BAD, blurb: 'Four always-loaded files are over budget and two cross-references point at files that no longer exist. Agents start every session with roughly 30,000 tokens of context, most of it duplicated.' }
+};
+
+const TOOLS = {
+  Cowork: '#5FA8A0', 'Claude Code': '#D4A24C', Cursor: '#8b8f9c', 'Gemini CLI': '#7aa2f7'
+};
+
+const fmtBytes = (b) => b === 0 ? '—' : b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : b >= 1024 ? Math.round(b / 1024) + ' KB' : b + ' B';
+const fmtNum = (n) => n.toLocaleString('en-US');
+
+class Component extends DCLogic {
+  state = { ws: 'kit', section: 'overview', dark: true, switcher: false, palette: false, query: '', expanded: {}, qFilter: 'All', sFilter: 'All tools', committed: false, prOpened: false, wtRemoved: {}, wtAdded: [] };
+
+  componentDidMount() {
+    this.applyTheme();
+    this.applyAccent();
+    this._key = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); this.setState({ palette: !this.state.palette, query: '' }); }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'o') { e.preventDefault(); this.setState({ switcher: !this.state.switcher, palette: false }); }
+      if (e.key === 'Escape') this.setState({ palette: false, switcher: false });
+    };
+    window.addEventListener('keydown', this._key);
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this._key); }
+  componentDidUpdate(pp) { this.applyTheme(); if (pp.accent !== this.props.accent) this.applyAccent(); }
+
+  applyTheme() {
+    const d = this.state.dark;
+    document.body.classList.toggle('dark', d);
+    document.documentElement.classList.toggle('dark', d);
+  }
+  applyAccent() {
+    document.documentElement.style.setProperty('--brand', ACCENTS[this.props.accent || 'Teal'] || ACCENTS.Teal);
+  }
+
+  go(s) { return () => this.setState({ section: s, palette: false }); }
+
+  renderVals() {
+    const st = this.state;
+    const ws = WS[st.ws];
+    const git = GIT[st.ws] || { states: {}, files: [], prBullets: [], worktrees: [] };
+    const v = VERDICTS[ws.verdict] || VERDICTS.ok;
+    const shell = this.props.shell || 'Sidebar';
+    const dense = (this.props.density || 'Comfortable') === 'Compact';
+    const rowPad = dense ? '7px' : '10px';
+
+    const navBg = (k) => (ws.valid && st.section === k) ? 'var(--accent)' : 'transparent';
+    const navFg = (k) => !ws.valid ? 'color-mix(in oklab, var(--muted-foreground) 50%, transparent)'
+      : st.section === k ? 'var(--foreground)' : 'var(--muted-foreground)';
+
+    const allFiles = [];
+    ws.groups.forEach(g => g.files.forEach(x => { if (x.exists) allFiles.push(x); }));
+    const totalLines = allFiles.reduce((a, b) => a + b.lines, 0);
+    const totalTokens = allFiles.reduce((a, b) => a + b.tokens, 0);
+    const missing = ws.groups.reduce((a, g) => a + g.files.filter(x => !x.exists).length, 0);
+
+    const groups = ws.groups.map(g => ({
+      title: g.title,
+      meta: g.files.filter(x => x.exists).length + ' of ' + g.files.length + ' present',
+      files: g.files.map(x => {
+        const folder = x.name.endsWith('/');
+        const gs = x.exists ? ((git.states || {})[x.name] || (st.committed ? 'clean' : 'clean')) : null;
+        const gm = GIT_STATE_META[st.committed && gs !== 'untracked' ? 'clean' : (gs || 'clean')];
+        const brokenNote = (BROKEN[st.ws] || {})[x.name];
+        return {
+          name: x.name,
+          broken: !!brokenNote, brokenTitle: brokenNote || '',
+          gitLabel: x.exists ? gm.label : '—',
+          gitFg: x.exists ? gm.color : 'var(--muted-foreground)',
+          gitDot: x.exists ? gm.color : 'transparent',
+          gitBg: x.exists && gm.label !== 'clean' && gm.label !== 'untracked' ? mix(gm.color === WARN ? WARN : '#D4A24C', 13) : 'transparent',
+          gitBorder: x.exists ? (gm.label === 'clean' ? 'transparent' : mix(gm.color === WARN ? WARN : 'var(--muted-foreground)', 40)) : 'transparent',
+          gitBorderStyle: gm.solid ? 'dashed' : 'solid',
+          icon: svg(x.exists ? (folder ? ic.folder : ic.file) : ic.missing),
+          iconColor: x.exists ? 'var(--muted-foreground)' : mix(BAD, 70),
+          nameColor: x.exists ? 'var(--foreground)' : 'var(--muted-foreground)',
+          weight: x.exists ? '500' : '400',
+          badge: x.exists ? 'Present' : 'Missing',
+          badgeBg: x.exists ? 'var(--muted)' : mix(BAD, 14),
+          badgeFg: x.exists ? 'var(--muted-foreground)' : BAD,
+          lines: x.exists ? (folder ? x.lines + ' files' : fmtNum(x.lines)) : '—',
+          size: x.exists ? fmtBytes(x.bytes) : '—',
+          tokens: x.exists && x.tokens ? '~' + fmtNum(x.tokens) : '—',
+          numColor: x.exists && x.lines > 300 && !folder ? WARN : 'var(--foreground)'
+        };
+      })
+    }));
+
+    const stats = [
+      { label: 'Files tracked', value: String(allFiles.length), sub: missing ? missing + ' missing' : 'all present' },
+      { label: 'Total lines', value: fmtNum(totalLines), sub: 'across the workspace' },
+      { label: 'Est. tokens', value: totalTokens > 100000 ? (totalTokens / 1000).toFixed(0) + 'k' : fmtNum(totalTokens), sub: 'if fully loaded' },
+      { label: 'Always loaded', value: fmtNum(ws.budget), sub: 'every session start' }
+    ];
+
+    const sevMap = { ok: OK, warn: WARN, bad: BAD };
+    const healthFiles = ws.health.map(h => {
+      const c = h.status === 'Healthy' ? OK : h.status === 'Warning' ? WARN : BAD;
+      return {
+        file: h.file, lines: fmtNum(h.lines), tokens: h.tokens, status: h.status, note: h.note,
+        color: c, numColor: h.lines > 300 ? c : 'var(--foreground)',
+        icon: svg(h.status === 'Healthy' ? ic.check : h.status === 'Warning' ? ic.warn : ic.bad)
+      };
+    });
+
+    const segs = ws.health.filter(h => h.status !== 'Healthy').slice(0, 3);
+    const budgetSegments = ws.budget ? ws.health.slice(0, 6).map(h => {
+      const t = parseInt(String(h.tokens).replace(/[^0-9]/g, ''), 10) || 0;
+      const c = h.status === 'Healthy' ? mix(OK, 55) : h.status === 'Warning' ? WARN : BAD;
+      return { title: h.file, pct: Math.round((t / ws.budget) * 100) + '%', color: c };
+    }) : [];
+
+    const suggestions = ws.suggestions.map(s => ({
+      file: s.file, tag: s.tag, body: s.body, action: s.action,
+      color: sevMap[s.sev], bg: mix(sevMap[s.sev], 14),
+      icon: svg(s.sev === 'bad' ? (s.tag === 'Broken reference' ? ic.link : ic.bad) : ic.warn)
+    }));
+
+    const usedTools = [];
+    ws.sessions.forEach(e => { if (usedTools.indexOf(e.tool) === -1) usedTools.push(e.tool); });
+    const sFilter = usedTools.indexOf(st.sFilter) === -1 ? 'All tools' : st.sFilter;
+    const sessions = ws.sessions.filter(e => sFilter === 'All tools' || e.tool === sFilter).map(e => {
+      const c = TOOLS[e.tool] || 'var(--muted-foreground)';
+      return { date: e.date, ago: e.ago, tool: e.tool, duration: e.duration, did: e.did, left: e.left, dot: c, fg: c, bg: mix(c, 12), border: mix(c, 30) };
+    });
+    const sessionFilters = ['All tools'].concat(usedTools).map(t => {
+      const on = sFilter === t;
+      const c = TOOLS[t] || 'var(--muted-foreground)';
+      const n = t === 'All tools' ? ws.sessions.length : ws.sessions.filter(e => e.tool === t).length;
+      return {
+        label: t + ' · ' + n, hasDot: t !== 'All tools', dot: on ? 'var(--background)' : c,
+        pick: () => this.setState({ sFilter: t }),
+        bg: on ? 'var(--foreground)' : 'transparent',
+        fg: on ? 'var(--background)' : 'var(--muted-foreground)',
+        border: on ? 'var(--foreground)' : 'var(--border)'
+      };
+    });
+
+    const pendingCount = ws.queue.filter(q => q.status === 'Pending').length;
+    const sortedQueue = ws.queue.slice().sort((a, b) => (a.status === 'Pending' ? 0 : 1) - (b.status === 'Pending' ? 0 : 1));
+    const shownQueue = sortedQueue.filter(q => st.qFilter === 'All' || q.status === st.qFilter);
+    const queueItems = shownQueue.map((q, i) => {
+      const key = q.source;
+      const open = !!st.expanded[key];
+      const c = q.status === 'Pending' ? WARN : 'var(--muted-foreground)';
+      return {
+        type: q.type, source: q.source, added: q.added, status: q.status, statusDate: q.statusDate,
+        notes: q.notes, dest: q.dest,
+        destLabel: q.status === 'Pending' ? 'Target' : 'Ingested into',
+        primaryAction: q.status === 'Pending' ? 'Mark ingested' : 'View in workspace',
+        open: open, caret: open ? 'rotate(90deg)' : 'rotate(0deg)',
+        color: q.status === 'Pending' ? WARN : 'var(--muted-foreground)',
+        bg: q.status === 'Pending' ? mix(WARN, 14) : 'var(--muted)',
+        statusIcon: svg(q.status === 'Pending' ? ic.clock : ic.tick),
+        typeIcon: svg(q.type === 'Voice note' ? ic.mic : ic.doc),
+        toggle: () => { const e = Object.assign({}, this.state.expanded); e[key] = !e[key]; this.setState({ expanded: e }); }
+      };
+    });
+    const queueFilters = ['All', 'Pending', 'Ingested'].map(l => {
+      const on = st.qFilter === l;
+      const n = l === 'All' ? ws.queue.length : ws.queue.filter(q => q.status === l).length;
+      return {
+        label: l + ' · ' + n, pick: () => this.setState({ qFilter: l }),
+        bg: on ? 'var(--foreground)' : 'transparent', fg: on ? 'var(--background)' : 'var(--muted-foreground)',
+        border: on ? 'var(--foreground)' : 'var(--border)'
+      };
+    });
+
+    const changed = Object.keys(git.states || {});
+    const countOf = (s) => changed.filter(k => git.states[k] === s).length;
+    const cleanCount = (git.tracked || 0) - changed.length;
+    const gitOrder = ['modified', 'staged', 'untracked'];
+    const gitCounts = (st.committed ? [] : gitOrder.filter(s => countOf(s)).map(s => {
+      const m = GIT_STATE_META[s];
+      return { label: countOf(s) + ' ' + m.label, fg: m.color, dot: m.color,
+        bg: s === 'untracked' ? 'transparent' : mix(s === 'modified' ? WARN : '#D4A24C', 12),
+        border: mix(s === 'untracked' ? 'var(--muted-foreground)' : (s === 'modified' ? WARN : '#D4A24C'), 38),
+        borderStyle: s === 'untracked' ? 'dashed' : 'solid' };
+    })).concat([{ label: (st.committed ? (git.tracked || 0) : cleanCount) + ' clean', fg: 'var(--muted-foreground)', dot: OK, bg: 'transparent', border: 'var(--border)', borderStyle: 'solid' }]);
+    const gitSummaryLine = st.committed ? 'all ' + (git.tracked || 0) + ' files clean'
+      : gitOrder.filter(s => countOf(s)).map(s => countOf(s) + ' ' + GIT_STATE_META[s].label).concat([cleanCount + ' clean']).join(' · ');
+    const sumCol = (k) => (git.files || []).reduce((a, x) => a + (parseInt(String(x[k]).replace(/[^0-9]/g, ''), 10) || 0), 0);
+    const totalAdd = '+' + sumCol('add'), totalDel = sumCol('del');
+    const gitMeta = st.committed ? 'nothing uncommitted · on ' + git.branch : changed.length + ' paths changed · ' + totalAdd + ' −' + totalDel;
+
+    const wtAll = (git.worktrees || []).concat(st.wtAdded).filter(w => !st.wtRemoved[w.name]);
+    const overlaps = wtAll.filter(w => w.overlap).length;
+    const worktrees = wtAll.map(w => {
+      const s = WT_STATUS[w.status || 'none'];
+      return {
+        name: w.name, path: w.path, branch: w.branch, agent: w.agent, created: w.created,
+        dot: w.main ? WT_STATUS.you.color : s.color,
+        statusLabel: s.label + (w.when ? ' · ' + w.when : ''), statusColor: s.color,
+        statusBg: (w.status === 'active' || w.status === 'idle') ? mix(s.color, 13) : 'transparent',
+        statusBorder: (w.status === 'active' || w.status === 'idle') ? mix(s.color, 38) : 'var(--border)',
+        pulse: w.status === 'active' ? 'wkPulse 1.8s ease-in-out infinite' : 'none',
+        activity: w.activity || 'no agent attached yet',
+        isMain: !!w.main, removable: !w.main,
+        overlap: !!w.overlap, overlapText: w.overlap || '',
+        remove: () => { const r = Object.assign({}, this.state.wtRemoved); r[w.name] = true; this.setState({ wtRemoved: r }); }
+      };
+    });
+    const wtActive = wtAll.filter(w => w.status === 'active').length;
+    const wtIdle = wtAll.filter(w => w.status === 'idle').length;
+
+    const growthRows = GROWTH[st.ws] || [];
+    const growth = growthRows.map(g => ({
+      file: g.file, count: g.count, note: g.note, pct: g.pct + '%',
+      color: g.sev === 'bad' ? BAD : g.sev === 'warn' ? WARN : g.sev === 'none' ? 'var(--muted-foreground)' : OK
+    }));
+    const growthMeta = growthRows.filter(g => g.sev === 'bad').length
+      ? growthRows.filter(g => g.sev === 'bad').length + ' past rotation'
+      : growthRows.filter(g => g.sev === 'warn').length + ' approaching rotation';
+
+    const pick = (id) => () => this.setState({ ws: id, switcher: false, section: 'overview', expanded: {}, qFilter: 'All', sFilter: 'All tools', palette: false, committed: false, prOpened: false, wtRemoved: {}, wtAdded: [] });
+    const workspaces = Object.keys(WS).map(k => {
+      const w = WS[k];
+      return { name: w.name, path: w.path, initial: w.initial, swatch: w.swatch,
+        dot: w.valid ? (VERDICTS[w.verdict] || VERDICTS.ok).color : 'var(--muted-foreground)',
+        verdict: w.valid ? (VERDICTS[w.verdict] || VERDICTS.ok).short : 'n/a',
+        rowBg: k === st.ws ? 'var(--accent)' : 'transparent', pick: pick(k) };
+    });
+    const recents = Object.keys(WS).filter(k => k !== st.ws).map(k => {
+      const w = WS[k];
+      return { short: w.path.replace('~/', ''), ago: w.ago, dot: w.valid ? (VERDICTS[w.verdict] || VERDICTS.ok).color : 'var(--muted-foreground)', pick: pick(k) };
+    });
+
+    const q = st.query.trim().toLowerCase();
+    const match = (s) => !q || s.toLowerCase().indexOf(q) !== -1;
+    const secItems = [
+      { label: 'Overview', hint: 'section', run: this.go('overview') },
+      { label: 'Health check', hint: 'section', run: this.go('health') },
+      { label: 'Session log', hint: 'section', run: this.go('sessions') },
+      { label: 'Queue', hint: 'section', run: this.go('queue') },
+      { label: 'Git', hint: 'section', run: this.go('git') }
+    ].filter(x => match(x.label)).map(x => Object.assign({ icon: svg(ic.sec), font: '400 13.5px Inter,sans-serif' }, x));
+    const fileItems = allFiles.filter(x => match(x.name)).slice(0, 6).map(x => ({
+      label: x.name, hint: x.lines + ' lines', icon: svg(ic.file), font: "400 13px 'JetBrains Mono',ui-monospace,monospace",
+      run: this.go('overview')
+    }));
+    const actionItems = [
+      { label: st.dark ? 'Switch to light mode' : 'Switch to dark mode', hint: '', run: () => this.setState({ dark: !st.dark, palette: false }) },
+      { label: 'Open a folder…', hint: '⌘O', run: () => this.setState({ palette: false, switcher: true }) },
+      { label: 'Re-run health check', hint: '', run: this.go('health') },
+      { label: 'Commit changes', hint: 'git', run: () => this.setState({ section: 'git', palette: false }) },
+      { label: 'Open Pull Request', hint: 'git', run: () => this.setState({ section: 'git', palette: false }) }
+    ].filter(x => match(x.label)).map(x => Object.assign({ icon: svg(ic.act), font: '400 13.5px Inter,sans-serif' }, x));
+    const paletteGroups = [
+      { title: 'Sections', items: secItems },
+      { title: 'Files in ' + ws.name, items: fileItems },
+      { title: 'Actions', items: actionItems }
+    ].filter(g => g.items.length);
+
+    return {
+      ws: { name: ws.name, path: ws.path, kit: ws.kit, updated: ws.updated, valid: ws.valid, fileCount: allFiles.length },
+      wsSwatch: ws.swatch, wsInitial: ws.initial,
+      workspaces: workspaces, recents: recents,
+      switcherOpen: st.switcher, toggleSwitcher: () => this.setState({ switcher: !st.switcher }),
+      switcherPos: shell === 'Icon rail' ? 'left:64px;top:14px;width:280px'
+        : shell === 'Top bar' ? 'left:214px;top:52px;width:300px'
+        : 'left:12px;top:106px;width:244px',
+      budgetTargetPct: ws.budget ? Math.min(100, Math.round((8000 / ws.budget) * 100)) + '%' : '0%',
+      showSidebar: shell === 'Sidebar', showRail: shell === 'Icon rail', showTopbar: shell === 'Top bar',
+      isDark: st.dark, isLight: !st.dark, toggleTheme: () => this.setState({ dark: !st.dark }),
+      rowPad: rowPad,
+      goOverview: this.go('overview'), goHealth: this.go('health'), goSessions: this.go('sessions'), goQueue: this.go('queue'),
+      navOverviewBg: navBg('overview'), navOverviewFg: navFg('overview'),
+      navHealthBg: navBg('health'), navHealthFg: navFg('health'),
+      navSessionsBg: navBg('sessions'), navSessionsFg: navFg('sessions'),
+      navQueueBg: navBg('queue'), navQueueFg: navFg('queue'),
+      growth: growth, growthMeta: growthMeta,
+      navGitBg: navBg('git'), navGitFg: navFg('git'),
+      goGit: this.go('git'), isGit: ws.valid && st.section === 'git',
+      hasChanges: ws.valid && !st.committed && changed.length > 0,
+      changedCount: String(changed.length),
+      gitSummaryLine: gitSummaryLine,
+      gitBranch: git.branch, gitMeta: gitMeta, gitCounts: gitCounts,
+      commitMeta: git.files.length + ' files · ' + totalAdd + ' −' + totalDel,
+      commitBlurb: st.committed ? 'Everything above is now in the last commit. Nothing is waiting.' : git.commitBlurb,
+      commitFiles: git.files, commitCount: String(git.files.length),
+      notCommitted: !st.committed, committed: st.committed,
+      doCommit: () => this.setState({ committed: true }),
+      undoCommit: () => this.setState({ committed: false, prOpened: false }),
+      prBranch: git.prBranch, prTitle: git.prTitle, prNumber: git.prNumber,
+      prBullets: (git.prBullets || []).map(t => ({ text: t })),
+      prClosed: !st.prOpened, prOpened: st.prOpened,
+      openPr: () => this.setState({ prOpened: true }),
+      worktrees: worktrees, wtMeta: worktrees.length + ' checkouts · ' + wtActive + ' agent active · ' + wtIdle + ' idle · ' + overlaps + ' touching the same file',
+      addWorktree: () => this.setState({ wtAdded: this.state.wtAdded.concat([{
+        name: 'worktree-' + (this.state.wtAdded.length + 1),
+        path: '~/dev/.worktrees/worktree-' + (this.state.wtAdded.length + 1),
+        branch: 'wip/worktree-' + (this.state.wtAdded.length + 1), agent: 'unassigned', created: 'just now'
+      }]) }),
+      invalid: !ws.valid,
+      isOverview: ws.valid && st.section === 'overview',
+      isHealth: ws.valid && st.section === 'health',
+      isSessions: ws.valid && st.section === 'sessions',
+      isQueue: ws.valid && st.section === 'queue',
+      verdictLabel: v.label, verdictShort: v.short, verdictColor: v.color,
+      verdictBg: mix(v.color, 12), verdictBorder: mix(v.color, 35), verdictBlurb: v.blurb,
+      verdictIcon: svg(ws.verdict === 'ok' ? ic.check : ws.verdict === 'warn' ? ic.warn : ic.bad),
+      stats: stats, groups: groups,
+      isAtlasGraph: st.ws === 'atlas', isKitGraph: st.ws === 'kit',
+      graphMeta: st.ws === 'atlas' ? 'showing 8 of 34 files · 2 broken references' : '7 files · 6 references · 1 broken',
+      healthFiles: healthFiles, suggestions: suggestions,
+      suggestionMeta: ws.suggestions.length + ' actionable',
+      budgetTokens: fmtNum(ws.budget), budgetCap: ws.cap,
+      budgetColor: ws.verdict === 'bad' ? BAD : ws.verdict === 'warn' ? WARN : OK,
+      budgetSegments: budgetSegments,
+      sessions: sessions, sessionFilters: sessionFilters,
+      sessionMeta: ws.sessions.length + ' sessions · ' + usedTools.length + ' tools',
+      queueItems: queueItems, queueFilters: queueFilters, queueEmpty: queueItems.length === 0,
+      queueMeta: pendingCount ? pendingCount + ' pending · ' + (ws.queue.length - pendingCount) + ' ingested' : 'all ' + ws.queue.length + ' ingested',
+      hasPending: pendingCount > 0, pendingCount: String(pendingCount),
+      paletteOpen: st.palette, openPalette: () => this.setState({ palette: true, query: '' }),
+      closePalette: () => this.setState({ palette: false }),
+      stop: (e) => e.stopPropagation(),
+      query: st.query, onQuery: (e) => this.setState({ query: e.target.value }),
+      paletteInput: (el) => { if (el) setTimeout(() => el.focus(), 30); },
+      paletteGroups: paletteGroups, paletteEmpty: paletteGroups.length === 0
+    };
+  }
+}
+</script>
+</body>
+</html>
