@@ -36,12 +36,24 @@ const HELP = [
   '                   consumes. Binds to 127.0.0.1 only.',
   '  inspect [dir]    Dump the raw workspace index as JSON (debugging aid).',
   '',
+  '  worktree list [dir]              Show every worktree of this workspace.',
+  '  worktree add <name> [dir]        Create one. By convention it goes in',
+  '                                   .worktrees/<name> on a branch of the same',
+  '                                   name; --path and --branch override either.',
+  '  worktree remove <name> [dir]     Remove one. Refuses if it holds uncommitted',
+  '                                   work unless --force. The branch is kept.',
+  '',
   'Options:',
   '  --json           Machine-readable output instead of the terminal report.',
   '  --port <n>       Port for `serve` (default 4319).',
   '  --max-lines <n>  Override the always-loaded budget (default 300 lines, the',
   '                   figure from docs/specs/context-manager-conventions.md).',
+  '  --path <p>       Place a new worktree somewhere other than the convention.',
+  '  --branch <b>     Use a branch name other than the worktree name.',
+  '  --force          Remove a worktree even though it holds uncommitted work.',
   '  -h, --help       Show this help.',
+  '',
+  'Worktrees are local-only: nothing is pushed and no remote is contacted.',
   '',
   'Note on token figures: every token count reported is an estimate derived from',
   'characters ÷ 4, a rough approximation — not a tokenizer count. Treat it as an',
@@ -49,15 +61,36 @@ const HELP = [
 ].join('\n');
 
 function parseArgs(argv) {
-  const args = { command: null, dir: null, json: false, maxLines: null, port: null, help: false };
+  const args = {
+    command: null, sub: null, name: null, dir: null, json: false, maxLines: null,
+    port: null, help: false, path: null, branch: null, force: false,
+  };
+  const positional = [];
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '-h' || arg === '--help') args.help = true;
     else if (arg === '--json') args.json = true;
+    else if (arg === '--force') args.force = true;
     else if (arg === '--max-lines') args.maxLines = parseInt(argv[++i], 10);
     else if (arg === '--port') args.port = parseInt(argv[++i], 10);
-    else if (!args.command) args.command = arg;
-    else if (!args.dir) args.dir = arg;
+    else if (arg === '--path') args.path = argv[++i];
+    else if (arg === '--branch') args.branch = argv[++i];
+    else positional.push(arg);
+  }
+  args.command = positional[0] || null;
+  if (args.command === 'worktree') {
+    // `worktree <sub> [name] [dir]` — `list` takes no name, so the directory
+    // shifts one place left for it.
+    args.sub = positional[1] || null;
+    if (args.sub === 'list') {
+      args.name = null;
+      args.dir = positional[2] || null;
+    } else {
+      args.name = positional[2] || null;
+      args.dir = positional[3] || null;
+    }
+  } else {
+    args.dir = positional[1] || null;
   }
   return args;
 }
@@ -98,6 +131,87 @@ function main(argv) {
     });
     process.stdout.write(out.join('\n') + '\n');
     return 0;
+  }
+
+  if (args.command === 'worktree') {
+    const sub = args.sub;
+
+    if (sub === 'list' || sub === null) {
+      const listed = gitLayer.listWorktrees(dir);
+      if (args.json) {
+        process.stdout.write(JSON.stringify(listed, null, 2) + '\n');
+        return 0;
+      }
+      if (!listed.isRepo) {
+        process.stdout.write('Not a git repository — no worktrees here.\n');
+        return 0;
+      }
+      const extra = listed.worktrees.filter(function (w) { return !w.isMain; });
+      if (!extra.length) {
+        process.stdout.write('No worktrees yet, only the main working copy.\n'
+          + 'Create one with:  workspace-kit worktree add <name>\n');
+        return 0;
+      }
+      const out = [extra.length + (extra.length === 1 ? ' worktree:' : ' worktrees:'), ''];
+      extra.forEach(function (w) {
+        out.push('  ' + w.name + '  on ' + (w.branch || 'a detached HEAD')
+          + (w.byConvention ? '' : '  (custom location)'));
+        out.push('    ' + w.path);
+      });
+      process.stdout.write(out.join('\n') + '\n');
+      return 0;
+    }
+
+    if (sub === 'add') {
+      const result = gitLayer.createWorktree(dir, args.name, {
+        path: args.path,
+        branch: args.branch,
+        // core/git.js depends on nothing but child_process and path, so the
+        // filesystem comes from here — same arrangement as doctor's readFile.
+        io: {
+          readFile: function (p) { return fs.readFileSync(p, 'utf8'); },
+          writeFile: function (p, c) { fs.writeFileSync(p, c); },
+          exists: function (p) { return fs.existsSync(p); },
+        },
+      });
+      if (args.json) {
+        process.stdout.write(JSON.stringify(result, null, 2) + '\n');
+        return result.ok ? 0 : 1;
+      }
+      if (!result.ok) {
+        process.stderr.write(result.error + '\n');
+        return 1;
+      }
+      const out = ['Created worktree "' + result.name + '".', ''];
+      out.push('  location  ' + result.path + (result.byConvention ? '' : '  (custom)'));
+      out.push('  branch    ' + result.branch + (result.reusedBranch ? '  (existing branch)' : '  (new branch)'));
+      if (result.gitignoreUpdated) out.push('  .gitignore updated so worktrees are not reported as stray files');
+      out.push('', 'Nothing was pushed — this is local only.');
+      process.stdout.write(out.join('\n') + '\n');
+      return 0;
+    }
+
+    if (sub === 'remove') {
+      const result = gitLayer.removeWorktree(dir, args.name, { force: args.force });
+      if (args.json) {
+        process.stdout.write(JSON.stringify(result, null, 2) + '\n');
+        return result.ok ? 0 : 1;
+      }
+      if (!result.ok) {
+        process.stderr.write(result.error + '\n');
+        if (result.uncommitted) {
+          result.uncommitted.forEach(function (f) { process.stderr.write('  ' + f + '\n'); });
+        }
+        return 1;
+      }
+      process.stdout.write('Removed worktree "' + result.name + '".\n'
+        + 'Branch ' + (result.branch || '(detached)') + ' was kept — delete it yourself if you no longer want it.\n');
+      return 0;
+    }
+
+    process.stderr.write('Unknown worktree subcommand: ' + sub + '\n'
+      + 'Expected one of: list, add, remove.\n');
+    return 2;
   }
 
   if (args.command === 'serve') {
