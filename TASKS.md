@@ -32,8 +32,9 @@ Generates *and* manages workspaces; hosts capabilities the standalone HTML can't
 ### Local Web App dashboard — lifecycle UI (prototyped — 2026-07-28)
 The screens over the five lifecycle features: one shell, five sections (Overview, Health check, Session log, Queue, Source control). Rendering only — every number comes from the specs below. Stack + visual identity decided 2026-07-28 (React/Tailwind/shadcn, Web-App-scoped; see DECISIONS.md). Full spec: docs/specs/web-app-dashboard.md. Prototype: docs/design/workspace-kit-dashboard.dc.html.
 
-### Workspace inspection layer (planning — 2026-07-26)
+### Workspace inspection layer (P0 implemented — 2026-07-29)
 Foundational read-side counterpart to `core/generator.js` — one shared way to open and index an existing workspace (files, sizes, parsed instructions, cross-reference graph) that several features below build on instead of each growing their own parser. Full spec + issue: docs/specs/workspace-inspection-layer.md → [#77](https://github.com/atempel/workspace-kit/issues/77).
+- [x] ~~P0 implemented~~ — `core/inspect.js` landed 2026-07-29 with `npm run test:inspect` (18 cases, one per P0 acceptance criterion) and two P1s (gitignore-aware scanning, `node core/inspect.js <folder>` debug dump). Three of the spec's Open Questions closed along the way — token heuristic, instruction granularity, Node-only export (see DECISIONS.md). **Unblocks** the health check (#78), git integration layer (#79) and the dashboard (#169), which were all waiting on this.
 
 ### Workspace health check — "system doctor" (planning — ingested from voice note, 2026-07-26)
 Evaluates a workspace's instruction/file-size health and gives concrete improvement suggestions — likely the CLI's natural second command (`workspace-kit doctor`). Full spec + issue: docs/specs/workspace-health-check.md → [#78](https://github.com/atempel/workspace-kit/issues/78).
