@@ -27,6 +27,7 @@ Digital product / App (internal tool, standalone artifact)
 🟡 2026-07-21 — full project review completed (past TASKS.md backlog, other session history, and open GitHub issues cross-checked); multi-surface direction (CLI + Web App + HTML) and context-manager repositioning decided — see DECISIONS.md. Next: split into specs per surface/theme, each becoming a GitHub issue.
 🟡 2026-07-26 — five new specs written from a voice-note brainstorm (workspace inspection layer #77, health check #78, git integration layer #79, document ingestion queue #80, cross-tool session log #81); TASKS.md reorganized into a lean index; DECISIONS.md ADR-rotated for the first time.
 🟡 2026-07-27 — `SESSIONS.md` and `queue/` dogfooded in this repo; docs/PRD.md and this file refreshed to reflect the batch above. No code touched yet — repo is ready for Claude Code to start implementing the specs. Next: prototype the new structures in Claude Design before implementation begins.
+🟡 2026-07-29 — first code change of the context-manager era: the "project type" → **kit** rename executed across both copies of the generation logic, the parity harness, `research/kits/`, and the docs (see DECISIONS.md, 2026-07-29). Generated output deliberately unchanged, which is what keeps the fixture/parity suites green. `index.html` re-mirrored after drifting a version behind the artifact.
 
 ---
 Workspace generated to give continuity to the project in Cowork.
