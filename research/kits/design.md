@@ -1,4 +1,4 @@
-# Project type — Design (UI/product) (`design`)
+# Kit — Design (UI/product) (`design`)
 
 ## Summary
 For design-only work streams: a design system, a UI redesign, a set of screens handed off to engineering — where the deliverable is specs and assets, not running code.
@@ -22,4 +22,4 @@ All three default to checked.
 
 ## Notes for the generator
 - The limits placeholder here is doing real work: it's the one type where "the AI making an unmarked deliverable-quality artifact" is a distinct, named risk versus just a generic "don't overstep" warning.
-- Good candidate to cross-reference with the `design` plugin skills (design-critique, accessibility-review, design-system) in a future "recommended skills per project type" feature — see TASKS.md.
+- Good candidate to cross-reference with the `design` plugin skills (design-critique, accessibility-review, design-system) in a future "recommended skills per kit" feature — see TASKS.md.

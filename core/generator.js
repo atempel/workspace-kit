@@ -35,7 +35,7 @@
     },
   };
 
-  var TYPE_CONFIG = {
+  var KIT_CONFIG = {
     produto: {
       label:{en:'Digital product / App', pt:'Produto digital / App'},
       checks:[
@@ -313,7 +313,7 @@
     const t = STRINGS[input.lang];
     return {
       name: (input.name || '').trim() || t.newProject,
-      type: input.type,
+      kit: input.kit,
       desc: (input.desc || '').trim() || t.fillIn,
       obj: (input.obj || '').trim() || t.fillIn,
       stack: (input.stack || '').trim(),
@@ -324,7 +324,7 @@
   function buildFileMap(input){
     const lang = input.lang;
     const d = resolveData(input);
-    const cfg = TYPE_CONFIG[d.type];
+    const cfg = KIT_CONFIG[d.kit];
     const date = todayStr(lang);
     const slug = slugify(d.name);
     const files = {};
@@ -385,7 +385,7 @@
     const name = (input.name || '').trim() || t.newProject;
     const desc = (input.desc || '').trim() || t.fillIn;
     const obj = (input.obj || '').trim() || t.fillIn;
-    const cfg = TYPE_CONFIG[input.type];
+    const cfg = KIT_CONFIG[input.kit];
     const agentList = buildAgentFileList(input.agents, lang);
 
     return lang === 'en'
@@ -417,6 +417,7 @@ COMO TRABALHAR
 - Atualize TASKS.md conforme o trabalho avança.
 - Você é uma ferramenta que amplia meu julgamento — em pontos de ambiguidade estratégica, não decida sozinho: traga opções e trade-offs para eu decidir.
 - Seja explícito sobre o que é fato, inferência ou suposição.
+- Este chat é em português, mas a documentação gerada (PROJECT.md, DECISIONS.md, etc.) deve continuar em inglês por padrão — só escreva a documentação em português se eu pedir isso explicitamente.
 
 Comece revisando os arquivos do workspace e me diga o que falta preencher antes de começarmos.`;
   }
@@ -436,7 +437,7 @@ Comece revisando os arquivos do workspace e me diga o que falta preencher antes 
   }
 
   return {
-    TYPE_CONFIG: TYPE_CONFIG,
+    KIT_CONFIG: KIT_CONFIG,
     STRINGS: STRINGS,
     GITIGNORE_BASE: GITIGNORE_BASE,
     slugify: slugify,

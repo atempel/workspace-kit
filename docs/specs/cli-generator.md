@@ -6,7 +6,7 @@ Status: draft, pending review. Part of the 2026-07-21 multi-surface direction (s
 Today workspace//kit only exists as a browser artifact (`src/workspace-kit.html`): you have to open it, fill a form, download a .zip, and manually extract it into a project folder before opening an AI agent. That's an extra manual hop for anyone already working from a terminal, and it structurally can't do things that need a real process — write files straight to disk, run `git init`, or chain into other local tooling. A CLI removes the browser round-trip and is the natural on-ramp for the "project context manager" direction: something you can run again, later, from the same place you already work.
 
 ## Goals
-- Reach full functional parity with the HTML generator's core output (human layer + agent layer + `.gitignore`, all 17 project types) from a single command, no browser involved.
+- Reach full functional parity with the HTML generator's core output (human layer + agent layer + `.gitignore`, all 17 kits) from a single command, no browser involved.
 - Cut the time from "I want to start a project" to "agent-ready folder" to one command instead of open-browser → fill form → download → extract.
 - Write directly into the target folder (optionally `git init` it), removing the download-and-extract step entirely.
 - Establish the CLI as a credible base for later features that need a real process (Templates management, Docker environment spin-up — see their specs) without over-building ahead of need.
@@ -41,14 +41,14 @@ Today workspace//kit only exists as a browser artifact (`src/workspace-kit.html`
 **Nice-to-Have (P1)**
 - Non-interactive mode fully driven by a config file or flags (for scripting/CI use).
 - `--dry-run` flag that prints the file tree it would generate without writing anything.
-- Shell completion for flags/project types.
+- Shell completion for flags/kits.
 
 **Future Considerations (P2)**
 - Re-running against an existing workspace to add an agent format or project-type folder that wasn't picked initially (this edges into Web App "management" territory — don't build the storage/state model for it now, but don't write generation code that assumes "always a brand-new empty folder" either).
 - Packaging for `npx workspace-kit` / global install.
 
 ## Success Metrics
-**Leading:** time from `npx ...` (or equivalent) to a written, agent-ready folder (target: under 60 seconds including prompts); whether output parity with the HTML generator holds across all 17 project types (target: 100%, verified by a checklist/test pass, not just spot-checks).
+**Leading:** time from `npx ...` (or equivalent) to a written, agent-ready folder (target: under 60 seconds including prompts); whether output parity with the HTML generator holds across all 17 kits (target: 100%, verified by a checklist/test pass, not just spot-checks).
 **Lagging:** whether the CLI becomes Alexandre's own default way of starting new projects going forward (self-usage is the realistic signal at this stage — there's no external user base yet to measure adoption against).
 
 ## Open Questions

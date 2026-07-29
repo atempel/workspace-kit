@@ -1,4 +1,4 @@
-# Project type — Browser extension (`extension`) — PROPOSED
+# Kit — Browser extension (`extension`) — PROPOSED
 
 ## Summary
 For Chrome/Firefox/Edge browser extensions. The defining risk is different from any existing type: store reviewers reject almost entirely on permission scope, not code quality or design polish.

@@ -37,10 +37,10 @@ function runRealHtml(input, FixedDate) {
 
   win.setLang(input.lang);
 
-  doc.getElementById('ptype').value = input.type;
-  win.applyTypeDefaults();
+  doc.getElementById('pkit').value = input.kit;
+  win.applyKitDefaults();
 
-  const cfgChecks = core.TYPE_CONFIG[input.type].checks;
+  const cfgChecks = core.KIT_CONFIG[input.kit].checks;
   const wantedFolders = new Set(input.folders.map(f => f.name));
   [1, 2, 3].forEach(i => {
     const folderName = cfgChecks[i - 1].folder[input.lang];

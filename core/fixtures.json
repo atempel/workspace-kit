@@ -3,7 +3,7 @@
     "name": "produto-en",
     "input": {
       "name": "Infinite List",
-      "type": "produto",
+      "kit": "produto",
       "lang": "en",
       "desc": "A test app for verifying core generation output.",
       "obj": "validate the concept before coding",
@@ -60,7 +60,7 @@
     "name": "jogo-pt",
     "input": {
       "name": "Jogo Teste",
-      "type": "jogo",
+      "kit": "jogo",
       "lang": "pt",
       "desc": "Um jogo de teste para verificar a saída do core.",
       "obj": "testar geração",
@@ -110,7 +110,7 @@
         "slug": "jogo-teste",
         "name": "Jogo Teste"
       },
-      "starterPrompt": "Você vai atuar como parceiro de trabalho neste projeto: \"Jogo Teste\".\n\nCONTEXTO\nUm jogo de teste para verificar a saída do core.\nObjetivo principal: testar geração\nTipo de projeto: Jogo digital (game dev)\n\nCOMO TRABALHAR\n- Antes de qualquer ação, leia CLAUDE.md, .cursor/rules/, depois PROJECT.md, CONTEXT.md e DECISIONS.md nesta pasta.\n- Toda decisão relevante que tomarmos deve ser registrada em DECISIONS.md (o quê, por quê, alternativas descartadas).\n- Atualize TASKS.md conforme o trabalho avança.\n- Você é uma ferramenta que amplia meu julgamento — em pontos de ambiguidade estratégica, não decida sozinho: traga opções e trade-offs para eu decidir.\n- Seja explícito sobre o que é fato, inferência ou suposição.\n\nComece revisando os arquivos do workspace e me diga o que falta preencher antes de começarmos.",
+      "starterPrompt": "Você vai atuar como parceiro de trabalho neste projeto: \"Jogo Teste\".\n\nCONTEXTO\nUm jogo de teste para verificar a saída do core.\nObjetivo principal: testar geração\nTipo de projeto: Jogo digital (game dev)\n\nCOMO TRABALHAR\n- Antes de qualquer ação, leia CLAUDE.md, .cursor/rules/, depois PROJECT.md, CONTEXT.md e DECISIONS.md nesta pasta.\n- Toda decisão relevante que tomarmos deve ser registrada em DECISIONS.md (o quê, por quê, alternativas descartadas).\n- Atualize TASKS.md conforme o trabalho avança.\n- Você é uma ferramenta que amplia meu julgamento — em pontos de ambiguidade estratégica, não decida sozinho: traga opções e trade-offs para eu decidir.\n- Seja explícito sobre o que é fato, inferência ou suposição.\n- Este chat é em português, mas a documentação gerada (PROJECT.md, DECISIONS.md, etc.) deve continuar em inglês por padrão — só escreva a documentação em português se eu pedir isso explicitamente.\n\nComece revisando os arquivos do workspace e me diga o que falta preencher antes de começarmos.",
       "agentFileList": "CLAUDE.md, .cursor/rules/"
     }
   }

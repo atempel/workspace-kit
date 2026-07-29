@@ -1,4 +1,4 @@
-# Project type — Website / landing page (`site`)
+# Kit — Website / landing page (`site`)
 
 ## Summary
 For marketing sites, landing pages, and simple content sites — narrower than `produto` in that there's no expectation of complex application state, just content + performance.

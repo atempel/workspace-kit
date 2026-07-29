@@ -3,10 +3,10 @@
 Status: draft, pending review. Source: Notion voice note "Notas de áudio Workspace Kit 14/07" (2026-07-14), refined in TASKS.md and the 2026-07-21 multi-surface decision.
 
 ## Problem Statement
-Workspace//kit today generates one fixed structure per project type, defined entirely by the maintainer. That's a good universal default, but it isn't the ideal workspace for everyone — professionals who work a certain way repeatedly end up wanting their own file structure and naming, not the maintainer's. The home nav already has a "Templates" option with no functionality behind it, so this gap is already visible to anyone using the artifact today.
+Workspace//kit today generates one fixed structure per kit, defined entirely by the maintainer. That's a good universal default, but it isn't the ideal workspace for everyone — professionals who work a certain way repeatedly end up wanting their own file structure and naming, not the maintainer's. The home nav already has a "Templates" option with no functionality behind it, so this gap is already visible to anyone using the artifact today.
 
 ## Goals
-- Let a user define their own reusable workspace structure (files, folders, content with fill-in-the-blank fields) instead of only the 17 built-in project types.
+- Let a user define their own reusable workspace structure (files, folders, content with fill-in-the-blank fields) instead of only the 17 built-in kits.
 - Reuse the existing generation UX (form → preview → download/write, starter prompt) for template-based generation, so it feels like the same tool, not a separate one.
 - Let users name and reuse templates across future projects without rebuilding them each time.
 - Keep the built-in generator as the zero-friction default — templates are additive, not a replacement, and shouldn't complicate the experience for someone who just wants a standard workspace.
@@ -27,7 +27,7 @@ Workspace//kit today generates one fixed structure per project type, defined ent
 ## Requirements
 
 **Must-Have (P0)**
-- Template authoring: create/edit a template's file and folder structure, including adding new files/folders beyond what any built-in project type defines.
+- Template authoring: create/edit a template's file and folder structure, including adding new files/folders beyond what any built-in kit defines.
   - Acceptance: a user can produce a template containing at least one file/folder not present in any of the 17 built-in types.
 - Merge-tag system: define named fields (like the built-in generator's "project name") and reference them in template `.md` files with a marker (`%tag%` or `[tag]`, format TBD — see Open Questions).
   - Acceptance: generating from a template with N defined fields produces a form with N inputs; submitting the form replaces every occurrence of each tag in every template file with the submitted value.

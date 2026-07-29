@@ -1,4 +1,4 @@
-# Project type — Marketing campaign (`marketing`) — PROPOSED
+# Kit — Marketing campaign (`marketing`) — PROPOSED
 
 ## Summary
 For a bounded marketing campaign: a product launch push, a seasonal promotion, a content series with a specific goal and timeline — distinct from ongoing brand/content work.

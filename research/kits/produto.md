@@ -1,4 +1,4 @@
-# Project type — Digital product / App (`produto`)
+# Kit — Digital product / App (`produto`)
 
 ## Summary
 The default, broadest type. Covers any software product built for end users or internal use: desktop apps, internal tools, standalone artifacts. This is the type used by the generator's own project (workspace//kit itself) and by the user's other product, GamerDash.

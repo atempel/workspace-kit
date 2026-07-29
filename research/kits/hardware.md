@@ -1,4 +1,4 @@
-# Project type — Hardware / IoT (`hardware`) — PROPOSED
+# Kit — Hardware / IoT (`hardware`) — PROPOSED
 
 ## Summary
 For physical computing and IoT projects: firmware plus a physical device, e.g. ESP32/Arduino/Raspberry Pi builds, sensors, enclosures. No existing type covers firmware or bills of materials.

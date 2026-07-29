@@ -1,4 +1,4 @@
-# Project type — Mobile app (iOS/Android) (`mobile`) — PROPOSED
+# Kit — Mobile app (iOS/Android) (`mobile`) — PROPOSED
 
 ## Summary
 For native or cross-platform mobile apps. Distinct from `produto` mainly because of the store-submission lifecycle: metadata, screenshots, permissions, and platform review — none of which a desktop/web product deals with.

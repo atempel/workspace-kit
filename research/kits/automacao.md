@@ -1,4 +1,4 @@
-# Project type — Automation / internal script (`automacao`)
+# Kit — Automation / internal script (`automacao`)
 
 ## Summary
 For small, self-contained scripts and internal tools that automate a task: scheduled jobs, one-off scripts, glue code between systems — deliberately scoped smaller than `produto`.

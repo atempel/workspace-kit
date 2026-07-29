@@ -1,4 +1,4 @@
-# Project type — Generic (`generico`)
+# Kit — Generic (`generico`)
 
 ## Summary
 The catch-all for anything that doesn't fit the other types — or that the user hasn't yet decided how to categorize.
@@ -22,4 +22,4 @@ None, and it should stay that way — adding an anchor file here would defeat th
 
 ## Notes for the generator
 - This type's placeholders are the most "meta" of the set — they describe the fields themselves rather than giving a concrete domain example, since there's no domain to anchor to.
-- Should remain last in the type list (or clearly marked as a fallback) so it doesn't get chosen by default ahead of a better-fitting type — currently it's simply last in `TYPE_CONFIG`, which coincides with iteration order in `populateTypeSelect()`.
+- Should remain last in the kit list (or clearly marked as a fallback) so it doesn't get chosen by default ahead of a better-fitting kit — currently it is simply last in `KIT_CONFIG`, which coincides with iteration order in `populateKitSelect()`.

@@ -1,4 +1,4 @@
-# Project type — Digital game (game dev) (`jogo`)
+# Kit — Digital game (game dev) (`jogo`)
 
 ## Summary
 For video game development projects, scoped explicitly toward small/solo projects ("single mechanic, scope of a few days") rather than large studio productions.

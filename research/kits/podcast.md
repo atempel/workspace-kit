@@ -1,4 +1,4 @@
-# Project type — Podcast / video production (`podcast`) — PROPOSED
+# Kit — Podcast / video production (`podcast`) — PROPOSED
 
 ## Summary
 For episodic audio/video content: podcasts, YouTube series — recurring production with a consistent format, as opposed to one-off writing.
