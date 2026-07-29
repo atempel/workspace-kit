@@ -76,3 +76,6 @@ This isn't hypothetical: in a recent real session, Alexandre had a Notion projec
 
 ## Timeline Considerations
 Content-generation only, so — unlike template management or git integration — it doesn't need the CLI or Web App to reach MVP first; even the standalone HTML can generate a single stub's text for copy/paste or download today. This makes it one of the cheapest features in the current batch to actually build and dogfood, and the repo-local dogfooding step (populating this repo's own `queue/`) can happen immediately, independent of any surface's build status.
+
+## Implementation status
+**Read side done 2026-07-29:** `core/inspect.js` parses `queue/*.md` stubs into `index.queue` (title, type, source, added, normalised `pending`/`ingested` status, ingestion date and destination, notes), closing this spec's deferral of reading to the inspection layer. A test asserts the parser and the documented `grep -l "Status: Pending"` convention never disagree about an item's state. **Still open:** the generation half — emitting the `queue/` convention and its stub format into generated workspaces from all three surfaces.
