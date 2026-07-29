@@ -323,6 +323,87 @@ test('P1  a binary file is indexed but not parsed', function () {
   assert.strictEqual(png.bytes, 6);
 });
 
+test('#80  queue stubs are parsed, with status normalised for the grep convention', function () {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'wskit-queue-'));
+  fs.writeFileSync(path.join(dir, 'PROJECT.md'), '# P\n');
+  fs.writeFileSync(path.join(dir, 'TASKS.md'), '# T\n');
+  fs.mkdirSync(path.join(dir, 'queue'), { recursive: true });
+  fs.writeFileSync(path.join(dir, 'queue', 'a.md'), [
+    '# Queue item — Voice note from 14/07', '',
+    '- **Type:** Voice note',
+    '- **Source:** https://example.com/note',
+    '- **Added:** 2026-07-14',
+    '- **Status:** Pending', '',
+    '## Notes', 'Covers the CLI direction.', '',
+  ].join('\n'));
+  fs.writeFileSync(path.join(dir, 'queue', 'b.md'), [
+    '# Queue item — Board export', '',
+    '- **Type:** Board',
+    '- **Source:** Miro',
+    '- **Added:** 2026-07-01',
+    '- **Status:** Ingested (2026-07-21)',
+    '- **Ingested into:** docs/specs/cli-generator.md (#20)', '',
+  ].join('\n'));
+
+  const items = inspector.inspect(dir).queue;
+  assert.strictEqual(items.length, 2);
+  const byPath = {};
+  items.forEach(function (i) { byPath[i.path] = i; });
+
+  const pending = byPath['queue/a.md'];
+  assert.strictEqual(pending.title, 'Voice note from 14/07');
+  assert.strictEqual(pending.type, 'Voice note');
+  assert.strictEqual(pending.added, '2026-07-14');
+  assert.strictEqual(pending.status, 'pending');
+  assert.strictEqual(pending.notes, 'Covers the CLI direction.');
+
+  const done = byPath['queue/b.md'];
+  assert.strictEqual(done.status, 'ingested');
+  assert.strictEqual(done.ingestedOn, '2026-07-21');
+  assert.match(done.ingestedInto, /cli-generator/);
+
+  // The parser and the documented grep must never disagree about state.
+  const grepPending = ['queue/a.md', 'queue/b.md'].filter(function (rel) {
+    return /Status:\*\*\s*Pending/i.test(fs.readFileSync(path.join(dir, rel), 'utf8'));
+  });
+  assert.deepStrictEqual(grepPending, items.filter(function (i) {
+    return i.status === 'pending';
+  }).map(function (i) { return i.path; }));
+});
+
+test('#81  SESSIONS.md entries are parsed newest-first with Did / Left at', function () {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'wskit-sessions-'));
+  fs.writeFileSync(path.join(dir, 'PROJECT.md'), '# P\n');
+  fs.writeFileSync(path.join(dir, 'TASKS.md'), '# T\n');
+  fs.writeFileSync(path.join(dir, 'SESSIONS.md'), [
+    '# Sessions', '', 'Preamble that is not an entry.', '', '## Entries', '',
+    '### 2026-07-27 — Cowork',
+    '**Did:** Planned the specs.',
+    '**Left at:** No code touched.', '',
+    '### 2026-07-29 — Claude Code',
+    '**Did:** Built the inspection layer.',
+    '**Left at:** Merged, tests green.', '',
+  ].join('\n'));
+
+  const entries = inspector.inspect(dir).sessions;
+  assert.strictEqual(entries.length, 2, 'the preamble and "## Entries" are not entries');
+  assert.strictEqual(entries[0].date, '2026-07-29', 'newest first');
+  assert.strictEqual(entries[0].tool, 'Claude Code');
+  assert.strictEqual(entries[0].did, 'Built the inspection layer.');
+  assert.strictEqual(entries[0].leftAt, 'Merged, tests green.');
+  assert.strictEqual(entries[1].date, '2026-07-27');
+  assert.strictEqual(entries[1].tool, 'Cowork');
+});
+
+test('#80/#81  a workspace with neither convention returns empty lists, not errors', function () {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'wskit-none-'));
+  fs.writeFileSync(path.join(dir, 'PROJECT.md'), '# P\n');
+  fs.writeFileSync(path.join(dir, 'TASKS.md'), '# T\n');
+  const index = inspector.inspect(dir);
+  assert.deepStrictEqual(index.queue, []);
+  assert.deepStrictEqual(index.sessions, []);
+});
+
 // ---------------------------------------------------------------------------
 
 let failures = 0;

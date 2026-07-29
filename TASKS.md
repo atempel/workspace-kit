@@ -42,12 +42,14 @@ Evaluates a workspace's instruction/file-size health and gives concrete improvem
 
 ### Cross-tool session log (planning — ingested from voice note, 2026-07-26)
 A per-session log recording what happened where across tools (Claude Design/Cowork/Claude Code) — cheapest of the 2026-07-26 batch, ships as plain generated text on all three surfaces. Full spec + issue: docs/specs/cross-tool-session-log.md → [#81](https://github.com/atempel/workspace-kit/issues/81).
+- [x] ~~Read side~~ — `core/inspect.js` parses `SESSIONS.md` into `index.sessions` (2026-07-29). Still open: generating `SESSIONS.md` + the standing instruction into new workspaces.
 
 ### Git as the integration layer (planning — ingested from voice note, 2026-07-26)
 Workspace//kit itself operating git (file-state tracking, worktrees, user-friendly commit/PR flows) — strictly model-agnostic (see DECISIONS.md, 2026-07-26), CLI/Web-App-only. Full spec + issue: docs/specs/git-integration-layer.md → [#79](https://github.com/atempel/workspace-kit/issues/79). Design brief for a Claude Design prototype (no UI existed yet for this spec): docs/design/git-layer-dashboard-brief.md.
 
 ### Document ingestion queue (planning — ingested from voice note, 2026-07-26)
 A per-workspace queue for references saved but not yet incorporated; dogfooded immediately in this repo's own `queue/` folder. Full spec + issue: docs/specs/document-ingestion-queue.md → [#80](https://github.com/atempel/workspace-kit/issues/80).
+- [x] ~~Read side~~ — `core/inspect.js` parses `queue/*.md` into `index.queue` (2026-07-29). Still open: generating the convention into new workspaces.
 
 ### Templates feature (planning — ingested from voice notes, 2026-07-14 and 2026-07-26)
 Lets a user define and reuse their own workspace structure via a form + merge tags. The home nav already has a non-functional "Templates" pill (`navTemplates` in `src/workspace-kit.html`). Full spec + issue: docs/specs/templates-feature.md → [#32](https://github.com/atempel/workspace-kit/issues/32).

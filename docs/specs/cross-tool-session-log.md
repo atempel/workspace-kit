@@ -52,3 +52,6 @@ The same workspace is often worked on from several tools in sequence — Claude 
 
 ## Timeline Considerations
 No dependency on the CLI or Web App reaching MVP — this is generated text plus an instruction, so it can ship to the standalone HTML artifact directly. Per the same sequencing logic as #34 and the Templates feature, dogfood in this repository first (add `SESSIONS.md` here and start appending to it) before offering it as a generated convention to workspaces this tool produces.
+
+## Implementation status
+**Read side done 2026-07-29:** `core/inspect.js` parses `SESSIONS.md` into `index.sessions` (date, tool, Did, Left at), newest-first, closing this spec's deferral of parsing to the inspection layer. **Still open:** the generation half — emitting `SESSIONS.md` plus the "every session" standing instruction into generated workspaces from all three surfaces. This repo dogfoods both already, but the generator does not yet produce them.

@@ -432,6 +432,89 @@ function parseEdges(fromPath, text, knownPaths) {
 }
 
 /**
+ * Parse a `queue/*.md` stub into a structured item.
+ *
+ * The stub format is fixed by docs/specs/document-ingestion-queue.md (→ #80).
+ * That spec, and docs/specs/cross-tool-session-log.md (→ #81) below, both
+ * delegate *reading* their own files to this module -- "the kind of thing the
+ * Workspace inspection layer exists to eventually provide" -- while #77's own
+ * Non-Goals never claimed it. This is that gap closed: one reader here rather
+ * than each consumer growing its own, which is the whole premise of #77.
+ *
+ * Status is normalised to `pending` / `ingested` while the raw string is kept,
+ * so the grep convention (`grep -l "Status: Pending" queue/*.md`) and this
+ * parser can never disagree about what an item's state is.
+ */
+function parseQueueItem(relPath, text) {
+  function field(name) {
+    const match = new RegExp('^\\s*[-*]\\s*\\*\\*' + name + ':\\*\\*\\s*(.+?)\\s*$', 'mi').exec(text);
+    return match ? match[1].trim() : null;
+  }
+  const titleMatch = /^#\s+(?:Queue item\s+[—-]\s+)?(.+?)\s*$/m.exec(text);
+  const rawStatus = field('Status');
+  const ingestedOn = rawStatus ? (/\(([^)]+)\)/.exec(rawStatus) || [])[1] || null : null;
+  const notesMatch = /^##\s+Notes\s*\n([\s\S]*)$/m.exec(text);
+  return {
+    path: relPath,
+    title: titleMatch ? titleMatch[1].trim() : relPath,
+    type: field('Type'),
+    source: field('Source'),
+    added: field('Added'),
+    status: rawStatus && /^ingested/i.test(rawStatus) ? 'ingested' : 'pending',
+    statusRaw: rawStatus,
+    ingestedOn: ingestedOn,
+    ingestedInto: field('Ingested into'),
+    notes: notesMatch ? notesMatch[1].trim() : null,
+  };
+}
+
+/**
+ * Parse `SESSIONS.md` into its entries (docs/specs/cross-tool-session-log.md
+ * → #81): one per `### <date> — <tool>` heading, with the Did / Left at fields
+ * that spec fixes as the entry shape.
+ *
+ * Entries are returned newest-first, since every consumer of a handoff log
+ * wants the most recent state first.
+ */
+function parseSessions(text) {
+  const lines = text.split('\n');
+  const entries = [];
+  let current = null;
+
+  function close(endLine) {
+    if (!current) return;
+    const body = lines.slice(current.startLine, endLine).join('\n');
+    const did = /^\s*\*\*Did:\*\*\s*([\s\S]*?)(?=\n\s*\*\*|\n\s*$|$)/m.exec(body);
+    const left = /^\s*\*\*Left at:\*\*\s*([\s\S]*?)(?=\n\s*\*\*|\n\s*$|$)/m.exec(body);
+    current.did = did ? did[1].trim() : null;
+    current.leftAt = left ? left[1].trim() : null;
+    current.endLine = endLine;
+    entries.push(current);
+    current = null;
+  }
+
+  lines.forEach(function (line, index) {
+    const heading = /^###\s+(\d{4}-\d{2}-\d{2})\s*[—-]\s*(.+?)\s*$/.exec(line);
+    if (!heading) return;
+    close(index);
+    current = {
+      date: heading[1],
+      tool: heading[2].trim(),
+      startLine: index + 1,
+      endLine: index + 1,
+      did: null,
+      leftAt: null,
+    };
+  });
+  close(lines.length);
+
+  return entries.sort(function (a, b) {
+    if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+    return b.startLine - a.startLine;
+  });
+}
+
+/**
  * Is this folder a workspace//kit workspace?
  *
  * Scored rather than all-or-nothing, because the spec requires recognising a
@@ -497,6 +580,8 @@ function inspect(rootDir, options) {
       },
       files: [],
       instructions: [],
+      queue: [],
+      sessions: [],
       graph: { nodes: [], edges: [] },
       totals: emptyTotals(),
     };
@@ -542,6 +627,12 @@ function inspect(rootDir, options) {
     return a.to < b.to ? -1 : a.to > b.to ? 1 : 0;
   });
 
+  const queue = files
+    .filter(function (f) { return /^queue\/[^/]+\.md$/.test(f.path) && !f.binary; })
+    .map(function (f) { return parseQueueItem(f.path, texts.get(f.path)); });
+
+  const sessions = texts.has('SESSIONS.md') ? parseSessions(texts.get('SESSIONS.md')) : [];
+
   const detection = detect(files);
 
   return {
@@ -550,6 +641,8 @@ function inspect(rootDir, options) {
     detection: detection,
     files: files,
     instructions: instructions,
+    queue: queue,
+    sessions: sessions,
     graph: {
       nodes: files.map(function (f) { return f.path; }),
       edges: edges,
@@ -596,6 +689,8 @@ module.exports = {
   countLines: countLines,
   parseInstructions: parseInstructions,
   parseEdges: parseEdges,
+  parseQueueItem: parseQueueItem,
+  parseSessions: parseSessions,
   anchorFilePaths: anchorFilePaths,
   HUMAN_FILES: HUMAN_FILES,
   SIGNAL_FILES: SIGNAL_FILES,
