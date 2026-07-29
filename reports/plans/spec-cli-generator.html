@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spec — CLI generator (MVP) — workspace//kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/report.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="../index.html"><span>workspace</span><span class="slashes">//</span><span>kit</span></a>
+  <nav><a href="../index.html">Início</a><a href="../plans/index.html" class="active">Planos & specs</a><a href="../decisions.html">Decisões</a><a href="../tasks.html">Tarefas</a><a href="../sessions.html">Sessões</a></nav>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema">
+    <span class="only-light">◐</span><span class="only-dark">◑</span>
+  </button>
+</header>
+<main class="page">
+
+<p class="breadcrumb"><a href="index.html">← Planos &amp; specs</a></p>
+<div class="page-head">
+  <h1>Spec — CLI generator (MVP)</h1>
+  <div class="meta card-meta"><span class="chip warn">draft, pending review</span> <span class="chip mono muted mono">docs/specs/cli-generator.md</span> <span class="chip muted">61 linhas</span> <span class="chip muted">~1.819 tokens</span></div>
+</div>
+<nav class="toc"><h2>Nesta página</h2><ul><li class="lvl2"><a href="#problem-statement">Problem Statement</a></li><li class="lvl2"><a href="#goals">Goals</a></li><li class="lvl2"><a href="#non-goals">Non-Goals</a></li><li class="lvl2"><a href="#user-stories">User Stories</a></li><li class="lvl2"><a href="#requirements">Requirements</a></li><li class="lvl2"><a href="#success-metrics">Success Metrics</a></li><li class="lvl2"><a href="#open-questions">Open Questions</a></li><li class="lvl2"><a href="#timeline-considerations">Timeline Considerations</a></li></ul></nav>
+<article class="doc">
+<p>Status: draft, pending review. Part of the 2026-07-21 multi-surface direction (see PROJECT.md, DECISIONS.md).</p>
+<h2 id="problem-statement">Problem Statement<a class="anchor" href="#problem-statement" aria-label="Link para esta seção">#</a></h2>
+<p>Today workspace//kit only exists as a browser artifact (<code>src/workspace-kit.html</code>): you have to open it, fill a form, download a .zip, and manually extract it into a project folder before opening an AI agent. That's an extra manual hop for anyone already working from a terminal, and it structurally can't do things that need a real process — write files straight to disk, run <code>git init</code>, or chain into other local tooling. A CLI removes the browser round-trip and is the natural on-ramp for the &quot;project context manager&quot; direction: something you can run again, later, from the same place you already work.</p>
+<h2 id="goals">Goals<a class="anchor" href="#goals" aria-label="Link para esta seção">#</a></h2>
+<ul><li>Reach full functional parity with the HTML generator's core output (human layer + agent layer + <code>.gitignore</code>, all 17 kits) from a single command, no browser involved.</li><li>Cut the time from &quot;I want to start a project&quot; to &quot;agent-ready folder&quot; to one command instead of open-browser → fill form → download → extract.</li><li>Write directly into the target folder (optionally <code>git init</code> it), removing the download-and-extract step entirely.</li><li>Establish the CLI as a credible base for later features that need a real process (Templates management, Docker environment spin-up — see their specs) without over-building ahead of need.</li></ul>
+<h2 id="non-goals">Non-Goals<a class="anchor" href="#non-goals" aria-label="Link para esta seção">#</a></h2>
+<ul><li><strong>Workspace management</strong> (editing/re-running against an existing workspace, tracking many projects) — that's the Local Web App's job (see its spec); the CLI's MVP only creates new workspaces.</li><li><strong>Templates feature</strong> — out of scope for MVP; the CLI should be built so it doesn't block that later, but isn't implementing it now.</li><li><strong>Docker environment generation</strong> — same: not in MVP, shouldn't be architecturally precluded.</li><li><strong>Publishing to npm/Homebrew/etc. as a polished public package</strong> — MVP can be a local Node script invoked via <code>npx</code> or a repo-local bin; packaging/distribution is a fast-follow, not P0.</li><li><strong>Interactive TUI with rich widgets</strong> — a straightforward prompt-based flow (à la <code>npm init</code>) is enough; a fancier TUI is a P2 at best.</li></ul>
+<h2 id="user-stories">User Stories<a class="anchor" href="#user-stories" aria-label="Link para esta seção">#</a></h2>
+<ul><li>As a developer starting a new project from the terminal, I want to run one command and answer a few prompts so that I get an agent-ready workspace without leaving the terminal or touching a browser.</li><li>As a developer who already has a project folder, I want to run the CLI inside it so that it writes the generated files directly into the folder instead of a .zip I have to extract myself.</li><li>As a developer who wants a git repo, I want the CLI to optionally run <code>git init</code> and commit the initial scaffold so that I don't do that by hand right after generating.</li><li>As a non-English speaker, I want to choose the same PT/EN options the HTML generator offers so that the output stays consistent no matter which surface I used.</li><li>As Alexandre, I want the CLI's generation logic to share a single source of truth with the HTML/Web App generators so that the three surfaces don't drift out of sync over time (see Open Questions — this is the biggest unresolved risk).</li></ul>
+<h2 id="requirements">Requirements<a class="anchor" href="#requirements" aria-label="Link para esta seção">#</a></h2>
+<p><strong>Must-Have (P0)</strong></p>
+<ul><li>Command-line flow (interactive prompts, flags for non-interactive/CI use) covering the same inputs as the HTML form: project name, type (17 types), description, stack, target agents (CLAUDE.md/AGENTS.md/Cursor/Copilot/Gemini CLI/Windsurf/Skill), language (PT/EN). <ul><li>Acceptance: running the CLI with no flags prompts for every field the HTML form currently collects; running with flags skips prompts for whichever fields were passed.</li></ul></li><li>Writes the full human layer + agent layer + <code>.gitignore</code> + anchor file (when applicable) directly into the target directory (default: cwd). <ul><li>Acceptance: output file set and content match what the HTML generator would produce for the same inputs, given today's generation logic.</li></ul></li><li><code>--git</code> flag (or an interactive yes/no) to run <code>git init</code> in the target folder after generation. <ul><li>Acceptance: with the flag, the folder has a <code>.git</code>; without it, no git action is taken.</li></ul></li><li>Clear error handling: refuses to overwrite an existing non-empty directory without an explicit <code>--force</code>/confirmation. <ul><li>Acceptance: running against a populated folder without <code>--force</code> exits with a non-zero code and no files written; with <code>--force</code>, proceeds and reports which files were overwritten.</li></ul></li><li>Starter prompt printed to stdout (and optionally written to a file) at the end of the run, same content the HTML generator produces today.</li></ul>
+<p><strong>Nice-to-Have (P1)</strong></p>
+<ul><li>Non-interactive mode fully driven by a config file or flags (for scripting/CI use).</li><li><code>--dry-run</code> flag that prints the file tree it would generate without writing anything.</li><li>Shell completion for flags/kits.</li></ul>
+<p><strong>Future Considerations (P2)</strong></p>
+<ul><li>Re-running against an existing workspace to add an agent format or project-type folder that wasn't picked initially (this edges into Web App &quot;management&quot; territory — don't build the storage/state model for it now, but don't write generation code that assumes &quot;always a brand-new empty folder&quot; either).</li><li>Packaging for <code>npx workspace-kit</code> / global install.</li></ul>
+<h2 id="success-metrics">Success Metrics<a class="anchor" href="#success-metrics" aria-label="Link para esta seção">#</a></h2>
+<p><strong>Leading:</strong> time from <code>npx ...</code> (or equivalent) to a written, agent-ready folder (target: under 60 seconds including prompts); whether output parity with the HTML generator holds across all 17 kits (target: 100%, verified by a checklist/test pass, not just spot-checks). <strong>Lagging:</strong> whether the CLI becomes Alexandre's own default way of starting new projects going forward (self-usage is the realistic signal at this stage — there's no external user base yet to measure adoption against).</p>
+<h2 id="open-questions">Open Questions<a class="anchor" href="#open-questions" aria-label="Link para esta seção">#</a></h2>
+<ul><li><strong>(Resolved 2026-07-22, see DECISIONS.md)</strong> Shared generation logic: <code>core/generator.js</code> is the shared generation engine — plain Node-compatible JS (UMD-lite: <code>module.exports</code> for Node, <code>window.WorkspaceKitCore</code> for <code>&lt;script&gt;</code>), zero dependencies, no build step. The CLI is expected to build directly on top of it via <code>require('../core/generator.js')</code>. Note the resolution's scope: it's a <strong>copy-derived seed</strong>, not a refactor-in-place — <code>src/workspace-kit.html</code> keeps its own separate inline copy for now (not wired to the module), to preserve its use as a standalone artifact pasted into Claude.ai. See DECISIONS.md, &quot;2026-07-22 — Shared generation module seeded standalone, HTML artifact deferred&quot;, for the full reasoning and the manual-backport policy that follows from it.</li><li><strong>(Engineering)</strong> Runtime choice: Node (consistent with the project's only existing tooling assumption — <code>npm install -g @anthropic-ai/claude-code</code> in the Dockerfile — and easiest to share code with a future Node-based Web App) vs. something else. Node is the reasonable default absent a stated reason otherwise.</li><li><strong>(Product — Alexandre)</strong> Should the CLI ship inside this same repo (<code>workspace-kit</code>) or as a separate package/repo? Affects the <code>docs/specs</code> and issue structure downstream.</li></ul>
+<h2 id="timeline-considerations">Timeline Considerations<a class="anchor" href="#timeline-considerations" aria-label="Link para esta seção">#</a></h2>
+<p>No hard deadline. Natural sequencing: this spec and the Web App spec are foundational — Templates and Docker environment generation both assume at least one of the two exists in some form, so this is reasonable to prioritize first or in parallel with the Web App, ahead of those two.</p>
+</article>
+</main>
+<footer class="footer">
+  <p>Gerado por <code>workspace-kit report</code> a partir dos arquivos Markdown do repositório — não edite estes HTMLs à mão, edite o <code>.md</code> de origem e rode o comando de novo.</p>
+  <p class="muted">Gerado em 29 de julho de 2026 às 17:42 · contagens de tokens são estimativas (caracteres ÷ 4), não contagem de tokenizer.</p>
+</footer>
+<script src="../assets/report.js"></script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens for the Local Web App surface.
+ *
+ * Values are lifted from the Claude Design prototype
+ * (docs/design/workspace-kit-dashboard.dc.html), which DESIGN.md names as the
+ * reference for numbers: a neutral shadcn zinc base with the amber/teal accent
+ * carried over from the product's existing identity.
+ *
+ * Dark and light are equally first-class, per DESIGN.md — not a dark theme with
+ * light bolted on. Both are declared explicitly rather than one deriving from
+ * the other.
+ *
+ * Status colours are semantic and never carry meaning alone: every status in
+ * the UI renders as colour + icon + text label together (DESIGN.md, and the
+ * spec's own P0 accessibility criterion).
+ */
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --color-brand: #d4a24c;
+  --color-brand-2: #5fa8a0;
+
+  --color-ok: #22c55e;
+  --color-warn: #f59e0b;
+  --color-bad: #ef4444;
+  --color-info: #7aa2f7;
+}
+
+:root {
+  color-scheme: light;
+  --background: #fbfbfa;
+  --foreground: #18181b;
+  --card: #ffffff;
+  --sidebar: #f4f4f3;
+  --border: #e4e4e7;
+  --muted: #f4f4f5;
+  --muted-foreground: #6b6a75;
+  --accent: #ebebe9;
+  --ring: #d4a24c;
+  --brand: #a5762a;
+  --brand-2: #3d7d76;
+
+  --ok: #16a34a;
+  --warn: #b45309;
+  --bad: #b91c1c;
+  --info: #3f6bb8;
+}
+
+:root[data-theme='dark'],
+:root:not([data-theme]) {
+  color-scheme: dark;
+  --background: #18181b;
+  --foreground: #e8e6e3;
+  --card: #1d1d20;
+  --sidebar: #0b0b0c;
+  --border: #3f3f46;
+  --muted: #232327;
+  --muted-foreground: #8b8f9c;
+  --accent: #27272a;
+  --ring: #d4a24c;
+  --brand: #d4a24c;
+  --brand-2: #5fa8a0;
+
+  --ok: #22c55e;
+  --warn: #f59e0b;
+  --bad: #ef4444;
+  --info: #7aa2f7;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --background: #fbfbfa;
+  --foreground: #18181b;
+  --card: #ffffff;
+  --sidebar: #f4f4f3;
+  --border: #e4e4e7;
+  --muted: #f4f4f5;
+  --muted-foreground: #6b6a75;
+  --accent: #ebebe9;
+  --brand: #a5762a;
+  --brand-2: #3d7d76;
+
+  --ok: #16a34a;
+  --warn: #b45309;
+  --bad: #b91c1c;
+  --info: #3f6bb8;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--muted-foreground) 30%, transparent);
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+:where(button, a, input):focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--ring) 60%, transparent);
+  outline-offset: 2px;
+}

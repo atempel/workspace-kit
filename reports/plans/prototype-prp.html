@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PRP — High-fidelity prototype: workspace//kit lifecycle dashboard — workspace//kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/report.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="../index.html"><span>workspace</span><span class="slashes">//</span><span>kit</span></a>
+  <nav><a href="../index.html">Início</a><a href="../plans/index.html" class="active">Planos & specs</a><a href="../decisions.html">Decisões</a><a href="../tasks.html">Tarefas</a><a href="../sessions.html">Sessões</a></nav>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema">
+    <span class="only-light">◐</span><span class="only-dark">◑</span>
+  </button>
+</header>
+<main class="page">
+
+<p class="breadcrumb"><a href="index.html">← Planos &amp; specs</a></p>
+<div class="page-head">
+  <h1>PRP — High-fidelity prototype: workspace//kit lifecycle dashboard</h1>
+  <div class="meta card-meta"><span class="chip mono muted mono">docs/design/prototype-prp.md</span> <span class="chip muted">88 linhas</span> <span class="chip muted">~1.896 tokens</span></div>
+</div>
+<nav class="toc"><h2>Nesta página</h2><ul><li class="lvl2"><a href="#what-workspace-kit-is">What workspace//kit is</a></li><li class="lvl2"><a href="#what-to-prototype">What to prototype</a></li><li class="lvl2"><a href="#section-1-overview-workspace-inspection">Section 1 — Overview (workspace inspection)</a></li><li class="lvl2"><a href="#section-2-health-check-doctor">Section 2 — Health check (&quot;doctor&quot;)</a></li><li class="lvl2"><a href="#section-3-session-log">Section 3 — Session log</a></li><li class="lvl2"><a href="#section-4-document-queue">Section 4 — Document queue</a></li><li class="lvl2"><a href="#visual-direction">Visual direction</a></li><li class="lvl2"><a href="#explicitly-not-in-scope-for-this-prototype">Explicitly not in scope for this prototype</a></li><li class="lvl2"><a href="#suggested-additional-context-to-paste-attach-into-claude-design">Suggested additional context to paste/attach into Claude Design</a></li></ul></nav>
+<article class="doc">
+<p>Paste this whole file into Claude Design as the brief. It's self-contained — the example content below is real (pulled from this repo's own dogfooded files), not placeholder text, so you can design against it directly instead of lorem ipsum.</p>
+<h2 id="what-workspace-kit-is">What workspace//kit is<a class="anchor" href="#what-workspace-kit-is" aria-label="Link para esta seção">#</a></h2>
+<p>workspace//kit is a <strong>workspace management and versioning tool</strong> — not a code-versioning tool, that's git's job. From a project description it generates a &quot;human layer&quot; (PROJECT.md, DECISIONS.md, CONTEXT.md, TASKS.md) and an &quot;agent layer&quot; (CLAUDE.md, AGENTS.md, Cursor/Copilot/Gemini/Windsurf rules) so any AI coding tool has consistent context to work from. It ships on three surfaces: a standalone HTML artifact (exists today), a CLI, and a <strong>Local Web App</strong> (planned) — the Web App is the one being prototyped here, since it's the only surface that can read an existing project on disk on an ongoing basis, not just generate once.</p>
+<h2 id="what-to-prototype">What to prototype<a class="anchor" href="#what-to-prototype" aria-label="Link para esta seção">#</a></h2>
+<p>The Local Web App's <strong>&quot;open an existing workspace&quot; view</strong> — a read-only dashboard over a workspace that already exists on disk. Four sections/tabs of one screen (not four separate pages):</p>
+<ol><li><strong>Overview</strong> — what files exist and their basic stats (the &quot;workspace inspection&quot; data)</li><li><strong>Health check</strong> (&quot;doctor&quot;) — is this workspace's context footprint getting too big, with concrete suggestions</li><li><strong>Session log</strong> — a chronological record of which AI tool touched this workspace and did what</li><li><strong>Document queue</strong> — references saved but not yet incorporated into the project</li></ol>
+<p>This is explicitly a <strong>prototype, not the real app</strong> — mock/static data is fine, no real file system access, no auth, no backend. The point (per the product owner's own sequencing decision, logged 2026-07-27) is to see and feel the UI before writing the real implementation.</p>
+<p>Desktop-first (like Cursor/Notion) — no mobile layout needed.</p>
+<hr>
+<h2 id="section-1-overview-workspace-inspection">Section 1 — Overview (workspace inspection)<a class="anchor" href="#section-1-overview-workspace-inspection" aria-label="Link para esta seção">#</a></h2>
+<p>Shows what a workspace has, structurally. Example real data shape (from <code>docs/specs/workspace-inspection-layer.md</code>):</p>
+<ul><li>A file list — human layer (PROJECT.md, DECISIONS.md, CONTEXT.md, TASKS.md), agent layer (CLAUDE.md, AGENTS.md, <code>.cursor/rules/</code>, etc.), and generated per-kit folders — each row showing: exists / missing, size (bytes), line count, estimated token count.</li><li>A <strong>cross-reference graph</strong>: which files link to which (e.g. <code>CLAUDE.md → AGENTS.md</code>, <code>PROJECT.md → DECISIONS.md/CONTEXT.md/TASKS.md</code>). Worth trying as a simple node/edge diagram, not just a table — this &quot;files link to only what's relevant&quot; model (the product calls it &quot;RAG by Markdown&quot;) is the product's core mental model, worth making visually legible.</li><li>A clear empty/error state: opening a folder that isn't a workspace-kit workspace should say so plainly, not error.</li></ul>
+<h2 id="section-2-health-check-doctor">Section 2 — Health check (&quot;doctor&quot;)<a class="anchor" href="#section-2-health-check-doctor" aria-label="Link para esta seção">#</a></h2>
+<p>An overall verdict plus per-file detail. Concrete example (from <code>docs/specs/workspace-health-check.md</code>) — use numbers like these, not abstractions:</p>
+<p><strong>Overall verdict:</strong> one of <code>Healthy</code> / <code>Needs attention</code> / <code>Unhealthy</code>, shown prominently at the top, plus the total &quot;always-loaded context budget&quot; (sum of every file an agent reads by default at session start).</p>
+<p><strong>Per-file status</strong>, using ~300 lines as the &quot;always-loaded file&quot; threshold:</p>
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Lines</th><th>Est. tokens</th><th>Status</th></tr></thead><tbody><tr><td>CLAUDE.md</td><td>210</td><td>~1,400</td><td>Healthy</td></tr><tr><td>AGENTS.md</td><td>287</td><td>~1,900</td><td>Warning (approaching 300-line threshold)</td></tr><tr><td>DECISIONS.md</td><td>412</td><td>~2,700</td><td>Over-budget</td></tr></tbody></table></div>
+<p><strong>Suggestions</strong>, each naming a specific file and a concrete action (not generic advice):</p>
+<ul><li>&quot;DECISIONS.md is 412 lines and has 21 entries — past the ~15-entry rotation trigger. Move the oldest entries to <code>decisions/*.md</code> with an index (see the ADR-rotation pattern already in use).&quot;</li><li>&quot;AGENTS.md is 287 lines, approaching the 300-line always-loaded budget. Consider moving a less-frequently-needed section to an on-demand file.&quot;</li><li>A <strong>broken cross-reference</strong> example: &quot;PROJECT.md links to <code>docs/PRD.md</code>, which doesn't exist in this workspace.&quot;</li></ul>
+<p>Status colors: green (healthy), amber (warning), red (over-budget/unhealthy) — consistent everywhere the same status appears, and never color-only (pair with an icon + text label) for accessibility.</p>
+<h2 id="section-3-session-log">Section 3 — Session log<a class="anchor" href="#section-3-session-log" aria-label="Link para esta seção">#</a></h2>
+<p>A chronological, append-only list — one entry per session, per tool. Real example entry (from this repo's own <code>SESSIONS.md</code>):</p>
+<blockquote><p><strong>2026-07-27 — Cowork</strong> <strong>Did:</strong> Resolved the CHANGELOG.md vs. SESSIONS.md boundary; created this file; populated <code>queue/</code> with two real voice-note references; refreshed docs/PRD.md and PROJECT.md; added standing instructions to AGENTS.md. <strong>Left at:</strong> No code touched — planning/docs only. Repo ready for Claude Code to start implementing the specs.</p></blockquote>
+<p>Design this as a simple reverse-chronological timeline/list — tool name should be visually tagged (badge/pill) since &quot;which tool touched this&quot; is the entire point of the feature.</p>
+<h2 id="section-4-document-queue">Section 4 — Document queue<a class="anchor" href="#section-4-document-queue" aria-label="Link para esta seção">#</a></h2>
+<p>A list of saved-but-not-yet-ingested references. Real examples (from this repo's own <code>queue/</code>):</p>
+<div class="table-wrap"><table><thead><tr><th>Type</th><th>Source</th><th>Added</th><th>Status</th></tr></thead><tbody><tr><td>Voice note</td><td>Notion — &quot;Notas de Áudio 26/07&quot;</td><td>2026-07-26</td><td>Ingested (2026-07-26)</td></tr><tr><td>Voice note</td><td>Notion — &quot;Notas de áudio Workspace Kit 14/07&quot;</td><td>2026-07-14</td><td>Ingested (2026-07-21)</td></tr></tbody></table></div>
+<p>Each item also has free-text <strong>Notes</strong>. Status is a small, fixed set (e.g. Pending / Ingested) — design it so &quot;what's still pending&quot; is scannable in one glance across a longer list (this maps to a real workflow: <code>grep -l &quot;Status: Pending&quot; queue/*.md</code>).</p>
+<hr>
+<h2 id="visual-direction">Visual direction<a class="anchor" href="#visual-direction" aria-label="Link para esta seção">#</a></h2>
+<p>See the attached/pasted <code>DESIGN.md</code> (written alongside this PRP) for full detail. Short version:</p>
+<ul><li><strong>Both dark and light mode</strong>, equally first-class — not a dark theme with light bolted on.</li><li><strong>Clean, organized, high-usability</strong> — Cursor and Notion are the explicit references: neutral grayscale base, restrained color (color = status/meaning, never decoration), 1px borders over shadows, no glass-morphism/gradients.</li><li><strong>shadcn/ui</strong> as the component base (already available in Claude Design) — gives native light/dark theming and a fast path to the requested feel.</li><li>Typography: <strong>Inter</strong> for UI text, <strong>JetBrains Mono</strong> for file names/paths/metrics/code-shaped content.</li><li>Shell: persistent left sidebar (Overview / Health / Session Log / Queue) + main content area, no top mega-nav.</li></ul>
+<h2 id="explicitly-not-in-scope-for-this-prototype">Explicitly not in scope for this prototype<a class="anchor" href="#explicitly-not-in-scope-for-this-prototype" aria-label="Link para esta seção">#</a></h2>
+<ul><li>Real file-system access, git integration, or any backend — static/mock data throughout.</li><li>The generation flow (project-name/description form, kit picker) — that's the existing HTML artifact's territory; this prototype is only the <em>read</em> side (open-an-existing-workspace).</li><li>Mobile/responsive layout.</li><li>Final color values — the palette in DESIGN.md is a starting point, expected to change as you iterate.</li></ul>
+<h2 id="suggested-additional-context-to-paste-attach-into-claude-design">Suggested additional context to paste/attach into Claude Design<a class="anchor" href="#suggested-additional-context-to-paste-attach-into-claude-design" aria-label="Link para esta seção">#</a></h2>
+<p>If Claude Design supports attaching more than this one file, these help but aren't required (this PRP is self-contained on purpose):</p>
+<ul><li><code>DESIGN.md</code> (written alongside this PRP)</li><li><code>docs/specs/workspace-inspection-layer.md</code>, <code>workspace-health-check.md</code>, <code>cross-tool-session-log.md</code>, <code>document-ingestion-queue.md</code> — full requirements behind each section above, if you want more edge cases to design for (empty states, very large workspaces, etc.)</li><li>A screenshot of the current <code>src/workspace-kit.html</code> artifact, <strong>only</strong> for contrast/context — its dark &quot;terminal&quot; glass-card look is a different, intentionally-separate visual identity (see DESIGN.md's scope note), not something to match here.</li></ul>
+</article>
+</main>
+<footer class="footer">
+  <p>Gerado por <code>workspace-kit report</code> a partir dos arquivos Markdown do repositório — não edite estes HTMLs à mão, edite o <code>.md</code> de origem e rode o comando de novo.</p>
+  <p class="muted">Gerado em 29 de julho de 2026 às 17:42 · contagens de tokens são estimativas (caracteres ÷ 4), não contagem de tokenizer.</p>
+</footer>
+<script src="../assets/report.js"></script>
+</body>
+</html>

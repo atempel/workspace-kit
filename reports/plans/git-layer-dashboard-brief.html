@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design brief — Git integration layer (for Claude Design) — workspace//kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/report.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="../index.html"><span>workspace</span><span class="slashes">//</span><span>kit</span></a>
+  <nav><a href="../index.html">Início</a><a href="../plans/index.html" class="active">Planos & specs</a><a href="../decisions.html">Decisões</a><a href="../tasks.html">Tarefas</a><a href="../sessions.html">Sessões</a></nav>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema">
+    <span class="only-light">◐</span><span class="only-dark">◑</span>
+  </button>
+</header>
+<main class="page">
+
+<p class="breadcrumb"><a href="index.html">← Planos &amp; specs</a></p>
+<div class="page-head">
+  <h1>Design brief — Git integration layer (for Claude Design)</h1>
+  <div class="meta card-meta"><span class="chip mono muted mono">docs/design/git-layer-dashboard-brief.md</span> <span class="chip muted">26 linhas</span> <span class="chip muted">~719 tokens</span> <a class="chip accent" href="https://github.com/atempel/workspace-kit/issues/79" target="_blank" rel="noopener">#79</a></div>
+</div>
+<nav class="toc"><h2>Nesta página</h2><ul><li class="lvl2"><a href="#where-it-goes">Where it goes</a></li><li class="lvl2"><a href="#what-to-show-grounded-in-docs-specs-git-integration-layer-md-s-must-have-require">What to show (grounded in docs/specs/git-integration-layer.md's Must-Have requirements)</a></li><li class="lvl2"><a href="#while-you-re-in-there-three-small-gaps-in-the-existing-sections">While you're in there — three small gaps in the existing sections</a></li><li class="lvl2"><a href="#constraints">Constraints</a></li></ul></nav>
+<article class="doc">
+<p>Existing prototype: https://claude.ai/design/p/d620bebb-45b3-423b-9daa-8d53cd155426?file=Workspace+Kit+Dashboard.dc.html&amp;via=share (&quot;Workspace Kit Dashboard&quot;)</p>
+<p>Purpose: extend that prototype with a Git section, so docs/specs/git-integration-layer.md (→ #79) has a visual reference before Claude Code implements it. This is an addition to the existing dashboard, not a new prototype — reuse its established visual system (sidebar nav, badge/status conventions, table components, accent/shell/density props) rather than introducing new patterns.</p>
+<h2 id="where-it-goes">Where it goes<a class="anchor" href="#where-it-goes" aria-label="Link para esta seção">#</a></h2>
+<p>Add a new nav item — &quot;Git&quot; (or &quot;Source control&quot;) — alongside the existing Overview / Health check / Session log / Queue, after Queue.</p>
+<h2 id="what-to-show-grounded-in-docs-specs-git-integration-layer-md-s-must-have-require">What to show (grounded in docs/specs/git-integration-layer.md's Must-Have requirements)<a class="anchor" href="#what-to-show-grounded-in-docs-specs-git-integration-layer-md-s-must-have-require" aria-label="Link para esta seção">#</a></h2>
+<ol><li><strong>File-state summary</strong> — per-file git status joined onto the existing Overview file table (new column: untracked / modified-unstaged / staged / committed-clean), plus a compact rollup at the top of the new Git section (e.g. &quot;3 modified · 1 staged · 37 clean&quot;).</li><li><strong>Commit flow</strong> — a card with a plain-language change summary (files changed, lines added/removed) and a single &quot;Commit changes&quot; action. No raw git commands anywhere in the UI.</li><li><strong>Pull request flow</strong> — from a branch with committed changes: a drafted title/description visually flagged as templated from the diff (not written by a model — keep the model-agnostic guardrail visible), one &quot;Open Pull Request&quot; action, and nothing past that. No approve/merge controls in this screen — the spec stops at &quot;PR opened&quot; on purpose.</li><li><strong>Worktrees</strong> — a list of active worktrees (name, path, branch/agent, created date), with create/remove actions. Nice-to-have: flag when two worktrees touch the same file (P1 in the spec).</li><li><strong>Safe-edit warning</strong> — one example state: a workspace//kit-driven edit attempted against a file with uncommitted changes shows a warning + confirmation before proceeding, instead of silently overwriting.</li></ol>
+<h2 id="while-you-re-in-there-three-small-gaps-in-the-existing-sections">While you're in there — three small gaps in the existing sections<a class="anchor" href="#while-you-re-in-there-three-small-gaps-in-the-existing-sections" aria-label="Link para esta seção">#</a></h2>
+<ul><li><strong>Health check:</strong> add a distinct &quot;history growth&quot; row per rotation-eligible file (e.g. &quot;DECISIONS.md — 12/15 entries before rotation&quot;), separate from the per-file size/line status.</li><li><strong>Overview table:</strong> surface &quot;broken cross-reference&quot; as a badge on the affected file's own row, not only as an annotation on the graph.</li><li><strong>Token counts:</strong> label them as estimates everywhere they appear (e.g. &quot;~1.2k tokens (chars ÷ 4, approx.)&quot;), so they never read as an exact count.</li></ul>
+<h2 id="constraints">Constraints<a class="anchor" href="#constraints" aria-label="Link para esta seção">#</a></h2>
+<ul><li>Mock data only — no real git operations, no backend; keep using the same <code>{{ placeholder }}</code> fixture-data convention as the rest of the dashboard.</li><li>Visual reference only — the actual implementation is a separate, later step for Claude Code; don't wire up real functionality.</li></ul>
+</article>
+</main>
+<footer class="footer">
+  <p>Gerado por <code>workspace-kit report</code> a partir dos arquivos Markdown do repositório — não edite estes HTMLs à mão, edite o <code>.md</code> de origem e rode o comando de novo.</p>
+  <p class="muted">Gerado em 29 de julho de 2026 às 17:42 · contagens de tokens são estimativas (caracteres ÷ 4), não contagem de tokenizer.</p>
+</footer>
+<script src="../assets/report.js"></script>
+</body>
+</html>

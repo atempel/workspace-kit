@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design — workspace//kit — workspace//kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/report.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="../index.html"><span>workspace</span><span class="slashes">//</span><span>kit</span></a>
+  <nav><a href="../index.html">Início</a><a href="../plans/index.html" class="active">Planos & specs</a><a href="../decisions.html">Decisões</a><a href="../tasks.html">Tarefas</a><a href="../sessions.html">Sessões</a></nav>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema">
+    <span class="only-light">◐</span><span class="only-dark">◑</span>
+  </button>
+</header>
+<main class="page">
+
+<p class="breadcrumb"><a href="index.html">← Planos &amp; specs</a></p>
+<div class="page-head">
+  <h1>Design — workspace//kit</h1>
+  <div class="meta card-meta"><span class="chip warn">draft, first pass (2026-07-27) — no prior version existed</span> <span class="chip mono muted mono">DESIGN.md</span> <span class="chip muted">41 linhas</span> <span class="chip muted">~1.401 tokens</span></div>
+</div>
+<nav class="toc"><h2>Nesta página</h2><ul><li class="lvl2"><a href="#reference-points">Reference points</a></li><li class="lvl2"><a href="#principles">Principles</a></li><li class="lvl2"><a href="#design-system">Design system</a></li><li class="lvl2"><a href="#typography-proposed">Typography (proposed)</a></li><li class="lvl2"><a href="#color-starting-point-expect-this-to-change-inside-claude-design">Color (starting point — expect this to change inside Claude Design)</a></li><li class="lvl2"><a href="#layout-shell-proposed">Layout shell (proposed)</a></li><li class="lvl2"><a href="#open-questions">Open Questions</a></li></ul></nav>
+<article class="doc">
+<p>Status: draft, first pass (2026-07-27) — no prior version existed. Written to seed a Claude Design prototype of the Local Web App's new lifecycle screens (workspace inspection summary, health check, session log, document queue); expected to be refined once the prototype comes back, not treated as final.</p>
+<p>Scope note: this describes the <strong>Local Web App</strong> surface's visual direction. The standalone HTML artifact (<code>src/workspace-kit.html</code>) keeps its own v2/v3 &quot;terminal&quot; identity (near-black, amber/teal, JetBrains Mono/Inter, glass-card) — see <code>decisions/008-v2-visual-identity.md</code>. Whether the two surfaces should look related, or are allowed to diverge as genuinely different products (one-shot artifact vs. ongoing management app), is an open call — see Open Questions. Nothing here silently overrides that existing decision; if the prototype's direction is adopted, it gets its own DECISIONS.md entry per CONTEXT.md's rule that brand changes are logged, not made silently.</p>
+<h2 id="reference-points">Reference points<a class="anchor" href="#reference-points" aria-label="Link para esta seção">#</a></h2>
+<p>Cursor and Notion, named explicitly by the owner: dense-but-uncluttered information display, generous whitespace, a persistent left sidebar + content area shell, subtle 1px borders instead of heavy shadows/skeuomorphism, restrained color (mostly neutral grayscale, color reserved for status/meaning, not decoration), fast-feeling and keyboard-friendly.</p>
+<h2 id="principles">Principles<a class="anchor" href="#principles" aria-label="Link para esta seção">#</a></h2>
+<ul><li><strong>Clean over decorative.</strong> No glass-morphism, no gradients-as-decoration, no glow effects. If the v3 HTML artifact's &quot;glass-card&quot; language shows up here, it should be a deliberate choice, not a default carried over.</li><li><strong>Status is legible at a glance.</strong> This app's whole job is telling the user &quot;is this workspace healthy?&quot; — verdicts (healthy / warning / over-budget / unhealthy) need an unambiguous, consistent visual language (color + icon + label together, never color alone, for accessibility).</li><li><strong>Real content, not chrome.</strong> Favor information density appropriate to a power-user tool (closer to Notion's database views or Cursor's file tree) over marketing-site-style whitespace-for-its-own-sake.</li><li><strong>Same product, two lights.</strong> Dark and light are equally first-class — design tokens, not a dark theme with light as an afterthought (or vice versa).</li></ul>
+<h2 id="design-system">Design system<a class="anchor" href="#design-system" aria-label="Link para esta seção">#</a></h2>
+<p><strong>shadcn/ui</strong> as the component foundation (Radix primitives + Tailwind), per the owner's call — already available in Claude Design. Reasons: native, well-tested light/dark theming via CSS variables; it's the same foundation a lot of Cursor/Linear/Notion-adjacent tools are built on, so it's a fast path to the requested feel; and it still reads as &quot;our own&quot; once brand tokens (color/type/radius) are swapped in, not generic.</p>
+<h2 id="typography-proposed">Typography (proposed)<a class="anchor" href="#typography-proposed" aria-label="Link para esta seção">#</a></h2>
+<ul><li><strong>Inter</strong> for UI text — carried over from the existing product typography (see <code>decisions/008-v2-visual-identity.md</code>), not a new brand element, so lower-risk to reuse.</li><li><strong>JetBrains Mono</strong> for anything file-path-, code-, or metric-shaped (file names, line/token counts, the <code>grep</code>-style commands the product already surfaces in TASKS.md/AGENTS.md) — same reasoning.</li></ul>
+<h2 id="color-starting-point-expect-this-to-change-inside-claude-design">Color (starting point — expect this to change inside Claude Design)<a class="anchor" href="#color-starting-point-expect-this-to-change-inside-claude-design" aria-label="Link para esta seção">#</a></h2>
+<p>Neutral-first, shadcn-token-shaped (<code>background</code>/<code>foreground</code>/<code>card</code>/<code>muted</code>/<code>border</code>/<code>primary</code>/<code>ring</code>, etc.), one accent color, semantic status colors reserved for verdicts:</p>
+<ul><li><strong>Neutral scale:</strong> near-white → near-black grayscale (standard shadcn &quot;zinc&quot; or &quot;neutral&quot; base is a reasonable starting point) for both modes — light mode is <em>not</em> pure white, dark mode is <em>not</em> pure black, matching the Notion/Cursor &quot;soft&quot; neutral feel rather than max-contrast.</li><li><strong>Accent:</strong> one color for interactive elements/links/selection state. Open question whether it's a fresh pick or a continuity nod to the existing teal (see Open Questions) — do not default to indigo/violet (the generic AI-tool color), per the same instinct that drove the original &quot;terminal&quot; identity away from AI-generated-content defaults.</li><li><strong>Status semantics</strong> (used consistently across the doctor report, file statuses, queue status): <ul><li>Healthy / OK → green</li><li>Warning / approaching threshold → amber/yellow</li><li>Over-budget / unhealthy / broken reference → red</li><li>Neutral/informational (e.g. &quot;ingested&quot;, &quot;not yet reviewed&quot;) → the neutral/muted tone, not a color, to avoid overloading the palette</li></ul></li></ul>
+<h2 id="layout-shell-proposed">Layout shell (proposed)<a class="anchor" href="#layout-shell-proposed" aria-label="Link para esta seção">#</a></h2>
+<p>Persistent left sidebar (workspace nav: Overview / Health / Session Log / Queue, plus a workspace switcher if multiple are ever opened) + main content area. No top mega-nav. Command-palette-style quick actions (⌘K) are a nice-to-have worth prototyping if time allows, since it fits the Cursor/Notion reference point directly.</p>
+<h2 id="open-questions">Open Questions<a class="anchor" href="#open-questions" aria-label="Link para esta seção">#</a></h2>
+<ul><li><strong>(Resolved 2026-07-28, see DECISIONS.md)</strong> Scope: this direction stays <strong>scoped to the Local Web App</strong>. The standalone HTML artifact keeps its v3 terminal identity (<code>decisions/008-v2-visual-identity.md</code>) unchanged, and the two surfaces are explicitly allowed to read as related-but-distinct products — a one-shot artifact and an ongoing management app. Nothing here overrides that earlier decision.</li><li><strong>(Resolved 2026-07-28, see DECISIONS.md)</strong> Accent: amber/teal — a continuity nod to the existing identity rather than a fresh pick, over a neutral shadcn token base, with Inter for UI text and JetBrains Mono for paths/metrics.</li><li><strong>(Resolved by the prototype)</strong> Exact token values (hex/OKLCH), spacing scale, radius scale — settled inside Claude Design and now versioned as markup at <code>docs/design/workspace-kit-dashboard.dc.html</code>. This file stays the direction; that file is the reference for numbers.</li></ul>
+</article>
+</main>
+<footer class="footer">
+  <p>Gerado por <code>workspace-kit report</code> a partir dos arquivos Markdown do repositório — não edite estes HTMLs à mão, edite o <code>.md</code> de origem e rode o comando de novo.</p>
+  <p class="muted">Gerado em 29 de julho de 2026 às 17:42 · contagens de tokens são estimativas (caracteres ÷ 4), não contagem de tokenizer.</p>
+</footer>
+<script src="../assets/report.js"></script>
+</body>
+</html>

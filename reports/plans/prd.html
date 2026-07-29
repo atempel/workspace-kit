@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PRD — workspace//kit — workspace//kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/report.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="../index.html"><span>workspace</span><span class="slashes">//</span><span>kit</span></a>
+  <nav><a href="../index.html">Início</a><a href="../plans/index.html" class="active">Planos & specs</a><a href="../decisions.html">Decisões</a><a href="../tasks.html">Tarefas</a><a href="../sessions.html">Sessões</a></nav>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema">
+    <span class="only-light">◐</span><span class="only-dark">◑</span>
+  </button>
+</header>
+<main class="page">
+
+<p class="breadcrumb"><a href="index.html">← Planos &amp; specs</a></p>
+<div class="page-head">
+  <h1>PRD — workspace//kit</h1>
+  <div class="meta card-meta"><span class="chip mono muted mono">docs/PRD.md</span> <span class="chip muted">30 linhas</span> <span class="chip muted">~1.052 tokens</span></div>
+</div>
+<nav class="toc"><h2>Nesta página</h2><ul><li class="lvl2"><a href="#problem">Problem</a></li><li class="lvl2"><a href="#proposed-solution">Proposed solution</a></li><li class="lvl2"><a href="#scope">Scope</a></li><li class="lvl2"><a href="#out-of-scope-for-now">Out of scope (for now)</a></li><li class="lvl2"><a href="#success-metrics">Success metrics</a></li></ul></nav>
+<article class="doc">
+<h2 id="problem">Problem<a class="anchor" href="#problem" aria-label="Link para esta seção">#</a></h2>
+<p>Starting a new project with AI requires manually assembling, every time, both the process context files (vision, decisions, tasks) and the instruction files specific to each AI tool (CLAUDE.md, AGENTS.md, .cursorrules, etc.) — and it's easy to leave this outdated or incomplete across tools. That burden doesn't end at kickoff either: keeping decisions, tasks, and instructions in sync as a project evolves is itself manual, repeated work (see DECISIONS.md, 2026-07-21 and 2026-07-22 — the product is not scoped to initial setup only). And a workspace that <em>is</em> kept up to date has its own failure mode: nothing today measures whether its instruction files have quietly grown too large for an agent to read efficiently, whether cross-references between files still resolve, or what's been saved-but-not-yet-incorporated into the project (see docs/specs/workspace-health-check.md, docs/specs/document-ingestion-queue.md).</p>
+<h2 id="proposed-solution">Proposed solution<a class="anchor" href="#proposed-solution" aria-label="Link para esta seção">#</a></h2>
+<p>A project context manager, shipped across three coexisting surfaces (see PROJECT.md, DECISIONS.md 2026-07-21): a standalone HTML artifact, a CLI, and a local Web App. From a project's name, kit (formerly &quot;project type&quot; — see DECISIONS.md, 2026-07-26), description, stack, and limits, it produces both file layers (human + agent) already formatted correctly per tool, plus a starter prompt — and, on the CLI/Web App surfaces, keeps supporting the project on an ongoing basis rather than only at the first generation.</p>
+<p>That ongoing support now has a concrete shape, specced 2026-07-26 (see DECISIONS.md and <code>docs/specs/</code>):</p>
+<ul><li>A <strong>workspace inspection layer</strong> (<code>core/inspect.js</code>) — the shared read-side counterpart to <code>core/generator.js</code>, giving every feature below one addressable index of an existing workspace instead of each writing its own parser.</li><li>A <strong>workspace health check</strong> (<code>workspace-kit doctor</code>) — measures a workspace's context footprint against concrete thresholds and gives specific, actionable suggestions (split a file, rotate a decision log, fix a broken cross-reference).</li><li>A <strong>git integration layer</strong> — workspace//kit itself tracking file state and driving user-friendly commit/PR/worktree flows, strictly model-agnostic (it never calls or hosts an AI model; that stays the job of whatever agent already works inside the workspace).</li><li>A <strong>cross-tool session log</strong> (<code>SESSIONS.md</code>) — a per-session record of which tool touched the workspace and what state it was left in, distinct from narrative product history (CHANGELOG.md, once it exists).</li><li>A <strong>document ingestion queue</strong> (<code>queue/</code>) — a durable place to record &quot;I saved this reference, I haven't brought it into the project yet,&quot; answerable by reading one file instead of re-investigating from scratch.</li></ul>
+<h2 id="scope">Scope<a class="anchor" href="#scope" aria-label="Link para esta seção">#</a></h2>
+<ul><li>Multi-surface generation sharing one generation engine (<code>core/generator.js</code>) across surfaces, not independent copies per surface.</li><li>Client-side, no-backend generation is a constraint of the standalone HTML surface specifically (see CONTEXT.md) — not the whole project. The CLI/Web App have their own local runtime.</li><li>Support for multiple <strong>kits</strong> (formerly &quot;project types&quot;) with their own folders and anchor file — built-ins are &quot;system kits&quot; (see DECISIONS.md, 2026-07-26).</li><li>Support for multiple agent &quot;targets&quot; (Claude/Cowork, universal AGENTS.md, Cursor, Copilot, Gemini CLI, Windsurf, Skills).</li><li>Ongoing project support on the CLI/Web App surfaces: persistent workspace management, Templates, Docker environment generation, workspace inspection, health check, git integration, session log, document ingestion queue — see their specs under <code>docs/specs/</code>.</li></ul>
+<h2 id="out-of-scope-for-now">Out of scope (for now)<a class="anchor" href="#out-of-scope-for-now" aria-label="Link para esta seção">#</a></h2>
+<ul><li>Direct integration with Notion/GitHub/other remote services to create or sync a workspace remotely.</li><li>Automatically fixing anything the health check flags — v1 diagnoses and suggests, never edits/splits/deletes a file itself (Markdown Orchestrator territory, still unspecced — owner decision pending, see TASKS.md).</li><li>An enterprise multi-user &quot;guardian&quot; approval role for the git integration layer — collides with the current single-user, no-auth scope; revisit only if a real multi-user need materializes.</li></ul>
+<h2 id="success-metrics">Success metrics<a class="anchor" href="#success-metrics" aria-label="Link para esta seção">#</a></h2>
+<ul><li>(to be defined in Cowork)</li></ul>
+</article>
+</main>
+<footer class="footer">
+  <p>Gerado por <code>workspace-kit report</code> a partir dos arquivos Markdown do repositório — não edite estes HTMLs à mão, edite o <code>.md</code> de origem e rode o comando de novo.</p>
+  <p class="muted">Gerado em 29 de julho de 2026 às 17:42 · contagens de tokens são estimativas (caracteres ÷ 4), não contagem de tokenizer.</p>
+</footer>
+<script src="../assets/report.js"></script>
+</body>
+</html>

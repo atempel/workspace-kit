@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spec — Docker environment generation — workspace//kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/report.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="../index.html"><span>workspace</span><span class="slashes">//</span><span>kit</span></a>
+  <nav><a href="../index.html">Início</a><a href="../plans/index.html" class="active">Planos & specs</a><a href="../decisions.html">Decisões</a><a href="../tasks.html">Tarefas</a><a href="../sessions.html">Sessões</a></nav>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema">
+    <span class="only-light">◐</span><span class="only-dark">◑</span>
+  </button>
+</header>
+<main class="page">
+
+<p class="breadcrumb"><a href="index.html">← Planos &amp; specs</a></p>
+<div class="page-head">
+  <h1>Spec — Docker environment generation</h1>
+  <div class="meta card-meta"><span class="chip warn">draft, pending review</span> <span class="chip mono muted mono">docs/specs/docker-environment-generation.md</span> <span class="chip muted">56 linhas</span> <span class="chip muted">~1.685 tokens</span></div>
+</div>
+<nav class="toc"><h2>Nesta página</h2><ul><li class="lvl2"><a href="#problem-statement">Problem Statement</a></li><li class="lvl2"><a href="#goals">Goals</a></li><li class="lvl2"><a href="#non-goals">Non-Goals</a></li><li class="lvl2"><a href="#user-stories">User Stories</a></li><li class="lvl2"><a href="#requirements">Requirements</a></li><li class="lvl2"><a href="#success-metrics">Success Metrics</a></li><li class="lvl2"><a href="#open-questions">Open Questions</a></li><li class="lvl2"><a href="#timeline-considerations">Timeline Considerations</a></li></ul></nav>
+<article class="doc">
+<p>Status: draft, pending review. Requested 2026-07-21, based on this repo's own <code>Dockerfile</code>/<code>docker-compose.yml</code> (created the same day).</p>
+<h2 id="problem-statement">Problem Statement<a class="anchor" href="#problem-statement" aria-label="Link para esta seção">#</a></h2>
+<p>Getting a project into a working dev container today means hand-writing a Dockerfile and docker-compose.yml, deciding on a base image, and wiring up whatever tooling the kit needs — the same kind of one-time setup friction workspace-kit already solves for context files. This repository's own <code>Dockerfile</code>/<code>docker-compose.yml</code> (Node 20 + Claude Code CLI + Python, no DB/JVM) is a concrete, working example of exactly the kind of output this feature should be able to generate automatically, adapted to whatever kit the workspace is for.</p>
+<h2 id="goals">Goals<a class="anchor" href="#goals" aria-label="Link para esta seção">#</a></h2>
+<ul><li>Generate a working Dockerfile + docker-compose.yml as part of a workspace, using this repo's own container setup as the base template.</li><li>Adapt the generated Docker template to the chosen kit (the same 17 kits already driving folders/anchor files), so a data/ML workspace and a mobile workspace don't get the same generic container.</li><li>Make &quot;spin up a dev environment for this project&quot; a small number of steps once the CLI or Web App exists, instead of a from-scratch Docker setup.</li></ul>
+<h2 id="non-goals">Non-Goals<a class="anchor" href="#non-goals" aria-label="Link para esta seção">#</a></h2>
+<ul><li><strong>Cloud/production deployment configs</strong> (Kubernetes manifests, cloud-provider-specific files) — this is a <em>local dev environment</em> feature, not a deployment tool.</li><li><strong>Running/orchestrating the container from the standalone HTML artifact</strong> — structurally impossible (no process execution from a browser artifact); see Requirements for what the HTML artifact <em>can</em> do.</li><li><strong>A full matrix of every possible tool/language per kit at launch</strong> — v1 covers a reasonable default per kit (see Requirements); exhaustive tool coverage per kit is a P1/P2 expansion, not a blocking v1 requirement.</li><li><strong>Editing the generated Dockerfile/docker-compose through a GUI</strong> — v1 generates static files the user can hand-edit afterward, same as every other generated file today; a config editor UI is out of scope.</li></ul>
+<h2 id="user-stories">User Stories<a class="anchor" href="#user-stories" aria-label="Link para esta seção">#</a></h2>
+<ul><li>As a developer generating a new workspace, I want the option to also generate a Dockerfile/docker-compose.yml so that I don't hand-write a dev container setup from scratch.</li><li>As a developer working on a data/ML project, I want the generated container to include the tooling that kit actually needs (e.g. Python) rather than a generic empty container.</li><li>As a CLI/Web App user, I want to go from &quot;generated workspace&quot; to &quot;running container&quot; in a small number of commands/clicks, so the Docker setup isn't just files I still have to wire up myself.</li><li>As Alexandre, I want the generated template to stay in sync with whatever this repo's own <code>Dockerfile</code>/<code>docker-compose.yml</code> evolves into, so the example and the generator don't quietly drift apart over time.</li></ul>
+<h2 id="requirements">Requirements<a class="anchor" href="#requirements" aria-label="Link para esta seção">#</a></h2>
+<p><strong>Must-Have (P0)</strong></p>
+<ul><li>Base Docker template reused from this repo's own <code>Dockerfile</code>/<code>docker-compose.yml</code>: Node 20 + Claude Code CLI, <code>git</code>/<code>curl</code>/<code>unzip</code>/<code>build-essential</code>, Python3/pip/venv available, single <code>dev</code> service, bind-mounted project folder, <code>.claude_global</code> volume for Claude Code config, <code>.gitignore</code> entry for it. <ul><li>Acceptance: a workspace generated with no kit-specific additions produces a Dockerfile/docker-compose.yml equivalent to this repo's own (same base packages, same volume/service structure).</li></ul></li><li>Kit → Docker adaptation mapping: at least a first pass covering the 17 existing kits, adding/removing base packages or services per kit where it clearly matters (e.g. data/ML keeps the Python stack front-and-center; a kit with no clear extra runtime need just gets the base template unchanged). <ul><li>Acceptance: at least 3 kits produce a visibly different Dockerfile/docker-compose.yml from the base (not just a cosmetic comment change), reflecting real tooling differences.</li></ul></li><li>Content generation available from all three surfaces (HTML included) — this is &quot;just more generated text,&quot; same pattern as <code>.gitignore</code>/CLAUDE.md/AGENTS.md. <ul><li>Acceptance: the standalone HTML artifact can produce the Dockerfile/docker-compose.yml files in its output zip, with no dependency on git or a local process.</li></ul></li><li>&quot;Spin it up&quot; step (build + up) available from the CLI and/or Web App once either exists — out of reach for the HTML artifact by construction. <ul><li>Acceptance: from the CLI or Web App, going from a freshly generated workspace to a running container takes no manual editing of the generated files (defaults must actually work, not just look plausible).</li></ul></li></ul>
+<p><strong>Nice-to-Have (P1)</strong></p>
+<ul><li>User-configurable extras in the generation form: optional services (DB/Redis/etc.), base image or runtime version override.</li><li>A <code>docker compose config</code> (or equivalent) validation step run automatically after generation, to catch broken output before the user hits it.</li></ul>
+<p><strong>Future Considerations (P2)</strong></p>
+<ul><li>Broader per-kit tooling matrix (e.g. JVM for kits that need it, GPU-aware base images for heavier ML work) — deliberately deferred past the P0 &quot;at least 3 kits differ&quot; bar.</li><li>Keeping the generated template automatically in sync with future changes to this repo's own <code>Dockerfile</code>/<code>docker-compose.yml</code> (vs. the two quietly diverging over time) — worth a policy decision once both exist for a while, not before.</li></ul>
+<h2 id="success-metrics">Success Metrics<a class="anchor" href="#success-metrics" aria-label="Link para esta seção">#</a></h2>
+<p><strong>Leading:</strong> whether <code>docker compose build &amp;&amp; docker compose up</code> succeeds without manual edits immediately after generation, across the kits covered in P0 (target: 100% of covered kits build cleanly, verified the same way the CLI/Web App specs verify generation parity — an explicit pass, not spot-checks). <strong>Lagging:</strong> whether Alexandre actually uses the generated Docker setup for his own new projects instead of hand-rolling one each time (self-usage signal, same caveat as the other specs).</p>
+<h2 id="open-questions">Open Questions<a class="anchor" href="#open-questions" aria-label="Link para esta seção">#</a></h2>
+<ul><li><strong>(Product — Alexandre)</strong> Exact per-kit mapping: which kits need which extra packages/services? The P0 bar (≥3 kits visibly differ) is deliberately low to unblock a first pass — the full mapping is better defined once this is being built, informed by <code>research/kits/</code>.</li><li><strong>(Engineering)</strong> Where does the kit → Docker mapping live technically — hardcoded alongside the existing kit → folders/anchor-file mapping, or a separate config? Reasonable default is alongside the existing mapping, for consistency, unless a reason emerges not to.</li><li><strong>(Engineering, shared with CLI/Web App specs)</strong> The &quot;spin it up&quot; P0 requirement depends on the CLI and/or Web App existing — sequencing follows theirs.</li></ul>
+<h2 id="timeline-considerations">Timeline Considerations<a class="anchor" href="#timeline-considerations" aria-label="Link para esta seção">#</a></h2>
+<p>The content-generation half (P0's first three items) can ship as soon as the generation logic is touched at all (any surface), independent of CLI/Web-App timing. The &quot;spin it up&quot; half is gated on the CLI/Web App reaching at least a basic working state.</p>
+</article>
+</main>
+<footer class="footer">
+  <p>Gerado por <code>workspace-kit report</code> a partir dos arquivos Markdown do repositório — não edite estes HTMLs à mão, edite o <code>.md</code> de origem e rode o comando de novo.</p>
+  <p class="muted">Gerado em 29 de julho de 2026 às 17:42 · contagens de tokens são estimativas (caracteres ÷ 4), não contagem de tokenizer.</p>
+</footer>
+<script src="../assets/report.js"></script>
+</body>
+</html>

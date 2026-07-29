@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>workspace//kit — workspace//kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/report.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="../index.html"><span>workspace</span><span class="slashes">//</span><span>kit</span></a>
+  <nav><a href="../index.html">Início</a><a href="../plans/index.html" class="active">Planos & specs</a><a href="../decisions.html">Decisões</a><a href="../tasks.html">Tarefas</a><a href="../sessions.html">Sessões</a></nav>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema">
+    <span class="only-light">◐</span><span class="only-dark">◑</span>
+  </button>
+</header>
+<main class="page">
+
+<p class="breadcrumb"><a href="index.html">← Planos &amp; specs</a></p>
+<div class="page-head">
+  <h1>workspace//kit</h1>
+  <div class="meta card-meta"><span class="chip mono muted mono">PROJECT.md</span> <span class="chip muted">34 linhas</span> <span class="chip muted">~1.435 tokens</span> <a class="chip accent" href="https://github.com/atempel/workspace-kit/issues/77" target="_blank" rel="noopener">#77</a> <a class="chip accent" href="https://github.com/atempel/workspace-kit/issues/78" target="_blank" rel="noopener">#78</a> <a class="chip accent" href="https://github.com/atempel/workspace-kit/issues/79" target="_blank" rel="noopener">#79</a> <a class="chip accent" href="https://github.com/atempel/workspace-kit/issues/80" target="_blank" rel="noopener">#80</a></div>
+</div>
+<nav class="toc"><h2>Nesta página</h2><ul><li class="lvl2"><a href="#overview">Overview</a></li><li class="lvl2"><a href="#main-goal">Main goal</a></li><li class="lvl2"><a href="#pillars">Pillars</a></li><li class="lvl2"><a href="#project-type">Project type</a></li><li class="lvl2"><a href="#stack">Stack</a></li><li class="lvl2"><a href="#status">Status</a></li></ul></nav>
+<article class="doc">
+<h2 id="overview">Overview<a class="anchor" href="#overview" aria-label="Link para esta seção">#</a></h2>
+<p>AI workspace generator: from a project description, produces the human context layer (PROJECT.md, DECISIONS.md, CONTEXT.md, TASKS.md) and the AI instruction layer (CLAUDE.md, AGENTS.md, Cursor/Copilot/Gemini CLI/Windsurf rules, Skills) — all downloadable as a .zip, plus a ready-to-use starter prompt.</p>
+<p><strong>Direction (decided 2026-07-21, see DECISIONS.md):</strong> the product is evolving from a one-shot generator into a <strong>project context manager</strong> — a tool that stays useful across a project's whole lifecycle, not just at kickoff. It will ship across three compatible surfaces: a <strong>CLI</strong>, a more robust <strong>local Web App</strong> (generates <em>and</em> manages workspaces), and the current <strong>standalone HTML artifact</strong> (kept as-is while viable, or until a fuller site exists). New features roll out to all three wherever technically possible — some things (git operations, spinning up Docker environments, persistent template/workspace management) can only live in the CLI/Web App, since a standalone HTML artifact can't touch git or a local filesystem process.</p>
+<p><strong>Sharpened 2026-07-26 (see DECISIONS.md):</strong> workspace//kit is positioned explicitly as a workspace <em>management and versioning</em> tool for instructions/prose/documentation — not a code-versioning tool — and is <strong>model- and tool-agnostic</strong> as an explicit product principle. The built-in &quot;project type&quot; concept is renamed <strong>&quot;kit&quot;</strong> (built-ins → &quot;system kits&quot;); that rename was executed across the codebase/UI on 2026-07-29. Five new specs formalize the &quot;lifecycle&quot; half of the context-manager pitch: a shared <strong>workspace inspection layer</strong> (<code>core/inspect.js</code>, the read counterpart to <code>core/generator.js</code>), a <strong>workspace health check</strong> (<code>workspace-kit doctor</code>), a <strong>git integration layer</strong> (file-state tracking, worktrees, user-friendly commit/PR flows — workspace//kit operates git itself, never calls or hosts a model), a <strong>cross-tool session log</strong> (<code>SESSIONS.md</code>), and a <strong>document ingestion queue</strong> (<code>queue/</code>). See <code>docs/specs/</code> and TASKS.md for the full list and issue links.</p>
+<h2 id="main-goal">Main goal<a class="anchor" href="#main-goal" aria-label="Link para esta seção">#</a></h2>
+<p>Eliminate the manual work of assembling and maintaining context throughout a project — from the first file to ongoing decisions/tasks/changelog upkeep — and make sure that context is born (and stays) in the right format for whichever AI tool is being used.</p>
+<h2 id="pillars">Pillars<a class="anchor" href="#pillars" aria-label="Link para esta seção">#</a></h2>
+<ul><li><strong>Security &amp; privacy</strong> — the generator and this repository itself should never expose secrets, personal data, or private discussions. Heavy or sensitive content belongs on each user's machine, not in version control.</li><li><strong>Collaboration</strong> — the generated context layer should make it easy for multiple people (and agents) to pick up a project without re-litigating past decisions. Local-only, per-user state should be isolated so it doesn't get in the way of shared work.</li><li><strong>Non-functional bar</strong> (Notion &quot;Notas de Áudio 26/07&quot;, 2026-07-26): every surface is held to being <strong>modern, complete, modular, functional, secure, reliable</strong> — this is why the roadmap now runs as one spec + one issue + one branch per feature (see TASKS.md) instead of a single sequential thread.</li></ul>
+<h2 id="project-type">Project type<a class="anchor" href="#project-type" aria-label="Link para esta seção">#</a></h2>
+<p>Digital product / App (internal tool, standalone artifact)</p>
+<h2 id="stack">Stack<a class="anchor" href="#stack" aria-label="Link para esta seção">#</a></h2>
+<p><strong>Standalone HTML artifact (today):</strong> plain HTML + CSS + JS, single-file. JSZip 3.10.1 via cdnjs for in-browser .zip generation. Fonts via Google Fonts (JetBrains Mono + Inter). No build step, no backend — this constraint is scoped to this surface specifically (see CONTEXT.md). <strong>CLI and local Web App (planned):</strong> their own runtime/local process is still an open choice (e.g. to run git, spin up Docker, persist managed workspaces — see TASKS.md), but the generation logic they'll build on is decided: <code>core/generator.js</code>, a plain Node-compatible JS module (zero dependencies, no build step) seeded from the HTML artifact's generation logic — see DECISIONS.md, 2026-07-22. It is not wired into the HTML artifact itself, which keeps its own separate inline copy.</p>
+<h2 id="status">Status<a class="anchor" href="#status" aria-label="Link para esta seção">#</a></h2>
+<p>🟢 v3 live on GitHub — new Figma-referenced visual identity (dark glass-card UI, outlined-wordmark logo, SVG flag language selector) promoted to <code>src/workspace-kit.html</code> and pushed on 2026-07-10, full functional parity with v2 (17 project types, PT/EN selector, auto-generated <code>.gitignore</code>). Previous version preserved at <code>src/workspace-kit-v2-archive.html</code>. README is now bilingual (English + Portuguese). 🟡 2026-07-21 — full project review completed (past TASKS.md backlog, other session history, and open GitHub issues cross-checked); multi-surface direction (CLI + Web App + HTML) and context-manager repositioning decided — see DECISIONS.md. Next: split into specs per surface/theme, each becoming a GitHub issue. 🟡 2026-07-26 — five new specs written from a voice-note brainstorm (workspace inspection layer #77, health check #78, git integration layer #79, document ingestion queue #80, cross-tool session log #81); TASKS.md reorganized into a lean index; DECISIONS.md ADR-rotated for the first time. 🟡 2026-07-27 — <code>SESSIONS.md</code> and <code>queue/</code> dogfooded in this repo; docs/PRD.md and this file refreshed to reflect the batch above. No code touched yet — repo is ready for Claude Code to start implementing the specs. Next: prototype the new structures in Claude Design before implementation begins. 🟡 2026-07-29 — first code change of the context-manager era: the &quot;project type&quot; → <strong>kit</strong> rename executed across both copies of the generation logic, the parity harness, <code>research/kits/</code>, and the docs (see DECISIONS.md, 2026-07-29). Generated output deliberately unchanged, which is what keeps the fixture/parity suites green. <code>index.html</code> re-mirrored after drifting a version behind the artifact.</p>
+<hr>
+<p>Workspace generated to give continuity to the project in Cowork.</p>
+</article>
+</main>
+<footer class="footer">
+  <p>Gerado por <code>workspace-kit report</code> a partir dos arquivos Markdown do repositório — não edite estes HTMLs à mão, edite o <code>.md</code> de origem e rode o comando de novo.</p>
+  <p class="muted">Gerado em 29 de julho de 2026 às 17:42 · contagens de tokens são estimativas (caracteres ÷ 4), não contagem de tokenizer.</p>
+</footer>
+<script src="../assets/report.js"></script>
+</body>
+</html>

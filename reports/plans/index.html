@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planos &amp; specs — workspace//kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/report.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="../index.html"><span>workspace</span><span class="slashes">//</span><span>kit</span></a>
+  <nav><a href="../index.html">Início</a><a href="../plans/index.html" class="active">Planos & specs</a><a href="../decisions.html">Decisões</a><a href="../tasks.html">Tarefas</a><a href="../sessions.html">Sessões</a></nav>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema">
+    <span class="only-light">◐</span><span class="only-dark">◑</span>
+  </button>
+</header>
+<main class="page">
+
+<div class="page-head">
+  <p class="eyebrow">Relatório</p>
+  <h1>Planos &amp; specs</h1>
+  <p class="lead">Todo documento de planejamento do repositório, renderizado a partir do Markdown de origem. Os links internos entre documentos continuam funcionando aqui.</p>
+</div>
+<div class="filter">
+  <input type="search" placeholder="Filtrar por título, caminho ou status…" data-filter aria-label="Filtrar documentos">
+  <span class="count" data-filter-count>19 de 19</span>
+</div>
+<section class="group" data-filter-group>
+  <h2>Produto &amp; visão</h2>
+  <p class="hint">O porquê do projeto: problema, escopo, pilares e restrições.</p>
+  <div class="cards"><a class="card" href="prd.html" data-searchable="prd — workspace//kit docs/prd.md  starting a new project with ai requires manually assembling, every time, both the process context files (vision, decisions, tasks) and the instruction files specific to each ai tool (claude.md, agents.md, .cursorrules, etc.) — and it's…">
+  <h3>PRD — workspace//kit</h3>
+  <p>Starting a new project with AI requires manually assembling, every time, both the process context files (vision, decisions, tasks) and the instruction files specific to each AI tool (CLAUDE.md, AGENTS.md, .cursorrules, etc.) — and it's…</p>
+  <div class="meta"><span class="chip mono muted mono">docs/PRD.md</span></div>
+</a>
+<a class="card" href="project.html" data-searchable="workspace//kit project.md  ai workspace generator: from a project description, produces the human context layer (project.md, decisions.md, context.md, tasks.md) and the ai instruction layer (claude.md, agents.md, cursor/copilot/gemini cli/windsurf rules, skills)…">
+  <h3>workspace//kit</h3>
+  <p>AI workspace generator: from a project description, produces the human context layer (PROJECT.md, DECISIONS.md, CONTEXT.md, TASKS.md) and the AI instruction layer (CLAUDE.md, AGENTS.md, Cursor/Copilot/Gemini CLI/Windsurf rules, Skills)…</p>
+  <div class="meta"><span class="chip mono muted mono">PROJECT.md</span> <span class="chip accent">#77</span> <span class="chip accent">#78</span></div>
+</a>
+<a class="card" href="context.html" data-searchable="context — workspace//kit context.md  context the ai should know to work well on this project: conventions, constraints, vocabulary, people involved.">
+  <h3>Context — workspace//kit</h3>
+  <p>Context the AI should know to work well on this project: conventions, constraints, vocabulary, people involved.</p>
+  <div class="meta"><span class="chip mono muted mono">CONTEXT.md</span></div>
+</a></div>
+</section>
+<section class="group" data-filter-group>
+  <h2>Specs de features</h2>
+  <p class="hint">Uma spec por feature — requisitos P0/P1, Non-Goals e questões em aberto.</p>
+  <div class="cards"><a class="card" href="spec-cli-generator.html" data-searchable="spec — cli generator (mvp) docs/specs/cli-generator.md draft, pending review today workspace//kit only exists as a browser artifact (src/workspace-kit.html): you have to open it, fill a form, download a .zip, and manually extract it into a project folder before opening an ai agent. that's an extra manual hop…">
+  <h3>Spec — CLI generator (MVP)</h3>
+  <p>Today workspace//kit only exists as a browser artifact (src/workspace-kit.html): you have to open it, fill a form, download a .zip, and manually extract it into a project folder before opening an AI agent. That's an extra manual hop…</p>
+  <div class="meta"><span class="chip warn">draft, pending review</span> <span class="chip mono muted mono">docs/specs/cli-generator.md</span></div>
+</a>
+<a class="card" href="spec-context-manager-conventions.html" data-searchable="spec — context-manager conventions (changelog + decision-log rotation) docs/specs/context-manager-conventions.md draft, pending review log-style files (context.md's narrative history, decisions.md's chronological entries) are genuinely useful — they give an agent a project's history — but they only grow, never shrink, and eventually become long and heavy enough that…">
+  <h3>Spec — Context-manager conventions (CHANGELOG + decision-log rotation)</h3>
+  <p>Log-style files (CONTEXT.md's narrative history, DECISIONS.md's chronological entries) are genuinely useful — they give an agent a project's history — but they only grow, never shrink, and eventually become long and heavy enough that…</p>
+  <div class="meta"><span class="chip warn">draft, pending review</span> <span class="chip mono muted mono">docs/specs/context-manager-conventions.md</span></div>
+</a>
+<a class="card" href="spec-cross-tool-session-log.html" data-searchable="spec — cross-tool session log docs/specs/cross-tool-session-log.md draft, pending review the same workspace is often worked on from several tools in sequence — claude design for a mockup, cowork for planning, claude code for implementation — but nothing records what happened where. anyone picking the workspace back up…">
+  <h3>Spec — Cross-tool session log</h3>
+  <p>The same workspace is often worked on from several tools in sequence — Claude Design for a mockup, Cowork for planning, Claude Code for implementation — but nothing records what happened where. Anyone picking the workspace back up…</p>
+  <div class="meta"><span class="chip warn">draft, pending review</span> <span class="chip mono muted mono">docs/specs/cross-tool-session-log.md</span> <span class="chip accent">#34</span></div>
+</a>
+<a class="card" href="spec-docker-environment-generation.html" data-searchable="spec — docker environment generation docs/specs/docker-environment-generation.md draft, pending review getting a project into a working dev container today means hand-writing a dockerfile and docker-compose.yml, deciding on a base image, and wiring up whatever tooling the kit needs — the same kind of one-time setup friction workspace-kit…">
+  <h3>Spec — Docker environment generation</h3>
+  <p>Getting a project into a working dev container today means hand-writing a Dockerfile and docker-compose.yml, deciding on a base image, and wiring up whatever tooling the kit needs — the same kind of one-time setup friction workspace-kit…</p>
+  <div class="meta"><span class="chip warn">draft, pending review</span> <span class="chip mono muted mono">docs/specs/docker-environment-generation.md</span></div>
+</a>
+<a class="card" href="spec-document-ingestion-queue.html" data-searchable="spec — document ingestion queue docs/specs/document-ingestion-queue.md draft, pending review people save references faster than they incorporate them: a miro board, a voice note, an external doc gets dropped somewhere (a notion page, a bookmark, a note app) with the intent of &quot;bring this into the project later.&quot; nothing today…">
+  <h3>Spec — Document ingestion queue</h3>
+  <p>People save references faster than they incorporate them: a Miro board, a voice note, an external doc gets dropped somewhere (a Notion page, a bookmark, a note app) with the intent of &quot;bring this into the project later.&quot; Nothing today…</p>
+  <div class="meta"><span class="chip warn">draft, pending review</span> <span class="chip mono muted mono">docs/specs/document-ingestion-queue.md</span> <span class="chip accent">#34</span></div>
+</a>
+<a class="card" href="spec-git-integration-layer.html" data-searchable="spec — git integration layer docs/specs/git-integration-layer.md draft, pending review as workspace//kit repositions itself from a one-shot generator into an ongoing project context manager, workspaces start accumulating edits over time instead of only being written once at creation: the markdown orchestrator toggling…">
+  <h3>Spec — Git integration layer</h3>
+  <p>As workspace//kit repositions itself from a one-shot generator into an ongoing project context manager, workspaces start accumulating edits over time instead of only being written once at creation: the Markdown Orchestrator toggling…</p>
+  <div class="meta"><span class="chip warn">draft, pending review</span> <span class="chip mono muted mono">docs/specs/git-integration-layer.md</span> <span class="chip accent">#20</span> <span class="chip accent">#29</span></div>
+</a>
+<a class="card" href="spec-local-web-app.html" data-searchable="spec — local web app (mvp) docs/specs/local-web-app.md draft, pending review the html artifact and the planned cli both solve *generation* — turning a project description into a workspace, once. neither solves what happens after: as workspace//kit repositions itself as a project context manager rather than a…">
+  <h3>Spec — Local Web App (MVP)</h3>
+  <p>The HTML artifact and the planned CLI both solve *generation* — turning a project description into a workspace, once. Neither solves what happens after: as workspace//kit repositions itself as a project context manager rather than a…</p>
+  <div class="meta"><span class="chip warn">draft, pending review</span> <span class="chip mono muted mono">docs/specs/local-web-app.md</span> <span class="chip accent">#77</span> <span class="chip accent">#79</span></div>
+</a>
+<a class="card" href="spec-templates-feature.html" data-searchable="spec — templates feature docs/specs/templates-feature.md draft, pending review workspace//kit today generates one fixed structure per kit, defined entirely by the maintainer. that's a good universal default, but it isn't the ideal workspace for everyone — professionals who work a certain way repeatedly end up…">
+  <h3>Spec — Templates feature</h3>
+  <p>Workspace//kit today generates one fixed structure per kit, defined entirely by the maintainer. That's a good universal default, but it isn't the ideal workspace for everyone — professionals who work a certain way repeatedly end up…</p>
+  <div class="meta"><span class="chip warn">draft, pending review</span> <span class="chip mono muted mono">docs/specs/templates-feature.md</span></div>
+</a>
+<a class="card" href="spec-web-app-dashboard.html" data-searchable="spec — local web app dashboard (workspace lifecycle ui) docs/specs/web-app-dashboard.md draft, prototyped five specs written 2026-07-26 (#77–#81) each define a piece of workspace//kit's &quot;lifecycle&quot; half — inspecting a workspace, checking its health, logging sessions, queuing references, operating git. each is specced as data and cli…">
+  <h3>Spec — Local Web App dashboard (workspace lifecycle UI)</h3>
+  <p>Five specs written 2026-07-26 (#77–#81) each define a piece of workspace//kit's &quot;lifecycle&quot; half — inspecting a workspace, checking its health, logging sessions, queuing references, operating git. Each is specced as data and CLI…</p>
+  <div class="meta"><span class="chip warn">draft, prototyped</span> <span class="chip mono muted mono">docs/specs/web-app-dashboard.md</span> <span class="chip accent">#77</span> <span class="chip accent">#81</span></div>
+</a>
+<a class="card" href="spec-workspace-health-check.html" data-searchable="spec — workspace health check (&quot;system doctor&quot;) docs/specs/workspace-health-check.md p0 implemented 2026-07-29 as `core/doctor workspace//kit today only writes workspaces — the html artifact, and (once built) the cli and web app, all solve *generation*. nothing solves what happens as a generated workspace ages: claude.md/agents.md accumulate instructions over…">
+  <h3>Spec — Workspace health check (&quot;system doctor&quot;)</h3>
+  <p>Workspace//kit today only writes workspaces — the HTML artifact, and (once built) the CLI and Web App, all solve *generation*. Nothing solves what happens as a generated workspace ages: CLAUDE.md/AGENTS.md accumulate instructions over…</p>
+  <div class="meta"><span class="chip ok">P0 implemented 2026-07-29 as `core/doctor</span> <span class="chip mono muted mono">docs/specs/workspace-health-check.md</span> <span class="chip accent">#78</span> <span class="chip accent">#34</span></div>
+</a>
+<a class="card" href="spec-workspace-inspection-layer.html" data-searchable="spec — workspace inspection layer docs/specs/workspace-inspection-layer.md p0 implemented 2026-07-29 as `core/inspect everything workspace//kit has built so far *writes* a workspace: core/generator.js, the standalone html artifact, and the planned cli all turn a project description into a set of files, once. nothing today reads one back. that gap was…">
+  <h3>Spec — Workspace inspection layer</h3>
+  <p>Everything workspace//kit has built so far *writes* a workspace: core/generator.js, the standalone HTML artifact, and the planned CLI all turn a project description into a set of files, once. Nothing today reads one back. That gap was…</p>
+  <div class="meta"><span class="chip ok">P0 implemented 2026-07-29 as `core/inspect</span> <span class="chip mono muted mono">docs/specs/workspace-inspection-layer.md</span> <span class="chip accent">#77</span> <span class="chip accent">#29</span></div>
+</a></div>
+</section>
+<section class="group" data-filter-group>
+  <h2>Design</h2>
+  <p class="hint">Direção visual e os briefs que alimentaram o protótipo.</p>
+  <div class="cards"><a class="card" href="design.html" data-searchable="design — workspace//kit design.md draft, first pass (2026-07-27) — no prior version existed scope note: this describes the local web app surface's visual direction. the standalone html artifact (src/workspace-kit.html) keeps its own v2/v3 &quot;terminal&quot; identity (near-black, amber/teal, jetbrains mono/inter, glass-card) —…">
+  <h3>Design — workspace//kit</h3>
+  <p>Scope note: this describes the Local Web App surface's visual direction. The standalone HTML artifact (src/workspace-kit.html) keeps its own v2/v3 &quot;terminal&quot; identity (near-black, amber/teal, JetBrains Mono/Inter, glass-card) —…</p>
+  <div class="meta"><span class="chip warn">draft, first pass (2026-07-27) — no prior version existed</span> <span class="chip mono muted mono">DESIGN.md</span></div>
+</a>
+<a class="card" href="git-layer-dashboard-brief.html" data-searchable="design brief — git integration layer (for claude design) docs/design/git-layer-dashboard-brief.md  existing prototype: https://claude.ai/design/p/d620bebb-45b3-423b-9daa-8d53cd155426?file=workspace+kit+dashboard.dc.html&amp;via=share (&quot;workspace kit dashboard&quot;)">
+  <h3>Design brief — Git integration layer (for Claude Design)</h3>
+  <p>Existing prototype: https://claude.ai/design/p/d620bebb-45b3-423b-9daa-8d53cd155426?file=Workspace+Kit+Dashboard.dc.html&amp;via=share (&quot;Workspace Kit Dashboard&quot;)</p>
+  <div class="meta"><span class="chip mono muted mono">docs/design/git-layer-dashboard-brief.md</span> <span class="chip accent">#79</span></div>
+</a>
+<a class="card" href="prototype-prp.html" data-searchable="prp — high-fidelity prototype: workspace//kit lifecycle dashboard docs/design/prototype-prp.md  paste this whole file into claude design as the brief. it's self-contained — the example content below is real (pulled from this repo's own dogfooded files), not placeholder text, so you can design against it directly instead of lorem…">
+  <h3>PRP — High-fidelity prototype: workspace//kit lifecycle dashboard</h3>
+  <p>Paste this whole file into Claude Design as the brief. It's self-contained — the example content below is real (pulled from this repo's own dogfooded files), not placeholder text, so you can design against it directly instead of lorem…</p>
+  <div class="meta"><span class="chip mono muted mono">docs/design/prototype-prp.md</span></div>
+</a></div>
+</section>
+<section class="group" data-filter-group>
+  <h2>Instruções de agente</h2>
+  <p class="hint">A camada que Claude Code, Cowork e afins leem antes de tocar no repo.</p>
+  <div class="cards"><a class="card" href="agents.html" data-searchable="workspace//kit agents.md  ai workspace generator: from a project description, produces the human context layer and the ai instruction layer per tool, packaged into a .zip.">
+  <h3>workspace//kit</h3>
+  <p>AI workspace generator: from a project description, produces the human context layer and the AI instruction layer per tool, packaged into a .zip.</p>
+  <div class="meta"><span class="chip mono muted mono">AGENTS.md</span> <span class="chip accent">#78</span> <span class="chip accent">#79</span></div>
+</a>
+<a class="card" href="claude.html" data-searchable="claude.md claude.md  @agents.md">
+  <h3>CLAUDE.md</h3>
+  <p>@AGENTS.md</p>
+  <div class="meta"><span class="chip mono muted mono">CLAUDE.md</span></div>
+</a></div>
+</section>
+</main>
+<footer class="footer">
+  <p>Gerado por <code>workspace-kit report</code> a partir dos arquivos Markdown do repositório — não edite estes HTMLs à mão, edite o <code>.md</code> de origem e rode o comando de novo.</p>
+  <p class="muted">Gerado em 29 de julho de 2026 às 17:42 · contagens de tokens são estimativas (caracteres ÷ 4), não contagem de tokenizer.</p>
+</footer>
+<script src="../assets/report.js"></script>
+</body>
+</html>

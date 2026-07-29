@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spec — Context-manager conventions (CHANGELOG + decision-log rotation) — workspace//kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/report.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="../index.html"><span>workspace</span><span class="slashes">//</span><span>kit</span></a>
+  <nav><a href="../index.html">Início</a><a href="../plans/index.html" class="active">Planos & specs</a><a href="../decisions.html">Decisões</a><a href="../tasks.html">Tarefas</a><a href="../sessions.html">Sessões</a></nav>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema">
+    <span class="only-light">◐</span><span class="only-dark">◑</span>
+  </button>
+</header>
+<main class="page">
+
+<p class="breadcrumb"><a href="index.html">← Planos &amp; specs</a></p>
+<div class="page-head">
+  <h1>Spec — Context-manager conventions (CHANGELOG + decision-log rotation)</h1>
+  <div class="meta card-meta"><span class="chip warn">draft, pending review</span> <span class="chip mono muted mono">docs/specs/context-manager-conventions.md</span> <span class="chip muted">53 linhas</span> <span class="chip muted">~1.732 tokens</span></div>
+</div>
+<nav class="toc"><h2>Nesta página</h2><ul><li class="lvl2"><a href="#problem-statement">Problem Statement</a></li><li class="lvl2"><a href="#goals">Goals</a></li><li class="lvl2"><a href="#non-goals">Non-Goals</a></li><li class="lvl2"><a href="#user-stories">User Stories</a></li><li class="lvl2"><a href="#requirements">Requirements</a></li><li class="lvl2"><a href="#success-metrics">Success Metrics</a></li><li class="lvl2"><a href="#open-questions">Open Questions</a></li><li class="lvl2"><a href="#timeline-considerations">Timeline Considerations</a></li></ul></nav>
+<article class="doc">
+<p>Status: draft, pending review. Grounded in findings from a separate session (&quot;Context.md file size&quot;) surfaced during the 2026-07-21 planning review; validated pattern applied to two targets — this repo's own docs, and a future product convention.</p>
+<h2 id="problem-statement">Problem Statement<a class="anchor" href="#problem-statement" aria-label="Link para esta seção">#</a></h2>
+<p>Log-style files (CONTEXT.md's narrative history, DECISIONS.md's chronological entries) are genuinely useful — they give an agent a project's history — but they only grow, never shrink, and eventually become long and heavy enough that reading them in full every session wastes context and attention. This is the exact problem the 2026-07-14 voice note flagged for workspace-kit's own conventions (&quot;status.md e decisions.md podem ficar longos e pesados&quot;), and a pattern for solving it was already validated in a different project: split the ever-growing narrative out into an on-demand file, and rotate old decision entries into individual files with an index. This spec applies that validated pattern in two places: this repository's own documentation, and — as workspace-kit repositions from generator to context manager — as a convention the tool itself could offer to every workspace it produces.</p>
+<h2 id="goals">Goals<a class="anchor" href="#goals" aria-label="Link para esta seção">#</a></h2>
+<ul><li>Keep this repo's own CONTEXT.md and DECISIONS.md from growing into files that are expensive to read every session, without losing the history they currently hold.</li><li>Establish a concrete, numeric policy (not just &quot;keep it short&quot;) so future sessions apply it consistently instead of re-deciding each time.</li><li>Validate the pattern on this repo first, so that offering it as a generated convention (future product feature) is proven, not speculative.</li></ul>
+<h2 id="non-goals">Non-Goals<a class="anchor" href="#non-goals" aria-label="Link para esta seção">#</a></h2>
+<ul><li><strong>Automating the rotation with tooling/scripts in v1</strong> — v1 is a documented convention an agent follows manually when it notices a file has grown past the threshold, not a script that runs itself. Automation is a later step once the manual version proves useful.</li><li><strong>Applying this to TASKS.md</strong> — TASKS.md is a live, frequently-edited file by design (see CONTEXT.md's &quot;RAG by Markdown&quot; framing); it isn't a pure append-only log the way DECISIONS.md is, so the same rotation logic doesn't obviously apply. Not addressed here.</li><li><strong>Making this a generator-form option before the CLI/Web App exist</strong> — offering &quot;enable log rotation&quot; as a checkbox in the standalone HTML generator's output is plausible eventually, but the convention needs to actually be lived with in this repo first (see Goals).</li></ul>
+<h2 id="user-stories">User Stories<a class="anchor" href="#user-stories" aria-label="Link para esta seção">#</a></h2>
+<ul><li>As an agent working in this repo, I want CONTEXT.md to stay focused on current, always-relevant context so that I'm not reading a long narrative history just to understand today's conventions.</li><li>As an agent working in this repo, I want a place to look up <em>why</em> an old decision was made without that history bloating the file I read every session.</li><li>As Alexandre, I want a numeric trigger (not a vague &quot;when it feels long&quot;) for when to split CONTEXT.md's history into CHANGELOG.md or rotate old DECISIONS.md entries, so this doesn't rely on remembering to do it.</li><li>As a future user of workspace-kit-the-context-manager, I want my own generated workspace to come with the same anti-bloat convention so I don't hit the same problem later on my own project.</li></ul>
+<h2 id="requirements">Requirements<a class="anchor" href="#requirements" aria-label="Link para esta seção">#</a></h2>
+<p><strong>Must-Have (P0)</strong></p>
+<ul><li><code>CHANGELOG.md</code> introduced in this repo, holding narrative/historical entries currently mixed into CONTEXT.md (if any accumulate there going forward — CONTEXT.md is intentionally kept to current conventions/constraints/vocabulary per its existing structure). <ul><li>Acceptance: CHANGELOG.md exists, documented as <strong>on-demand/grep-only reading</strong> (not part of the always-read file set) in CLAUDE.md/AGENTS.md's &quot;See also&quot; list.</li></ul></li><li>Explicit pruning policy for CHANGELOG.md: entries older than ~3 months get summarized to one line or removed. <ul><li>Acceptance: the policy is written down (in CHANGELOG.md's own header or CONTEXT.md) in concrete terms — &quot;~3 months,&quot; not &quot;periodically.&quot;</li></ul></li><li>ADR-style rotation policy for DECISIONS.md: once it passes ~15 entries, older entries move to individual files under a <code>decisions/</code> folder, leaving an index (one line + link) in DECISIONS.md itself. <ul><li>Acceptance: the policy is written down with the numeric trigger; DECISIONS.md is at or below that count today, so this is a documented future action, not an immediate rewrite (see Non-Goals — no automation yet).</li></ul></li><li>Both policies applied consistently to (a) this repository's own docs, and (b) recorded in DECISIONS.md as the intended future product convention — already partially done in the 2026-07-21 DECISIONS.md entry; this spec is where the detail lives.</li></ul>
+<p><strong>Nice-to-Have (P1)</strong></p>
+<ul><li>A short &quot;how to rotate&quot; checklist (in CLAUDE.md/AGENTS.md or CONTEXT.md) so any agent — not just the one that set this up — can execute the rotation correctly when the trigger is hit.</li><li>Cross-link fix noted separately in TASKS.md: CONTEXT.md is currently missing from the &quot;See also&quot; list in AGENTS.md/CLAUDE.md (only listed in README/starter prompt) — worth fixing alongside this, since it's the same &quot;keep the reference network accurate&quot; concern.</li></ul>
+<p><strong>Future Considerations (P2)</strong></p>
+<ul><li>Offering this as a generation-time option (&quot;enable changelog/decision-log rotation for this workspace&quot;) once the CLI/Web App exist and the pattern has been lived with here for a while.</li><li>Automated tooling (a script or agent routine that performs the rotation itself when triggered) instead of a manually-followed policy.</li></ul>
+<h2 id="success-metrics">Success Metrics<a class="anchor" href="#success-metrics" aria-label="Link para esta seção">#</a></h2>
+<p><strong>Leading:</strong> CONTEXT.md and DECISIONS.md stay under a reasonable size going forward (rough target, consistent with the &quot;RAG by Markdown&quot; research already in CONTEXT.md: always-loaded files under ~300 lines — DECISIONS.md is arguably not &quot;always loaded&quot; the same way CLAUDE.md/AGENTS.md are, but the same instinct applies). <strong>Lagging:</strong> whether this actually gets applied when the DECISIONS.md ~15-entry trigger is hit, rather than being a policy that's written down and then ignored — the real test of whether it was worth formalizing.</p>
+<h2 id="open-questions">Open Questions<a class="anchor" href="#open-questions" aria-label="Link para esta seção">#</a></h2>
+<ul><li><strong>(Product — Alexandre)</strong> Is ~15 entries / ~3 months the right threshold, or was that specific to the other project this pattern came from? Treated here as a reasonable starting default, not a firm number.</li><li><strong>(Product — Alexandre)</strong> Should CHANGELOG.md be created now (proactively, ahead of CONTEXT.md actually growing a narrative history) or only once there's real content to move into it? Current CONTEXT.md is short (19 lines) — creating an empty CHANGELOG.md today may be premature; worth revisiting once there's actual history to split out.</li></ul>
+<h2 id="timeline-considerations">Timeline Considerations<a class="anchor" href="#timeline-considerations" aria-label="Link para esta seção">#</a></h2>
+<p>No hard deadline; independent of the CLI/Web App/Templates/Docker specs — this is a documentation-process change, not a product feature with its own build. Reasonable to apply to this repo whenever DECISIONS.md/CONTEXT.md actually approach the stated thresholds, rather than immediately.</p>
+</article>
+</main>
+<footer class="footer">
+  <p>Gerado por <code>workspace-kit report</code> a partir dos arquivos Markdown do repositório — não edite estes HTMLs à mão, edite o <code>.md</code> de origem e rode o comando de novo.</p>
+  <p class="muted">Gerado em 29 de julho de 2026 às 17:42 · contagens de tokens são estimativas (caracteres ÷ 4), não contagem de tokenizer.</p>
+</footer>
+<script src="../assets/report.js"></script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel — workspace//kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/report.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="index.html"><span>workspace</span><span class="slashes">//</span><span>kit</span></a>
+  <nav><a href="index.html" class="active">Início</a><a href="plans/index.html">Planos & specs</a><a href="decisions.html">Decisões</a><a href="tasks.html">Tarefas</a><a href="sessions.html">Sessões</a></nav>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema">
+    <span class="only-light">◐</span><span class="only-dark">◑</span>
+  </button>
+</header>
+<main class="page">
+
+<div class="page-head">
+  <p class="eyebrow">workspace//kit · relatórios</p>
+  <h1>Painel do projeto</h1>
+  <p class="lead">Uma leitura navegável do estado do repositório — planos, specs, decisões, tarefas e sessões — gerada direto dos arquivos Markdown versionados. Nada aqui é fonte da verdade: os <code>.md</code> são.</p>
+</div>
+<div class="kpis"><div class="kpi"><span class="n">19</span><span class="l">Documentos</span></div><div class="kpi"><span class="n">11</span><span class="l">Specs de feature</span></div><div class="kpi"><span class="n">33</span><span class="l">Decisões registradas</span></div><div class="kpi"><span class="n">11</span><span class="l">Tarefas abertas</span></div><div class="kpi"><span class="n">36</span><span class="l">Tarefas concluídas</span></div><div class="kpi"><span class="n">13</span><span class="l">Sessões registradas</span></div></div>
+
+<section class="group">
+  <h2>Specs de features</h2>
+  <p class="hint">Uma por feature. O status é o que a própria spec declara na sua linha <code>Status:</code>.</p>
+  <div class="cards"><a class="card" href="plans/spec-cli-generator.html">
+  <h3>CLI generator (MVP)</h3>
+  <p>Today workspace//kit only exists as a browser artifact (src/workspace-kit.html): you have to open it, fill a form, download a .zip, and manually extract it into a project folder before opening an AI agent. That's an extra manual hop…</p>
+  <div class="meta"><span class="chip warn">draft, pending review</span></div>
+</a>
+<a class="card" href="plans/spec-context-manager-conventions.html">
+  <h3>Context-manager conventions (CHANGELOG + decision-log rotation)</h3>
+  <p>Log-style files (CONTEXT.md's narrative history, DECISIONS.md's chronological entries) are genuinely useful — they give an agent a project's history — but they only grow, never shrink, and eventually become long and heavy enough that…</p>
+  <div class="meta"><span class="chip warn">draft, pending review</span></div>
+</a>
+<a class="card" href="plans/spec-cross-tool-session-log.html">
+  <h3>Cross-tool session log</h3>
+  <p>The same workspace is often worked on from several tools in sequence — Claude Design for a mockup, Cowork for planning, Claude Code for implementation — but nothing records what happened where. Anyone picking the workspace back up…</p>
+  <div class="meta"><span class="chip warn">draft, pending review</span> <span class="chip accent">#34</span></div>
+</a>
+<a class="card" href="plans/spec-docker-environment-generation.html">
+  <h3>Docker environment generation</h3>
+  <p>Getting a project into a working dev container today means hand-writing a Dockerfile and docker-compose.yml, deciding on a base image, and wiring up whatever tooling the kit needs — the same kind of one-time setup friction workspace-kit…</p>
+  <div class="meta"><span class="chip warn">draft, pending review</span></div>
+</a>
+<a class="card" href="plans/spec-document-ingestion-queue.html">
+  <h3>Document ingestion queue</h3>
+  <p>People save references faster than they incorporate them: a Miro board, a voice note, an external doc gets dropped somewhere (a Notion page, a bookmark, a note app) with the intent of &quot;bring this into the project later.&quot; Nothing today…</p>
+  <div class="meta"><span class="chip warn">draft, pending review</span> <span class="chip accent">#34</span></div>
+</a>
+<a class="card" href="plans/spec-git-integration-layer.html">
+  <h3>Git integration layer</h3>
+  <p>As workspace//kit repositions itself from a one-shot generator into an ongoing project context manager, workspaces start accumulating edits over time instead of only being written once at creation: the Markdown Orchestrator toggling…</p>
+  <div class="meta"><span class="chip warn">draft, pending review</span> <span class="chip accent">#20</span></div>
+</a>
+<a class="card" href="plans/spec-local-web-app.html">
+  <h3>Local Web App (MVP)</h3>
+  <p>The HTML artifact and the planned CLI both solve *generation* — turning a project description into a workspace, once. Neither solves what happens after: as workspace//kit repositions itself as a project context manager rather than a…</p>
+  <div class="meta"><span class="chip warn">draft, pending review</span> <span class="chip accent">#77</span></div>
+</a>
+<a class="card" href="plans/spec-templates-feature.html">
+  <h3>Templates feature</h3>
+  <p>Workspace//kit today generates one fixed structure per kit, defined entirely by the maintainer. That's a good universal default, but it isn't the ideal workspace for everyone — professionals who work a certain way repeatedly end up…</p>
+  <div class="meta"><span class="chip warn">draft, pending review</span></div>
+</a>
+<a class="card" href="plans/spec-web-app-dashboard.html">
+  <h3>Local Web App dashboard (workspace lifecycle UI)</h3>
+  <p>Five specs written 2026-07-26 (#77–#81) each define a piece of workspace//kit's &quot;lifecycle&quot; half — inspecting a workspace, checking its health, logging sessions, queuing references, operating git. Each is specced as data and CLI…</p>
+  <div class="meta"><span class="chip warn">draft, prototyped</span> <span class="chip accent">#77</span></div>
+</a>
+<a class="card" href="plans/spec-workspace-health-check.html">
+  <h3>Workspace health check (&quot;system doctor&quot;)</h3>
+  <p>Workspace//kit today only writes workspaces — the HTML artifact, and (once built) the CLI and Web App, all solve *generation*. Nothing solves what happens as a generated workspace ages: CLAUDE.md/AGENTS.md accumulate instructions over…</p>
+  <div class="meta"><span class="chip ok">P0 implemented 2026-07-29 as `core/doctor</span> <span class="chip accent">#78</span></div>
+</a>
+<a class="card" href="plans/spec-workspace-inspection-layer.html">
+  <h3>Workspace inspection layer</h3>
+  <p>Everything workspace//kit has built so far *writes* a workspace: core/generator.js, the standalone HTML artifact, and the planned CLI all turn a project description into a set of files, once. Nothing today reads one back. That gap was…</p>
+  <div class="meta"><span class="chip ok">P0 implemented 2026-07-29 as `core/inspect</span> <span class="chip accent">#77</span></div>
+</a></div>
+</section>
+
+<section class="group">
+  <h2>Atalhos</h2>
+  <div class="cards">
+    <a class="card" href="plans/index.html"><h3>Planos &amp; specs →</h3><p>Todos os documentos de planejamento, com filtro por título, caminho e status.</p></a>
+    <a class="card" href="decisions.html"><h3>Linha do tempo de decisões →</h3><p>33 decisões, das mais recentes às arquivadas em <code>decisions/</code>.</p></a>
+    <a class="card" href="tasks.html"><h3>Board de tarefas →</h3><p>11 abertas e 36 concluídas, agrupadas por frente de trabalho.</p></a>
+    <a class="card" href="sessions.html"><h3>Log de sessões →</h3><p>Quem tocou no workspace, em qual ferramenta e em que estado deixou.</p></a>
+  </div>
+</section>
+
+<div class="board">
+  <section class="column">
+    <h2>Decisões recentes <span class="chip muted">últimas 5</span></h2>
+    <p class="sub">De <code>DECISIONS.md</code></p>
+    <div class="item"><span class="txt"><span class="path">2026-07-29</span> — &quot;project type&quot; → &quot;kit&quot; rename executed; generated text deliberately excluded</span></div><div class="item"><span class="txt"><span class="path">2026-07-29</span> — Issue tracker pruned to the spec convention; spec→issue sync keyed instead of title-matched</span></div><div class="item"><span class="txt"><span class="path">2026-07-29</span> — `core/inspect.js` implemented; the inspection layer's open questions closed</span></div><div class="item"><span class="txt"><span class="path">2026-07-29</span> — Local Web App reaches the filesystem through a local Node server</span></div><div class="item"><span class="txt"><span class="path">2026-07-29</span> — Workspace health check implemented; the doctor judges, the inspector reports</span></div>
+  </section>
+  <section class="column">
+    <h2>Sessões recentes <span class="chip muted">últimas 4</span></h2>
+    <p class="sub">De <code>SESSIONS.md</code></p>
+    <div class="item"><span class="txt"><span class="path">2026-07-29</span> — Cowork</span></div><div class="item"><span class="txt"><span class="path">2026-07-29</span> — Claude Code (background job, `gitlocal` worktree)</span></div><div class="item"><span class="txt"><span class="path">2026-07-29</span> — Claude Code (background job, `reports-folder` worktree)</span></div><div class="item"><span class="txt"><span class="path">2026-07-29</span> — Claude Code (background job, `server` branch)</span></div>
+  </section>
+</div>
+</main>
+<footer class="footer">
+  <p>Gerado por <code>workspace-kit report</code> a partir dos arquivos Markdown do repositório — não edite estes HTMLs à mão, edite o <code>.md</code> de origem e rode o comando de novo.</p>
+  <p class="muted">Gerado em 29 de julho de 2026 às 17:42 · contagens de tokens são estimativas (caracteres ÷ 4), não contagem de tokenizer.</p>
+</footer>
+<script src="assets/report.js"></script>
+</body>
+</html>

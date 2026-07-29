@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spec — Document ingestion queue — workspace//kit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/report.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="../index.html"><span>workspace</span><span class="slashes">//</span><span>kit</span></a>
+  <nav><a href="../index.html">Início</a><a href="../plans/index.html" class="active">Planos & specs</a><a href="../decisions.html">Decisões</a><a href="../tasks.html">Tarefas</a><a href="../sessions.html">Sessões</a></nav>
+  <button class="theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema">
+    <span class="only-light">◐</span><span class="only-dark">◑</span>
+  </button>
+</header>
+<main class="page">
+
+<p class="breadcrumb"><a href="index.html">← Planos &amp; specs</a></p>
+<div class="page-head">
+  <h1>Spec — Document ingestion queue</h1>
+  <div class="meta card-meta"><span class="chip warn">draft, pending review</span> <span class="chip mono muted mono">docs/specs/document-ingestion-queue.md</span> <span class="chip muted">82 linhas</span> <span class="chip muted">~3.192 tokens</span> <a class="chip accent" href="https://github.com/atempel/workspace-kit/issues/34" target="_blank" rel="noopener">#34</a></div>
+</div>
+<nav class="toc"><h2>Nesta página</h2><ul><li class="lvl2"><a href="#problem-statement">Problem Statement</a></li><li class="lvl2"><a href="#goals">Goals</a></li><li class="lvl2"><a href="#non-goals">Non-Goals</a></li><li class="lvl2"><a href="#user-stories">User Stories</a></li><li class="lvl2"><a href="#requirements">Requirements</a></li></ul></nav>
+<article class="doc">
+<p>Status: draft, pending review. Source: Notion page &quot;Notas de Áudio 26/07&quot; (2026-07-26), surfaced in TASKS.md alongside the other 2026-07-26 items; grounded in a manual workflow actually performed in a prior session (see Problem Statement).</p>
+<h2 id="problem-statement">Problem Statement<a class="anchor" href="#problem-statement" aria-label="Link para esta seção">#</a></h2>
+<p>People save references faster than they incorporate them: a Miro board, a voice note, an external doc gets dropped somewhere (a Notion page, a bookmark, a note app) with the intent of &quot;bring this into the project later.&quot; Nothing today tracks that intent — so the only way to answer &quot;what have I saved that I haven't brought into the project yet?&quot; is to manually re-investigate from scratch every time.</p>
+<p>This isn't hypothetical: in a recent real session, Alexandre had a Notion project card (&quot;Workspace//Kit&quot;) with two voice-note pages nested under it, and wasn't sure which had already been incorporated into this repo's docs. An AI agent had to manually search Notion, fetch each page's full content, cross-reference it against TASKS.md/DECISIONS.md/CONTEXT.md and grep the codebase, and report back which was ingested and which wasn't. That entire investigation — repeatable, mechanical, and avoidable — is exactly what this feature should turn into a first-class, low-effort convention: save a reference once as a queue item, and its own file answers &quot;ingested or not&quot; from then on, with no re-investigation required.</p>
+<h2 id="goals">Goals<a class="anchor" href="#goals" aria-label="Link para esta seção">#</a></h2>
+<ul><li>Give a workspace a durable, low-effort place to record &quot;I saved this reference, I haven't ingested it yet&quot; as it happens, instead of relying on memory or an ad hoc search later.</li><li>Make &quot;has this been ingested&quot; a question answered by reading one file, not by cross-referencing TASKS.md/DECISIONS.md/CONTEXT.md and the codebase by hand.</li><li>Keep the history of what was ingested and when, without inventing a second history file that duplicates TASKS.md or the cross-tool session log.</li><li>Ship as content-generation only, so it works identically on all three surfaces (CLI, Web App, standalone HTML) from day one.</li></ul>
+<h2 id="non-goals">Non-Goals<a class="anchor" href="#non-goals" aria-label="Link para esta seção">#</a></h2>
+<ul><li><strong>Actually fetching or rendering the referenced content</strong> (opening the Miro board, transcribing the voice note, pulling the doc's text) — that requires a local process and touches the no-network constraint in CONTEXT.md (&quot;no backend, no external API calls requiring a key,&quot; scoped to the standalone HTML but a real consideration for CLI/Web-App fetch features too). v1 only generates and tracks the reference <em>stub</em>, never retrieves what it points to.</li><li><strong>Automated ingestion detection</strong> (an agent scanning the queue against the actual docs and auto-flipping status) — v1's status change is a manual, agent-or-user-performed edit, same precedent as docs/specs/context-manager-conventions.md → #34's &quot;manually-followed policy, no automation in v1.&quot; Automation is a later step once the manual convention proves useful.</li><li><strong>A separate aggregated index/summary file</strong> — one folder of per-item <code>.md</code> files plus a documented grep convention is enough for v1; building a real aggregated view is the kind of thing the Workspace inspection layer (docs/specs/workspace-inspection-layer.md) exists to eventually provide across every feature that needs one, not something this feature should build its own copy of.</li><li><strong>Overlapping with TASKS.md or the cross-tool session log</strong> — see Open Questions for the exact boundary; the explicit design goal is that these three files never end up doing the same job.</li><li><strong>Priority/ordering on queue items</strong> — it's a flat set of pending references, not a ranked backlog; if prioritization is ever needed, that's what TASKS.md is already for once an item graduates into an actual task.</li></ul>
+<h2 id="user-stories">User Stories<a class="anchor" href="#user-stories" aria-label="Link para esta seção">#</a></h2>
+<ul><li>As Alexandre, I want to save a reference (a voice note, a doc, a link, a board) into my workspace the moment I think &quot;I should bring this in later,&quot; so that it isn't only living in my memory or in Notion with no trace in the project itself.</li><li>As Alexandre, I want to open a saved reference's own file and immediately see whether it's already been ingested, so that I never again have to ask an agent to manually search Notion and cross-reference three files to answer that question.</li><li>As an agent working in this repo, I want a documented convention for where pending references live and how &quot;ingested&quot; is recorded, so that I can both file new references and correctly update one when I finish incorporating it.</li><li>As Alexandre, I want the record of an already-ingested reference kept (not deleted) once it's done, so that the queue also serves as a lightweight history of what got pulled in and when, without needing to check a different file for that.</li></ul>
+<h2 id="requirements">Requirements<a class="anchor" href="#requirements" aria-label="Link para esta seção">#</a></h2>
+<p><strong>Must-Have (P0)</strong></p>
+<ul><li>Queue folder convention: a <code>queue/</code> folder at the workspace root holding one <code>.md</code> stub file per saved reference (not a single monolithic queue file, and not a convention bolted onto TASKS.md). <ul><li>Acceptance: the convention is documented in generated CONTEXT.md/CLAUDE.md/AGENTS.md text — where <code>queue/</code> lives, what a stub file looks like, and the status-field convention below.</li></ul></li><li>Stub generation: given a small set of inputs (title, type, source, optional note), generate one <code>.md</code> file following a fixed stub format. <ul><li>Acceptance: the generated stub contains, at minimum, a title heading and a metadata block with <strong>Type</strong>, <strong>Source</strong>, <strong>Added</strong> (date), and <strong>Status</strong> (<code>Pending</code>); this is generatable identically on all three surfaces (a copy/download-able block of text on the standalone HTML, a written file on CLI/Web App).</li><li>Stub format: ``` # Queue item — &lt;Title&gt; <ul><li><strong>Type:</strong> &lt;Voice note | Document | Link | Board | Other&gt;</li><li><strong>Source:</strong> &lt;URL or description&gt;</li><li><strong>Added:</strong> &lt;YYYY-MM-DD&gt;</li><li><strong>Status:</strong> Pending</li></ul></li></ul></li></ul>
+<p>## Notes &lt;optional free text — what this covers, why it was saved, what to extract when ingesting&gt;</p>
+<pre class="code"><code>- In-place &quot;mark as done&quot; convention: ingesting a reference is recorded by editing that same file's own **Status** field (e.g. `Status: Ingested (2026-07-26)`), optionally adding an **Ingested into:** line naming which file(s)/section(s) absorbed it — not a checkbox list, not a move to a different folder, not a new entry in another file.
+  - Acceptance: a queue item can go from `Status: Pending` to `Status: Ingested (&lt;date&gt;)` by editing only that one file; the file's full history (when added, when ingested, where it went) is readable from that single file with no other file consulted.
+- Lookup convention documented, no new index file: a one-line grep pattern (e.g. `grep -l &quot;Status: Pending&quot; queue/*.md`) documented in AGENTS.md/CLAUDE.md as &quot;how to list open queue items,&quot; so the folder-of-files approach doesn't need a hand-maintained aggregator to stay useful.
+  - Acceptance: the documented command correctly lists only the pending items in a folder containing a mix of pending and ingested stubs.
+- Dogfood in this repository: create `queue/` here and populate it with the real backlog this spec is grounded in — the two Notion voice-note pages under the &quot;Workspace//Kit&quot; project card — with their status set to reflect what's actually already known (per TASKS.md's 2026-07-26 &quot;Done&quot; entry, both have already been checked; record that outcome in the stub rather than leaving it to memory).
+  - Acceptance: `queue/` in this repo contains a stub per voice note, each with the correct Status and (where applicable) Ingested into field, so the next session never has to re-run that investigation by hand.
+
+**Nice-to-Have (P1)**
+- A CLI/Web-App convenience command (e.g. `workspace-kit queue list`) that reads `queue/` and prints pending vs. ingested items — a nicer wrapper around the same grep convention, not a new source of truth.
+- A form UI (standalone HTML and Web App) for adding a queue item — Type/Source/Added/Notes fields — instead of hand-writing the stub, mirroring the existing form → preview → download pattern used elsewhere in the product.
+- Configurable/extendable Type enum, if the fixed list (Voice note/Document/Link/Board/Other) turns out too narrow for how references actually show up in practice.
+
+**Future Considerations (P2)**
+- Actually fetching/rendering referenced content (would need per-source auth — a Notion API key, a Miro API key, etc.) — explicitly deferred; a different-shaped problem than this spec, and in tension with the no-network/no-API-key constraint on at least the standalone HTML surface.
+- Ingestion-detection assistance (an agent proposing &quot;this queue item looks incorporated already, confirm?&quot;) built on top of whatever the Workspace inspection layer (docs/specs/workspace-inspection-layer.md) eventually exposes as an addressable index of a workspace's files — not before that foundational piece exists.
+- Folding queue items into a future aggregated view if grep-based lookup ever proves insufficient in practice.
+
+## Success Metrics
+**Leading:** this repo's own `queue/` folder exists, populated with the real historical backlog (the two Notion voice-note pages), each correctly reflecting its actual ingested/pending status — the concrete test that the convention answers &quot;was this ingested?&quot; without a fresh investigation.
+**Lagging:** whether Alexandre actually files new references into `queue/` as he saves them, rather than letting them sit in Notion until a memory-jog conversation forces another manual audit — the real recurring failure mode this feature targets, and the only signal that actually matters at this stage.
+
+## Open Questions
+- **(Product — Alexandre)** Stub filename/slug convention — kebab-case of the title, date-prefixed, or something else? Cosmetic; pick a sensible default now and revisit if it's ever annoying.
+- **(Product — Alexandre)** Should **Type** be a fixed small enum (Voice note/Document/Link/Board/Other) or freeform text? Fixed is more consistent for the grep convention; freeform is more flexible for reference kinds not anticipated here.
+- **(Resolved)** Mark-as-done mechanism: in-place edit of the item's own **Status** field, not a checkbox list, not a move-to-done-folder, not a session-log append — chosen because it keeps a reference's entire lifecycle in one file, needs no filesystem move, and is therefore trivially available on all three surfaces including the standalone HTML (see Requirements).
+- **(Resolved)** Boundary against TASKS.md: `queue/` holds only external references awaiting ingestion, never general project tasks; TASKS.md may optionally link to `queue/` in a single line but never enumerates its items — a list of pending references is adjacent to a task list but is not one (it tracks &quot;have I looked at this&quot; rather than &quot;what work is left to do&quot;).
+- **(Resolved 2026-07-27, see docs/specs/cross-tool-session-log.md and DECISIONS.md)** Whether an ingestion event should also produce an entry in the cross-tool session log: the queue item remains the sole authoritative record for *that specific reference's* lifecycle (its own Status/Ingested-into fields); `SESSIONS.md`'s per-session entries may mention &quot;ingested queue item X&quot; in passing as a mechanical handoff fact, but are never required to, and never restate the why. Consistent with the CHANGELOG.md/SESSIONS.md boundary resolved the same day — three overlapping &quot;history of what happened&quot; files was the risk, and each of TASKS.md/queue/SESSIONS.md now has one clear, non-overlapping job.
+- **(Engineering)** Does this feature need any involvement from docs/specs/workspace-inspection-layer.md's addressable index (e.g., to eventually power the P1 `queue list` command), or is a folder of files plus grep sufficient indefinitely at this feature's scope? Lean toward &quot;sufficient for now&quot; — flagged only because that inspection layer explicitly lists this feature as a consumer to keep in view.
+
+## Timeline Considerations
+Content-generation only, so — unlike template management or git integration — it doesn't need the CLI or Web App to reach MVP first; even the standalone HTML can generate a single stub's text for copy/paste or download today. This makes it one of the cheapest features in the current batch to actually build and dogfood, and the repo-local dogfooding step (populating this repo's own `queue/`) can happen immediately, independent of any surface's build status.
+
+## Implementation status
+**Read side done 2026-07-29:** `core/inspect.js` parses `queue/*.md` stubs into `index.queue` (title, type, source, added, normalised `pending`/`ingested` status, ingestion date and destination, notes), closing this spec's deferral of reading to the inspection layer. A test asserts the parser and the documented `grep -l &quot;Status: Pending&quot;` convention never disagree about an item's state. **Still open:** the generation half — emitting the `queue/` convention and its stub format into generated workspaces from all three surfaces.
+</code></pre>
+</article>
+</main>
+<footer class="footer">
+  <p>Gerado por <code>workspace-kit report</code> a partir dos arquivos Markdown do repositório — não edite estes HTMLs à mão, edite o <code>.md</code> de origem e rode o comando de novo.</p>
+  <p class="muted">Gerado em 29 de julho de 2026 às 17:42 · contagens de tokens são estimativas (caracteres ÷ 4), não contagem de tokenizer.</p>
+</footer>
+<script src="../assets/report.js"></script>
+</body>
+</html>

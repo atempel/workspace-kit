@@ -21,6 +21,7 @@ const inspector = require('../core/inspect.js');
 const doctor = require('../core/doctor.js');
 const gitLayer = require('../core/git.js');
 const webServer = require('../core/server.js');
+const reportLayer = require('../core/report.js');
 
 const HELP = [
   'workspace//kit — workspace management and versioning for instructions and docs',
@@ -35,6 +36,9 @@ const HELP = [
   '  serve [dir]      Start the read-only local JSON server the Web App dashboard',
   '                   consumes. Binds to 127.0.0.1 only.',
   '  inspect [dir]    Dump the raw workspace index as JSON (debugging aid).',
+  '  report [dir]     Render the workspace\'s own planning docs (PRD, specs, design,',
+  '                   DECISIONS/TASKS/SESSIONS) as a static, readable HTML report.',
+  '                   Writes to <dir>/reports; never edits a source document.',
   '',
   '  worktree list [dir]              Show every worktree of this workspace.',
   '  worktree add <name> [dir]        Create one. By convention it goes in',
@@ -45,6 +49,7 @@ const HELP = [
   '',
   'Options:',
   '  --json           Machine-readable output instead of the terminal report.',
+  '  --out <dir>      Output directory for `report` (default <dir>/reports).',
   '  --port <n>       Port for `serve` (default 4319).',
   '  --max-lines <n>  Override the always-loaded budget (default 300 lines, the',
   '                   figure from docs/specs/context-manager-conventions.md).',
@@ -63,7 +68,7 @@ const HELP = [
 function parseArgs(argv) {
   const args = {
     command: null, sub: null, name: null, dir: null, json: false, maxLines: null,
-    port: null, help: false, path: null, branch: null, force: false,
+    port: null, out: null, help: false, path: null, branch: null, force: false,
   };
   const positional = [];
   for (let i = 0; i < argv.length; i++) {
@@ -71,6 +76,7 @@ function parseArgs(argv) {
     if (arg === '-h' || arg === '--help') args.help = true;
     else if (arg === '--json') args.json = true;
     else if (arg === '--force') args.force = true;
+    else if (arg === '--out') args.out = argv[++i];
     else if (arg === '--max-lines') args.maxLines = parseInt(argv[++i], 10);
     else if (arg === '--port') args.port = parseInt(argv[++i], 10);
     else if (arg === '--path') args.path = argv[++i];
@@ -231,6 +237,42 @@ function main(argv) {
 
   if (args.command === 'inspect') {
     process.stdout.write(JSON.stringify(inspector.inspect(dir), null, 2) + '\n');
+    return 0;
+  }
+
+  if (args.command === 'report') {
+    const outDir = args.out ? path.resolve(args.out) : path.join(dir, 'reports');
+    const result = reportLayer.build(dir, outDir);
+    if (args.json) {
+      process.stdout.write(JSON.stringify(result, null, 2) + '\n');
+      return 0;
+    }
+    process.stdout.write(
+      result.files.length + ' files written to ' + result.outDir + '\n'
+        + '  ' + result.counts.documents + ' documents, '
+        + result.counts.decisions + ' decisions, '
+        + result.counts.tasks + ' task items, '
+        + result.counts.sessions + ' sessions\n'
+        + 'Open ' + path.join(result.outDir, 'index.html') + ' in a browser.\n'
+    );
+    return 0;
+  }
+
+  if (args.command === 'report') {
+    const outDir = args.out ? path.resolve(args.out) : path.join(dir, 'reports');
+    const result = reportLayer.build(dir, outDir);
+    if (args.json) {
+      process.stdout.write(JSON.stringify(result, null, 2) + '\n');
+      return 0;
+    }
+    process.stdout.write(
+      result.files.length + ' files written to ' + result.outDir + '\n'
+        + '  ' + result.counts.documents + ' documents, '
+        + result.counts.decisions + ' decisions, '
+        + result.counts.tasks + ' task items, '
+        + result.counts.sessions + ' sessions\n'
+        + 'Open ' + path.join(result.outDir, 'index.html') + ' in a browser.\n'
+    );
     return 0;
   }
 
