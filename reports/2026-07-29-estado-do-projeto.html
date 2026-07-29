@@ -357,16 +357,22 @@ curl http://127.0.0.1:4319/api/dashboard</code></pre>
   </p>
 </div>
 
-<div class="card">
-  <h3>3. Push travado por credencial <span class="badge warn">ação sua</span></h3>
+<div class="card ok">
+  <h3>3. Push travado por credencial <span class="badge pass">corrigido — não era verdade</span></h3>
   <p>
-    O branch <code>worktree-workflow-sync-fix</code> está commitado mas não pôde ser enviado: o token OAuth não tem
-    escopo <code>workflow</code>. Rode <code>gh auth refresh -s workflow</code> e depois faça o push.
+    <strong>Este item estava errado na primeira versão deste relatório e foi corrigido.</strong> A primeira versão dizia
+    que o branch <code>worktree-workflow-sync-fix</code> estava travado por falta do escopo <code>workflow</code> no token,
+    e pedia um <code>gh auth refresh</code>. Isso não era mais verdade quando o relatório foi escrito.
   </p>
   <p>
-    <strong>Enquanto isso não entra:</strong> o workflow antigo, que casa issues por título exato, continua sendo o que
-    roda a cada push em <code>docs/specs/*.md</code> — e vai continuar criando issues duplicadas toda vez que um bullet
-    P0 for reescrito.
+    <strong>O que é fato:</strong> o fix já está em <code>main</code> — commit <code>562e78a</code>, mergeado pelo PR #183.
+    <code>.github/scripts/sync_specs_to_issues.py</code> está no lugar e o workflow dispara por push em <code>main</code>.
+    Não havia nada para enviar.
+  </p>
+  <p>
+    <strong>Origem do erro:</strong> o item foi copiado de uma entrada do <code>SESSIONS.md</code> escrita antes daquele
+    merge, e não foi verificado contra o estado real do repositório — exatamente o que a regra
+    "diga o que foi verificado rodando" em <code>reports/README.md</code> existe para impedir.
   </p>
 </div>
 
