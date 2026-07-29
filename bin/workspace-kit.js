@@ -20,6 +20,7 @@ const path = require('path');
 const inspector = require('../core/inspect.js');
 const doctor = require('../core/doctor.js');
 const gitLayer = require('../core/git.js');
+const webServer = require('../core/server.js');
 
 const HELP = [
   'workspace//kit — workspace management and versioning for instructions and docs',
@@ -31,10 +32,13 @@ const HELP = [
   '                   directory. Exits non-zero when the verdict is unhealthy, so it',
   '                   is usable in CI.',
   '  status [dir]     Show what has changed in the workspace, in plain language.',
+  '  serve [dir]      Start the read-only local JSON server the Web App dashboard',
+  '                   consumes. Binds to 127.0.0.1 only.',
   '  inspect [dir]    Dump the raw workspace index as JSON (debugging aid).',
   '',
   'Options:',
   '  --json           Machine-readable output instead of the terminal report.',
+  '  --port <n>       Port for `serve` (default 4319).',
   '  --max-lines <n>  Override the always-loaded budget (default 300 lines, the',
   '                   figure from docs/specs/context-manager-conventions.md).',
   '  -h, --help       Show this help.',
@@ -45,12 +49,13 @@ const HELP = [
 ].join('\n');
 
 function parseArgs(argv) {
-  const args = { command: null, dir: null, json: false, maxLines: null, help: false };
+  const args = { command: null, dir: null, json: false, maxLines: null, port: null, help: false };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === '-h' || arg === '--help') args.help = true;
     else if (arg === '--json') args.json = true;
     else if (arg === '--max-lines') args.maxLines = parseInt(argv[++i], 10);
+    else if (arg === '--port') args.port = parseInt(argv[++i], 10);
     else if (!args.command) args.command = arg;
     else if (!args.dir) args.dir = arg;
   }
@@ -95,6 +100,21 @@ function main(argv) {
     return 0;
   }
 
+  if (args.command === 'serve') {
+    const port = args.port || 4319;
+    webServer.listen(dir, port, function (err, instance) {
+      if (err) {
+        process.stderr.write('Could not start the server: ' + err.message + '\n');
+        process.exit(1);
+      }
+      const actual = instance.address().port;
+      process.stdout.write('workspace//kit serving ' + dir + '\n');
+      process.stdout.write('  http://' + webServer.HOST + ':' + actual + '/api/dashboard\n');
+      process.stdout.write('Read-only; localhost only. Ctrl-C to stop.\n');
+    });
+    return null; // keep the process alive
+  }
+
   if (args.command === 'inspect') {
     process.stdout.write(JSON.stringify(inspector.inspect(dir), null, 2) + '\n');
     return 0;
@@ -121,4 +141,5 @@ function main(argv) {
   return 2;
 }
 
-process.exit(main(process.argv.slice(2)));
+const code = main(process.argv.slice(2));
+if (code !== null) process.exit(code);

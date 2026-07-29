@@ -63,3 +63,9 @@ The read-side UI for this surface is prototyped and specced separately: `docs/sp
 
 ## Timeline Considerations
 No hard deadline. Foundational alongside the CLI spec — Templates and Docker environment generation both build on whichever of these two ships first (or both, if built together). Reasonable to scope this MVP tightly (P0 list above) rather than let "context manager" ambitions expand it before it exists at all.
+
+## Implementation status
+**Server side started 2026-07-29:** `core/server.js` + `workspace-kit serve` provide the read-only local JSON surface (`/api/dashboard`, `/api/index`, `/api/doctor`, `/api/status`), confirming the local-Node-server decision of the same date. It is read-only by construction and must not grow write endpoints ahead of #79's blocked commit/PR/worktree questions.
+
+**Still open:** the generation flow (P0 parity with CLI/HTML), writing to a user-picked folder, `git init` on generation, "add to an existing workspace", and the front end itself.
+

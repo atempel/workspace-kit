@@ -75,3 +75,20 @@ Blocked on `core/inspect.js` (#77) for every number it displays — layout can b
 - `docs/design/prototype-prp.md` — the brief the prototype was built from.
 - `docs/design/git-layer-dashboard-brief.md` — the follow-up brief that added the Source control section.
 - `DESIGN.md` — visual direction (tokens, typography, principles).
+
+## Implementation status
+**Data layer complete 2026-07-29.** Every number this spec renders is now produced by `core/` and served by `core/server.js` at `/api/dashboard` in a single round trip — deliberately one scan, so the five sections cannot disagree with each other mid-refresh:
+
+| section | source | status |
+|---|---|---|
+| Overview (file table + graph, with git column) | `core/inspect.js` (#77) + `core/git.js` (#79) | done |
+| Health check | `core/doctor.js` (#78) | done |
+| Session log | `core/inspect.js` `parseSessions` (#81) | done |
+| Queue | `core/inspect.js` `parseQueueItem` (#80) | done |
+| Source control — file states | `core/git.js` (#79) | done |
+| Source control — commit / PR / worktree actions | #79 | **blocked** on two owner decisions |
+
+The payload carries a `capabilities` object (`{commit: false, pullRequest: false, worktrees: false}`) so the UI can render those controls as unavailable rather than drawing live-looking buttons over nothing.
+
+**Not started:** the front end itself (React + Tailwind + shadcn per DECISIONS.md, 2026-07-28), which is the remaining work for this spec.
+
