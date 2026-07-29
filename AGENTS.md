@@ -17,7 +17,9 @@ AI workspace generator: from a project description, produces the human context l
 
 **Report layer (`core/report.js`):** renders the workspace's own planning documents — `docs/PRD.md`, `docs/specs/*.md`, `docs/design/*.md`, `DESIGN.md`/`PROJECT.md`/`CONTEXT.md`/`AGENTS.md`, plus `TASKS.md`, `DECISIONS.md` (+ `decisions/`) and `SESSIONS.md` — into a static, readable HTML report under `reports/`. Zero-dependency and Node-only, same conventions as the rest of `core/`; it carries its own small Markdown subset renderer rather than taking a dependency. **It renders, it never judges and never writes to a source document** — thresholds and verdicts stay in `core/doctor.js`. `reports/` is generated output: edit the `.md` and re-run, never hand-edit the HTML. Run `node bin/workspace-kit.js report [dir]` or `npm run report`. To test: `npm run test:report`.
 
-`npm test` runs all seven suites.
+**Local Web App dashboard (`web/`):** the front end over the five lifecycle features (docs/specs/web-app-dashboard.md → #169) — one shell, five sections (Overview, Health check, Session log, Queue, Source control), built from the Claude Design prototype. Vite + React + Tailwind, **in its own `package.json`** so `core/` and the CLI still install nothing. It reads `core/server.js` over HTTP and owns no domain logic: no threshold, verdict or git classification is computed here, and a test asserts the sections hold no hard-coded workspace data. **It renders; it does not execute** — every `capabilities` flag is false and blocked actions are drawn unavailable with the reason, since the server is read-only and the git layer is local-only. Run `node bin/workspace-kit.js serve .` for data, then `npm --prefix web run dev`. To test: `npm run test:web` (12 cases, each mapping to a P0 acceptance criterion).
+
+`npm test` runs all seven core suites; `npm run test:web` runs the dashboard's, kept separate so the core suite stays install-free.
 
 ## Reports folder
 `reports/` is the shared place where Cowork and Claude Code leave readable, presentable output for the owner. Two kinds of thing live there, and they don't mix:

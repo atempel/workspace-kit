@@ -21,6 +21,15 @@ export default defineConfig({
       },
     },
   },
+  preview: {
+    port: 4321,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:4319',
+        changeOrigin: false,
+      },
+    },
+  },
   build: {
     outDir: 'dist',
     emptyOutDir: true,

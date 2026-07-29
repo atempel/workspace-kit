@@ -25,10 +25,10 @@
   <p class="lead">Cada coluna é uma frente de trabalho de <code>TASKS.md</code>. O arquivo é um índice: os requisitos detalhados vivem nas specs, ligadas aqui pelos próprios links do texto.</p>
 </div>
 <div class="kpis">
-  <div class="kpi"><span class="n">47</span><span class="l">Itens no total</span></div>
-  <div class="kpi"><span class="n">11</span><span class="l">Em aberto</span></div>
-  <div class="kpi"><span class="n">36</span><span class="l">Concluídos</span></div>
-  <div class="kpi"><span class="n">11</span><span class="l">Frentes de trabalho</span></div>
+  <div class="kpi"><span class="n">50</span><span class="l">Itens no total</span></div>
+  <div class="kpi"><span class="n">13</span><span class="l">Em aberto</span></div>
+  <div class="kpi"><span class="n">37</span><span class="l">Concluídos</span></div>
+  <div class="kpi"><span class="n">12</span><span class="l">Frentes de trabalho</span></div>
 </div>
 <div class="filter">
   <input type="search" placeholder="Filtrar frentes de trabalho…" data-filter aria-label="Filtrar tarefas">
@@ -51,6 +51,12 @@
   <p class="sub">planning — 2026-07-21</p>
   <div class="bar"><span style="width:100%"></span></div>
   <div class="item done"><span class="check">&#10003;</span><span class="txt">Shared-generation-engine blocker — resolved 2026-07-22, <code>core/generator.js</code> created as a standalone shared module (see DECISIONS.md).</span></div><div class="item done"><span class="check">&#10003;</span><span class="txt">Parity test harness — <code>core/parity-check.js</code>/<code>core/check-fixtures.js</code> confirm <code>core/generator.js</code> matches <code>src/workspace-kit.html</code>'s output (see DECISIONS.md).</span></div>
+</section>
+<section class="column" data-searchable="local web app dashboard — lifecycle ui p0 implemented — 2026-07-29 p0 implemented — `web/` landed 2026-07-29: vite + react + tailwind in its own package, all five sections rendering live from `/api/dashboard`, dark/light, the not-a-workspace state, and `npm run test:web` (12 cases, one per p0 acceptance criterion). shadcn primitives vendored rather than generated; see decisions.md. p1 not built: command palette (⌘k), workspace switcher across recent workspaces, suggestion dismissal (where that state persists is still an open question in the spec), worktree conflict flag. serving the built dashboard from `workspace-kit serve` itself, so it runs without a vite dev server. static gets would not break the server's read-only guarantee; not done yet.">
+  <h2><span>Local Web App dashboard — lifecycle UI</span><span class="chip muted">1/3</span></h2>
+  <p class="sub">P0 implemented — 2026-07-29</p>
+  <div class="bar"><span style="width:33%"></span></div>
+  <div class="item"><span class="check"></span><span class="txt">P1 not built: command palette (⌘K), workspace switcher across recent workspaces, suggestion dismissal (where that state persists is still an open question in the spec), worktree conflict flag.</span></div><div class="item"><span class="check"></span><span class="txt">Serving the built dashboard from <code>workspace-kit serve</code> itself, so it runs without a Vite dev server. Static GETs would not break the server's read-only guarantee; not done yet.</span></div><div class="item done"><span class="check">&#10003;</span><span class="txt">P0 implemented — <code>web/</code> landed 2026-07-29: Vite + React + Tailwind in its own package, all five sections rendering live from <code>/api/dashboard</code>, dark/light, the not-a-workspace state, and <code>npm run test:web</code> (12 cases, one per P0 acceptance criterion). shadcn primitives vendored rather than generated; see DECISIONS.md.</span></div>
 </section>
 <section class="column" data-searchable="workspace inspection layer p0 implemented — 2026-07-29 p0 implemented — `core/inspect.js` landed 2026-07-29 with `npm run test:inspect` (18 cases, one per p0 acceptance criterion) and two p1s (gitignore-aware scanning, `node core/inspect.js &lt;folder&gt;` debug dump). three of the spec's open questions closed along the way — token heuristic, instruction granularity, node-only export (see decisions.md). **unblocks** the health check (#78), git integration layer (#79) and the dashboard (#169), which were all waiting on this.">
   <h2><span>Workspace inspection layer</span><span class="chip ok">1/1</span></h2>
@@ -103,7 +109,7 @@
 </main>
 <footer class="footer">
   <p>Gerado por <code>workspace-kit report</code> a partir dos arquivos Markdown do repositório — não edite estes HTMLs à mão, edite o <code>.md</code> de origem e rode o comando de novo.</p>
-  <p class="muted">Gerado em 29 de julho de 2026 às 17:42 · contagens de tokens são estimativas (caracteres ÷ 4), não contagem de tokenizer.</p>
+  <p class="muted">Gerado em 29 de julho de 2026 às 17:53 · contagens de tokens são estimativas (caracteres ÷ 4), não contagem de tokenizer.</p>
 </footer>
 <script src="assets/report.js"></script>
 </body>

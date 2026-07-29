@@ -36,8 +36,11 @@ Foundational surface: generates workspaces from a terminal instead of only the b
 ### Local Web App (planning — 2026-07-21)
 Generates *and* manages workspaces; hosts capabilities the standalone HTML can't (git, Templates management, Docker spin-up). Full spec + issue: docs/specs/local-web-app.md → [#29](https://github.com/atempel/workspace-kit/issues/29). Its "open an existing workspace" P0 bullet is being absorbed into the Workspace inspection layer below rather than built as its own reader.
 
-### Local Web App dashboard — lifecycle UI (prototyped — 2026-07-28)
+### Local Web App dashboard — lifecycle UI (P0 implemented — 2026-07-29)
 The screens over the five lifecycle features: one shell, five sections (Overview, Health check, Session log, Queue, Source control). Rendering only — every number comes from the specs below. Stack + visual identity decided 2026-07-28 (React/Tailwind/shadcn, Web-App-scoped; see DECISIONS.md). Full spec: docs/specs/web-app-dashboard.md. Prototype: docs/design/workspace-kit-dashboard.dc.html.
+- [x] ~~P0 implemented~~ — `web/` landed 2026-07-29: Vite + React + Tailwind in its own package, all five sections rendering live from `/api/dashboard`, dark/light, the not-a-workspace state, and `npm run test:web` (12 cases, one per P0 acceptance criterion). shadcn primitives vendored rather than generated; see DECISIONS.md.
+- [ ] P1 not built: command palette (⌘K), workspace switcher across recent workspaces, suggestion dismissal (where that state persists is still an open question in the spec), worktree conflict flag.
+- [ ] Serving the built dashboard from `workspace-kit serve` itself, so it runs without a Vite dev server. Static GETs would not break the server's read-only guarantee; not done yet.
 
 ### Workspace inspection layer (P0 implemented — 2026-07-29)
 Foundational read-side counterpart to `core/generator.js` — one shared way to open and index an existing workspace (files, sizes, parsed instructions, cross-reference graph) that several features below build on instead of each growing their own parser. Full spec + issue: docs/specs/workspace-inspection-layer.md → [#77](https://github.com/atempel/workspace-kit/issues/77).

@@ -90,5 +90,19 @@ Blocked on `core/inspect.js` (#77) for every number it displays — layout can b
 
 The payload carries a `capabilities` object (`{commit: false, pullRequest: false, worktrees: false}`) so the UI can render those controls as unavailable rather than drawing live-looking buttons over nothing.
 
-**Not started:** the front end itself (React + Tailwind + shadcn per DECISIONS.md, 2026-07-28), which is the remaining work for this spec.
+**P0 front end implemented 2026-07-29** as `web/` — Vite + React 19 + Tailwind v4 in its own package, so `core/` and the CLI stay install-free. Tests: `npm run test:web`, 12 cases, each mapping to a P0 acceptance criterion above.
+
+Built: the shell with its persistent sidebar and five sections sharing one scan; the Overview file table grouped by layer with the git column and the cross-reference graph; broken references surfaced twice (row badge + graph annotation, naming the missing target); the health report with the always-loaded budget, history growth as its own block, and per-finding suggestions; the session log with its tool tag read rather than inferred; the queue with pending items sorted first; Source control with the file-state rollup, the safe-edit warning, and the worktree list; the not-a-workspace state as a first-class result offering both ways forward; dark and light equally first-class.
+
+Two P0 criteria are enforced by test rather than by convention, because both are easy to erode: every rendered status carries an icon *and* a text label, never colour alone; and every token figure carries its estimate marker, with the chars ÷ 4 heuristic named on screen.
+
+**Deliberately renders rather than executes.** Every `capabilities` flag is false and the UI draws those actions as unavailable with the reason. Two independent reasons: the local server is read-only and rejects non-GET, so writes belong to the CLI; and pull requests are out of scope while the git layer is local-only (DECISIONS.md, 2026-07-29). The spec's own Open Question called a CLI-first v1 "a legitimate smaller v1" — this is that, and it is the answer for now.
+
+**Open Questions closed by the implementation:**
+- *How the front end reaches the file system* — through `core/server.js` over HTTP, decided 2026-07-29 and now built. Vite proxies `/api` in development so the browser stays on one origin.
+- *Whether Source control executes git in v1* — no: it displays state and hands execution to the CLI.
+
+**Still open:** where suggestion dismissals, the workspace list and theme preference persist. Theme is in `localStorage`; the other two are not persisted at all, deliberately — inventing a store would answer that question by accident.
+
+**Not built (P1):** command palette, workspace switcher, suggestion dismissal, worktree conflict flag. Also not built: serving the compiled dashboard from `workspace-kit serve` itself, which would let it run without a Vite dev server and would not breach the read-only guarantee, since static assets are GETs.
 

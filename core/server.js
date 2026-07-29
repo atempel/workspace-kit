@@ -128,11 +128,22 @@ function handle(root, pathname, query) {
         health: report,
         sessions: index.sessions,
         queue: index.queue,
-        git: summary,
-        // The actions the prototype draws are not wired: they are blocked on
-        // the hosting-provider and worktree-placement questions in #79. Saying
-        // so in the payload keeps the UI honest rather than drawing live-looking
-        // buttons over nothing.
+        // Worktrees are listed here because the Source control section names
+        // them as P0 (docs/specs/web-app-dashboard.md). Listing is a read, so
+        // it belongs on this server; creating and removing them are writes and
+        // stay in the CLI, which is what `capabilities` below says.
+        git: Object.assign({}, summary, {
+          worktrees: gitLayer.listWorktrees(target).worktrees,
+        }),
+        // What the UI may *do*, as opposed to what it may show. Every one of
+        // these is false because this server is read-only by design and rejects
+        // non-GET; the dashboard renders state and hands execution to the CLI.
+        // Saying so in the payload keeps the UI honest rather than drawing
+        // live-looking buttons over nothing.
+        //
+        // `pullRequest` is false for a second, independent reason: the git
+        // layer is scoped to local git and contacts no remote at all
+        // (see DECISIONS.md, 2026-07-29).
         capabilities: { commit: false, pullRequest: false, worktrees: false },
       },
     };

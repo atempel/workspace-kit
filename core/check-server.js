@@ -89,6 +89,17 @@ test('/api/dashboard returns every section the prototype renders, in one round t
   assert.ok('gitState' in body.overview.files[0], 'the Overview table carries its git column');
   assert.ok('verdict' in body.health);
   assert.ok(Array.isArray(body.overview.graph.edges));
+  assert.ok(Array.isArray(body.git.worktrees),
+    'the Source control section lists worktrees, which the spec makes P0');
+});
+
+test('the worktree list is served, since listing is a read', function () {
+  const root = makeWorkspace();
+  const body = server.handle(root, '/api/dashboard', new URLSearchParams()).body;
+  // The workspace fixture is a git repo with only its main working copy.
+  assert.strictEqual(body.git.worktrees.length, 1);
+  assert.strictEqual(body.git.worktrees[0].isMain, true);
+  assert.ok('branch' in body.git.worktrees[0]);
 });
 
 test('blocked actions are declared unavailable, not drawn as if they worked', function () {
@@ -96,7 +107,7 @@ test('blocked actions are declared unavailable, not drawn as if they worked', fu
   const body = server.handle(root, '/api/dashboard', new URLSearchParams()).body;
   assert.deepStrictEqual(body.capabilities,
     { commit: false, pullRequest: false, worktrees: false },
-    'the commit/PR/worktree flows are blocked on open product questions in #79');
+    'this server is read-only, so the UI renders state and hands execution to the CLI');
 });
 
 test('one scan backs every section, so they cannot disagree', function () {

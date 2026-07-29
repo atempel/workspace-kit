@@ -20,3 +20,6 @@ __pycache__/
 # landing anywhere inside the working tree by accident.
 .github/git-credentials
 *.git-credentials
+
+# Dashboard build output (web/) — regenerate with `npm --prefix web run build`
+web/dist/

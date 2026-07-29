@@ -3,12 +3,12 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Local Web App dashboard (docs/specs/web-app-dashboard.md → #169). Kept in its own package so core/ stays zero-dependency.",
+  "description": "Local Web App dashboard (docs/specs/web-app-dashboard.md \u2192 #169). Kept in its own package so core/ stays zero-dependency.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node check-render.js"
+    "test": "node check-render.cjs"
   },
   "dependencies": {
     "react": "^19.2.0",
