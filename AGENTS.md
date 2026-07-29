@@ -11,7 +11,9 @@ AI workspace generator: from a project description, produces the human context l
 
 **Workspace health check (`core/doctor.js` + `bin/workspace-kit.js`):** the judgement layer over the inspection index — thresholds, verdict, and concrete suggestions (docs/specs/workspace-health-check.md → #78). `diagnose()` takes an index, never a folder path, so `core/inspect.js` stays the only module in this codebase that touches the disk. Run it with `node bin/workspace-kit.js doctor [dir]` (`--json` for machine output); it exits non-zero when the verdict is unhealthy, so it works in CI. To test: `npm run test:doctor`.
 
-`npm test` runs all four suites.
+**Git integration layer (`core/git.js`):** file-state tracking, the safe-edit check, a plain-language change summary and a templated commit message (docs/specs/git-integration-layer.md → #79). Builds on the inspection index rather than re-walking the folder. Model-agnostic is a product rule here, not a preference: every string it emits is a deterministic template over file names and diff counts, and a test asserts the module makes no outbound call. Git is driven with explicit argument arrays, never a shell string. Run `node bin/workspace-kit.js status [dir]`. To test: `npm run test:git`. **Not implemented, on purpose:** the PR flow and worktree management, both gated on open product questions in the spec (hosting-provider scope; worktree placement/naming).
+
+`npm test` runs all five suites.
 
 ## Limits — don't do this without asking
 - Don't introduce a backend, API keys, or network calls beyond CDN/fonts — the generator needs to stay 100% client-side.
