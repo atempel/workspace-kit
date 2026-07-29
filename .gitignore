@@ -14,3 +14,9 @@ docs/design/workspace-kit-prototipo.html
 # Python bytecode (core/ and .github/scripts/ are run directly, never packaged)
 __pycache__/
 *.py[cod]
+
+# Local GitHub credentials — never commit (public repo). The real file
+# lives in .git/, which git never versions; these rules guard against a copy
+# landing anywhere inside the working tree by accident.
+.github/git-credentials
+*.git-credentials
