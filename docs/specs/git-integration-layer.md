@@ -68,9 +68,9 @@ This spec is about workspace//kit **itself operating git** — as a local tool s
 
 ## Open Questions
 - **(Engineering — blocking)** This spec depends on `docs/specs/workspace-inspection-layer.md` (no issue number yet) for the read-side file index that git file-state tracking is layered on top of; can't fully build ahead of that spec maturing.
-- **(Product — Alexandre)** Worktree placement/naming: does workspace//kit auto-place worktrees (e.g. sibling folders like `../workspace-name-agent2/`) with a default naming convention, or prompt the user for location every time?
-- **(Product — Alexandre)** Hosting-provider scope for the PR flow: GitHub only for v1, or also GitLab/Bitbucket? Determines whether this depends on GitHub's `gh` CLI specifically or needs a provider-agnostic approach.
-- **(Engineering)** Implementation approach for git operations: shell out to the local `git` binary directly, or additionally lean on an existing provider CLI (e.g. `gh`) where available for faster PR creation — trades an extra external dependency against less flow to build/maintain in-house.
+- **(Resolved 2026-07-29, see DECISIONS.md)** Worktree placement/naming: **both, ordered** — convention by default (`<workspace>/.worktrees/<name>`, branch of the same name), with `--path`/`--branch` overriding either. Placement moved inside the workspace rather than the sibling folder this question suggested, so a workspace stays one self-contained directory; safe because `core/inspect.js` already skips nested git repositories.
+- **(Deferred 2026-07-29, see DECISIONS.md)** Hosting-provider scope for the PR flow: still open, but **out of scope for now** — the owner scoped this layer to local git only, since remote operations bring authentication and a hosting-provider surface that deserve their own security pass. The question gets answered when push/PR is picked up as its own step, not before.
+- **(Resolved 2026-07-29)** Implementation approach for git operations: shell out to the local `git` binary with explicit argument arrays. The provider-CLI half of this question (`gh`) is moot while the layer stays local-only, and returns with the PR flow.
 - **(Resolved 2026-07-26, see DECISIONS.md)** Does workspace//kit call an AI model itself anywhere in this feature? No. Commit-message/PR-description drafting is templated from file-state/diff data only; "the model can make commits and PRs" refers strictly to whatever agent is already working inside the generated workspace, using its own tools — workspace//kit only tracks state and prepares the flow for that agent (or for the user directly).
 - **(Resolved)** Relationship to the `## Next` git-instructions bullet in TASKS.md: that bullet covers generated instructional prose teaching an agent how to use git/worktrees inside a workspace; this spec covers workspace//kit's own tooling actually operating git. Cross-referenced, not duplicated.
 - **(Resolved)** Overlap with the `git init`/first-commit P0 slice already scoped in `docs/specs/cli-generator.md` → #20 and `docs/specs/local-web-app.md` → #29: that slice stays where it is; this spec is everything past it.
@@ -86,9 +86,12 @@ A Claude Design prototype of the Local Web App dashboard ("Workspace Kit Dashboa
 
 Done: file-state tracking (untracked / modified-unstaged / staged / committed-clean, joined onto #77's index), the safe-edit substrate, the plain-language change summary, the templated commit message, and both guardrail criteria — a test asserts no outbound AI call exists in the module, and another asserts `src/workspace-kit.html` is untouched.
 
-**Deliberately not built, pending owner decisions flagged in Open Questions above:**
-- **The PR flow** — blocked on hosting-provider scope (GitHub-only via `gh`, or provider-agnostic). That answer determines the implementation, so building either version first would mean throwing one away.
-- **Worktree create/list/remove** — blocked on placement/naming (auto-placed by convention, or prompted each time). This is a UX decision with no reversible default.
+**Worktrees added 2026-07-29** (`npm run test:git` grew to 22 cases), once the owner answered placement/naming: create, list and remove, with the convention `<workspace>/.worktrees/<name>` on a branch of the same name and `--path`/`--branch` overriding either. Creating a worktree that lands inside the repository also adds its ignore rule, so the parent's change summary never reports its own worktrees as stray files. Removal refuses a worktree holding uncommitted work unless forced, and always keeps the branch.
+
+The P0 acceptance criterion for this slice is tested directly rather than by proxy: two worktrees are created, the *same* file is edited independently in each, and the test asserts both edits survive, neither worktree sees the other's uncommitted change, file-state tracking reports each one correctly, and the parent workspace's copy is untouched.
+
+**Deliberately not built:**
+- **The PR flow, and anything touching a remote** — this layer is local-only by decision (2026-07-29, see DECISIONS.md), not by omission: push and PR bring authentication and a hosting-provider surface the owner wants to treat as its own step. A test asserts `core/git.js` contains no push/fetch/clone/pull and no `gh pr` call, so the boundary fails the build if it erodes.
 
 Note on ordering: staged-plus-further-unstaged reports as `modified-unstaged`, because the unrecorded change is the one a caller about to overwrite the file needs to know about. That ordering is what makes the safe-edit check trustworthy.
 
