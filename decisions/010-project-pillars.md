@@ -1,0 +1,4 @@
+# 2026-07-01 — Project pillars: security & privacy, collaboration
+- **Decision:** the project declares two explicit pillars, recorded in PROJECT.md: security & privacy, and collaboration.
+- **Reason:** came out of a privacy audit of the repository (triggered by the owner's discomfort about making it public) and the resulting `.gitignore` discussion. Security & privacy: the repo and the generator's output must never expose secrets, personal data, or private discussion. Collaboration: the generated context layer exists so multiple people (and agents) can pick up a project without re-litigating past decisions, and local-only per-user state should be isolated rather than versioned.
+- **How to apply:** future features (starting with the `.gitignore` generation task) should be evaluated against both pillars — e.g., what's heavy/sensitive stays local (privacy), and what helps a new collaborator or agent onboard faster stays documented and versioned (collaboration).

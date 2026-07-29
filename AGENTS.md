@@ -9,7 +9,9 @@ AI workspace generator: from a project description, produces the human context l
 
 **Workspace inspection layer (`core/inspect.js`):** the read-side counterpart to `core/generator.js` — same conventions (Node-compatible, zero runtime dependencies, no build step), but Node-only (`module.exports`, no `window.*`) since reading a folder needs `fs`. Turns an existing workspace into an addressable index: per-file metrics, agent-layer instructions parsed into stable-ID units, and the cross-reference graph. It reports; it never judges — thresholds, verdicts and suggestions belong to the health check (docs/specs/workspace-health-check.md → #78), git state to #79, rendering to #169. To test: `npm run test:inspect` (each case maps 1:1 to a P0 acceptance criterion in docs/specs/workspace-inspection-layer.md → #77). To eyeball an index: `node core/inspect.js <folder>`.
 
-`npm test` runs all three suites.
+**Workspace health check (`core/doctor.js` + `bin/workspace-kit.js`):** the judgement layer over the inspection index — thresholds, verdict, and concrete suggestions (docs/specs/workspace-health-check.md → #78). `diagnose()` takes an index, never a folder path, so `core/inspect.js` stays the only module in this codebase that touches the disk. Run it with `node bin/workspace-kit.js doctor [dir]` (`--json` for machine output); it exits non-zero when the verdict is unhealthy, so it works in CI. To test: `npm run test:doctor`.
+
+`npm test` runs all four suites.
 
 ## Limits — don't do this without asking
 - Don't introduce a backend, API keys, or network calls beyond CDN/fonts — the generator needs to stay 100% client-side.
