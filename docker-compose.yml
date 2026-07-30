@@ -12,9 +12,27 @@ services:
       # project config (.claude/) so it doesn't collide and can have its
       # own gitignore (see .gitignore).
       - ./.claude_global:/root/.claude
+      # Claude Code's account and per-project state live in ~/.claude.json,
+      # *outside* ~/.claude. Without this line the file is container-only and
+      # `docker compose up -d` silently logs you out. The host file has to exist
+      # before the first `up`: Docker creates a *directory* in place of a
+      # missing bind-mounted file, and Claude Code then fails to start.
+      #   cp .claude_global/_container-backup/claude.json .claude_global/claude.json
+      - ./.claude_global/claude.json:/root/.claude.json
+      # The gh token. `git push` goes through `gh auth git-credential` (see
+      # ~/.gitconfig), so losing this breaks pushing, not just the `gh` CLI.
+      # A named volume rather than a bind: it must never land in the repo.
+      - wskit_gh:/root/.config/gh
+      # Caches. Not work, but ms-playwright alone is ~650 MB to re-download,
+      # and `npm run test:ui` needs it.
+      - wskit_npm_cache:/root/.npm
+      - wskit_cache:/root/.cache
     environment:
       - COLORTERM=truecolor
       - TERM=xterm-256color
+      # Windows bind mounts do not deliver inotify events, so Vite's HMR sees
+      # no file changes without polling. Only affects `npm --prefix web run dev`.
+      - CHOKIDAR_USEPOLLING=true
     # The dashboard is served from inside the container, so its port has to be
     # published or the host browser cannot reach it — 127.0.0.1 inside a
     # container is the container, not your machine.
@@ -29,11 +47,16 @@ services:
     #   node bin/workspace-kit.js serve . --host 0.0.0.0
     #
     # then open http://localhost:4319 on the host. Still read-only and non-GET
-    # is still refused; the wide bind reaches no further than this container's
-    # published ports.
+    # is still refused; the published ports bind the host's loopback only, so
+    # the wide bind inside the container reaches no further than this machine.
     ports:
       - "127.0.0.1:4319:4319"
       - "127.0.0.1:4330:4330"
     tty: true
     stdin_open: true
     working_dir: /workspace
+
+volumes:
+  wskit_gh: {}
+  wskit_npm_cache: {}
+  wskit_cache: {}
