@@ -27,6 +27,24 @@ services:
       # and `npm run test:ui` needs it.
       - wskit_npm_cache:/root/.npm
       - wskit_cache:/root/.cache
+      # node_modules on named volumes, so they live on the Linux filesystem
+      # instead of crossing the Windows bind mount on every file read. Installs
+      # and Vite builds are markedly faster, and the Linux-native binaries stop
+      # fighting with whatever the host may have put there.
+      #
+      # Two consequences, both intended:
+      #   - They start empty. `npm install` (root) and `npm --prefix web install`
+      #     are needed once after the first `up`; the volumes keep them after
+      #     that, across every later recreate.
+      #   - The host can no longer see these folders, so a Windows editor will
+      #     not resolve imports into them. Run the language server in the
+      #     container, or accept it — nothing in this repo needs the host to
+      #     read node_modules.
+      #
+      # Worktrees under .claude/worktrees/ are NOT covered: each has its own
+      # web/node_modules on the bind mount. That is fine — they are temporary.
+      - wskit_node_modules:/workspace/node_modules
+      - wskit_web_node_modules:/workspace/web/node_modules
     environment:
       - COLORTERM=truecolor
       - TERM=xterm-256color
@@ -60,3 +78,5 @@ volumes:
   wskit_gh: {}
   wskit_npm_cache: {}
   wskit_cache: {}
+  wskit_node_modules: {}
+  wskit_web_node_modules: {}
