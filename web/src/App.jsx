@@ -198,12 +198,18 @@ export default function App() {
           ) : null}
         </div>
 
-        {data?.health?.method ? (
+        {/*
+          `health.method` is an object ({ tokenEstimate, thresholds }), not a
+          string. Only the token line belongs in the footer — the spec asks that
+          the estimate always be labelled as an approximation wherever a token
+          count is shown, and this is where that label lives for the whole shell.
+        */}
+        {data?.health?.method?.tokenEstimate ? (
           <footer
             className="px-8 pb-8 text-[11px]"
             style={{ color: 'var(--muted-foreground)' }}
           >
-            <Status tone="muted">{data.health.method}</Status>
+            <Status tone="muted">Tokens: {data.health.method.tokenEstimate}</Status>
           </footer>
         ) : null}
       </main>
