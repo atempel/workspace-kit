@@ -26,3 +26,16 @@ web/dist/
 
 # Playwright output from web/check-ui.mjs — evidence for a run, not source.
 web/screenshots/
+
+# Claude Code's own worktrees and per-machine settings. The git layer's
+# convention is .worktrees/ (see core/git.js), but Claude Code's EnterWorktree
+# puts its own under .claude/worktrees/ — a checkout of a branch that already
+# lives in this repo, so versioning it would nest the repo inside itself.
+# settings.local.json is per-machine permissions, not project config.
+.claude/worktrees/
+.claude/settings.local.json
+
+# Editor-local state. The repo pins no editor.
+.zed/
+.vscode/
+.idea/
