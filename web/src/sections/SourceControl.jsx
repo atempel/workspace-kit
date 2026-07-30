@@ -138,7 +138,7 @@ export default function SourceControl({ data }) {
         <Card>
           <CardHeader title="Commit" note="Record the changes above in the workspace's history." />
           <div className="px-5 py-4">
-            <Button disabled={!caps.commit} tone="brand">
+            <Button data-capability="commit" disabled={!caps.commit} tone="brand">
               Commit changes
             </Button>
             {!caps.commit && (
@@ -155,7 +155,9 @@ export default function SourceControl({ data }) {
         <Card>
           <CardHeader title="Pull request" note="Publish the branch for review." />
           <div className="px-5 py-4">
-            <Button disabled={!caps.pullRequest}>Open pull request</Button>
+            <Button data-capability="pullRequest" disabled={!caps.pullRequest}>
+              Open pull request
+            </Button>
             {!caps.pullRequest && (
               <UnavailableNote>
                 Out of scope for now, by decision: this layer works on local git only and contacts
@@ -210,12 +212,17 @@ export default function SourceControl({ data }) {
             ))}
           </ul>
         )}
-        <div className="px-5 pb-4">
-          <UnavailableNote>
-            Creating and removing worktrees is a write, so it lives in the CLI:{' '}
-            <code className="font-mono">workspace-kit worktree add &lt;name&gt;</code>. This screen
-            lists them.
-          </UnavailableNote>
+        <div className="px-5 py-4">
+          <Button data-capability="worktrees" disabled={!caps.worktrees}>
+            Manage worktrees
+          </Button>
+          {!caps.worktrees && (
+            <UnavailableNote>
+              Creating and removing worktrees is a write, so it lives in the CLI:{' '}
+              <code className="font-mono">workspace-kit worktree add &lt;name&gt;</code>. This screen
+              lists them.
+            </UnavailableNote>
+          )}
         </div>
       </Card>
     </div>

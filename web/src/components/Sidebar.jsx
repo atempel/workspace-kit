@@ -100,6 +100,8 @@ export default function Sidebar({ data, active, onSelect, theme, onToggleTheme, 
             <button
               key={id}
               type="button"
+              data-nav={id}
+              aria-current={isActive ? 'page' : undefined}
               onClick={() => onSelect(id)}
               className="flex cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-[13px] font-medium"
               style={{
@@ -139,6 +141,7 @@ export default function Sidebar({ data, active, onSelect, theme, onToggleTheme, 
       <div className="mt-auto px-3 py-3">
         <button
           type="button"
+          data-theme-toggle=""
           onClick={onToggleTheme}
           className="flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-2 text-[13px]"
           style={{ color: 'var(--muted-foreground)', border: '1px solid var(--border)' }}

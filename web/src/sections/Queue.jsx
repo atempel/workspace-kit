@@ -77,7 +77,7 @@ export default function Queue({ data }) {
               </thead>
               <tbody>
                 {sorted.map((item) => (
-                  <tr key={item.path}>
+                  <tr key={item.path} data-queue-status={item.status}>
                     <Td>
                       <div className="font-medium">{item.title || '—'}</div>
                       <div className="font-mono text-[11px]" style={{ color: 'var(--muted-foreground)' }}>

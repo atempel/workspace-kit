@@ -58,7 +58,7 @@ export default function Sessions({ data }) {
       ) : (
         <div className="space-y-3">
           {sessions.map((s, i) => (
-            <Card key={i}>
+            <Card key={i} data-session={s.tool || 'untagged'}>
               <CardHeader
                 title={
                   <span className="flex items-center gap-2.5">

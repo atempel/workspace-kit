@@ -94,9 +94,9 @@ export function CardHeader({ title, note, right }) {
   );
 }
 
-export function Stat({ label, value, sub, tone }) {
+export function Stat({ label, value, sub, tone, ...rest }) {
   return (
-    <Card className="px-5 py-4">
+    <Card className="px-5 py-4" {...rest}>
       <div
         className="font-mono text-2xl font-semibold"
         style={{ color: tone ? TONE_COLOR[tone] : 'var(--foreground)' }}
@@ -110,6 +110,32 @@ export function Stat({ label, value, sub, tone }) {
         </div>
       ) : null}
     </Card>
+  );
+}
+
+/**
+ * The always-loaded budget as a real meter, not a decorative bar.
+ *
+ * `role="meter"` with aria-valuenow/min/max is what makes the figure reachable
+ * to a screen reader — the same reason every status here pairs colour with an
+ * icon and a label. The percentage arrives already computed by the health
+ * check; nothing is judged here.
+ */
+export function Meter({ value, max = 100, tone = 'ok', label }) {
+  const pct = Math.max(0, Math.min(100, (value / max) * 100));
+  const color = TONE_COLOR[tone] || TONE_COLOR.muted;
+  return (
+    <div
+      role="meter"
+      aria-valuenow={value}
+      aria-valuemin={0}
+      aria-valuemax={max}
+      aria-label={label}
+      className="h-1.5 w-full overflow-hidden rounded-full"
+      style={{ background: 'var(--muted)' }}
+    >
+      <div className="h-full rounded-full" style={{ width: pct + '%', background: color }} />
+    </div>
   );
 }
 
@@ -145,7 +171,7 @@ export function Td({ children, align = 'left', mono = false, className = '' }) {
   );
 }
 
-export function Button({ children, disabled, title, onClick, tone = 'default' }) {
+export function Button({ children, disabled, title, onClick, tone = 'default', ...rest }) {
   const isBrand = tone === 'brand';
   return (
     <button
@@ -153,6 +179,7 @@ export function Button({ children, disabled, title, onClick, tone = 'default' })
       onClick={onClick}
       disabled={disabled}
       title={title}
+      {...rest}
       className={
         'inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-[13px] font-medium transition-opacity ' +
         (disabled ? 'cursor-not-allowed opacity-45' : 'cursor-pointer hover:opacity-85')

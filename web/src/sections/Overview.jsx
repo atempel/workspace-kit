@@ -166,6 +166,7 @@ export default function Overview({ data }) {
                 layer === 'other' && files.length > 8 ? (
                   <button
                     type="button"
+                    data-show-all=""
                     onClick={() => setShowAll((v) => !v)}
                     className="cursor-pointer text-xs font-medium hover:underline"
                     style={{ color: 'var(--brand-2)' }}
@@ -190,7 +191,7 @@ export default function Overview({ data }) {
                   {visible.map((f) => {
                     const broken = brokenBySource.get(f.path);
                     return (
-                      <tr key={f.path}>
+                      <tr key={f.path} data-file={f.path}>
                         <Td mono>
                           <div className="flex flex-wrap items-center gap-2">
                             <span>{f.path}</span>

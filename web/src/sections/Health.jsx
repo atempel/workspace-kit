@@ -17,6 +17,7 @@ import {
   Card,
   CardHeader,
   Empty,
+  Meter,
   SectionTitle,
   Stat,
   Status,
@@ -54,6 +55,7 @@ export default function Health({ data }) {
           label="Overall verdict"
           value={statusLabel(health.verdict)}
           tone={statusTone(health.verdict)}
+          data-status={health.verdict}
         />
         <Stat
           label="Always-loaded budget"
@@ -82,6 +84,19 @@ export default function Health({ data }) {
             TOKEN_METHOD_NOTE
           }
         />
+        <div className="px-5 pt-4">
+          <Meter
+            value={budget.pctOfCap}
+            tone={statusTone(budget.status)}
+            label={
+              'Always-loaded context budget: ' +
+              budget.lines +
+              ' of ' +
+              budget.lineCap +
+              ' lines'
+            }
+          />
+        </div>
         {alwaysLoaded.length === 0 ? (
           <Empty>No always-loaded files detected.</Empty>
         ) : (
@@ -172,6 +187,7 @@ export default function Health({ data }) {
             {health.suggestions.map((s, i) => (
               <li
                 key={i}
+                data-suggestion={s.severity}
                 className="px-5 py-3.5"
                 style={{
                   borderBottom:

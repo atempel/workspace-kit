@@ -23,3 +23,6 @@ __pycache__/
 
 # Dashboard build output (web/) — regenerate with `npm --prefix web run build`
 web/dist/
+
+# Playwright output from web/check-ui.mjs — evidence for a run, not source.
+web/screenshots/

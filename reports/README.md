@@ -29,3 +29,5 @@ Never move a decision's rationale in here — it belongs in `DECISIONS.md`.
 - [2026-07-30 — Comparativo das duas implementações do dashboard](2026-07-30-comparativo-dashboards.html) — how to run
   `web/` and `app/` side by side against one data server, what running them actually exposed (a white-screen crash in
   `web/`, since fixed, and a port collision between the two), and a recommendation on which to keep.
+  **Outcome (2026-07-30):** the owner chose `web/` and kept `app/`'s Playwright harness — see DECISIONS.md. The report
+  is left as written; it is a point-in-time snapshot, and the side-by-side it describes no longer exists.
