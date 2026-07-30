@@ -15,10 +15,25 @@ services:
     environment:
       - COLORTERM=truecolor
       - TERM=xterm-256color
-    # No backend/db/redis today — the artifact is static HTML/CSS/JS with
-    # no build step (see CONTEXT.md "Constraints"). If a dev server is
-    # added later (e.g. the project evolves into a web app), map its port
-    # here, e.g. "5173:5173".
+    # The dashboard is served from inside the container, so its port has to be
+    # published or the host browser cannot reach it — 127.0.0.1 inside a
+    # container is the container, not your machine.
+    #
+    #   4319  workspace-kit serve — the dashboard on / and the JSON API on /api/*
+    #   4330  Vite dev server, only needed when working on web/ itself
+    #
+    # Start it with `--host 0.0.0.0`; binding to 127.0.0.1 inside the container
+    # publishes nothing:
+    #
+    #   npm --prefix web install && npm --prefix web run build   # once
+    #   node bin/workspace-kit.js serve . --host 0.0.0.0
+    #
+    # then open http://localhost:4319 on the host. Still read-only and non-GET
+    # is still refused; the wide bind reaches no further than this container's
+    # published ports.
+    ports:
+      - "127.0.0.1:4319:4319"
+      - "127.0.0.1:4330:4330"
     tty: true
     stdin_open: true
     working_dir: /workspace

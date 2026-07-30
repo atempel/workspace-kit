@@ -186,6 +186,128 @@ test('over the wire: the server is read-only — writes are refused', async func
   }
 });
 
+// --- serving the built dashboard -------------------------------------------
+// `serve` hands out the compiled front end as well as the JSON, so the whole
+// dashboard is one command and one port. Static GETs do not touch the read-only
+// guarantee — but the directory still has to be a wall, not a suggestion.
+
+/** A stand-in for web/dist, plus a secret next to it that must stay unreachable. */
+function makeUiDir() {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'wskit-ui-'));
+  const dist = path.join(base, 'dist');
+  fs.mkdirSync(path.join(dist, 'assets'), { recursive: true });
+  fs.writeFileSync(path.join(dist, 'index.html'), '<!doctype html><title>dashboard</title>');
+  fs.writeFileSync(path.join(dist, 'assets', 'app.js'), 'console.log(1)');
+  fs.writeFileSync(path.join(base, 'secret.txt'), 'TOP-SECRET');
+  return { dist: dist, base: base };
+}
+
+function getRaw(port, urlPath) {
+  return new Promise(function (resolve, reject) {
+    http.get({ host: server.HOST, port: port, path: urlPath }, function (res) {
+      let data = '';
+      res.on('data', function (chunk) { data += chunk; });
+      res.on('end', function () {
+        resolve({ status: res.statusCode, body: data, headers: res.headers });
+      });
+    }).on('error', reject);
+  });
+}
+
+async function withServer(root, options, fn) {
+  const instance = server.createServer(root, options);
+  await new Promise(function (resolve) { instance.listen(0, server.HOST, resolve); });
+  try {
+    return await fn(instance.address().port);
+  } finally {
+    instance.close();
+  }
+}
+
+test('the built dashboard is served at /, so no second server is needed', async function () {
+  const ui = makeUiDir();
+  await withServer(makeWorkspace(), { uiDir: ui.dist }, async function (port) {
+    const res = await getRaw(port, '/');
+    assert.strictEqual(res.status, 200);
+    assert.match(res.headers['content-type'], /text\/html/);
+    assert.match(res.body, /<title>dashboard<\/title>/);
+
+    const asset = await getRaw(port, '/assets/app.js');
+    assert.strictEqual(asset.status, 200);
+    assert.match(asset.headers['content-type'], /javascript/);
+  });
+});
+
+test('the JSON API still wins over the static files', async function () {
+  const ui = makeUiDir();
+  await withServer(makeWorkspace(), { uiDir: ui.dist }, async function (port) {
+    const res = await getRaw(port, '/api/health');
+    assert.strictEqual(res.status, 200);
+    assert.match(res.headers['content-type'], /application\/json/);
+    assert.strictEqual(JSON.parse(res.body).ok, true);
+  });
+});
+
+test('an unknown path falls back to the app, not to a 404', async function () {
+  const ui = makeUiDir();
+  await withServer(makeWorkspace(), { uiDir: ui.dist }, async function (port) {
+    // The dashboard is one page whose section state lives in the client, so a
+    // reload on any path has to reach the app.
+    const res = await getRaw(port, '/health');
+    assert.strictEqual(res.status, 200);
+    assert.match(res.body, /<title>dashboard<\/title>/);
+  });
+});
+
+test('a path escaping the UI directory cannot read the disk', async function () {
+  const ui = makeUiDir();
+  await withServer(makeWorkspace(), { uiDir: ui.dist }, async function (port) {
+    const attempts = [
+      '/../secret.txt',
+      '/../../etc/passwd',
+      '/%2e%2e%2fsecret.txt',
+      '/assets/../../secret.txt',
+    ];
+    for (const attempt of attempts) {
+      const res = await getRaw(port, attempt);
+      assert.ok(res.body.indexOf('TOP-SECRET') === -1, attempt + ' must not escape the UI directory');
+      assert.ok(res.body.indexOf('root:') === -1, attempt + ' must not reach /etc/passwd');
+    }
+  });
+});
+
+test('when the dashboard is not built, / explains rather than failing blankly', async function () {
+  const empty = fs.mkdtempSync(path.join(os.tmpdir(), 'wskit-nodist-'));
+  await withServer(makeWorkspace(), { uiDir: empty }, async function (port) {
+    const res = await getRaw(port, '/');
+    assert.strictEqual(res.status, 503);
+    assert.match(res.body, /has not been built yet/);
+    assert.match(res.body, /npm --prefix web run build/,
+      'the message has to name the command, not just the problem');
+
+    const api = await getRaw(port, '/api/health');
+    assert.strictEqual(api.status, 200, 'the API works whether or not the front end was built');
+  });
+});
+
+test('ui:false keeps it a pure JSON surface, for the Vite dev proxy and the tests', async function () {
+  await withServer(makeWorkspace(), { ui: false }, async function (port) {
+    const res = await getRaw(port, '/');
+    assert.strictEqual(res.status, 404);
+    assert.match(JSON.parse(res.body).error, /unknown endpoint/);
+  });
+});
+
+test('serving files did not open a write path: non-GET is still refused', async function () {
+  const ui = makeUiDir();
+  await withServer(makeWorkspace(), { uiDir: ui.dist }, async function (port) {
+    for (const method of ['POST', 'PUT', 'DELETE', 'PATCH']) {
+      const res = await request(port, method, '/');
+      assert.strictEqual(res.status, 405, method + ' must be refused at the static root too');
+    }
+  });
+});
+
 // ---------------------------------------------------------------------------
 
 (async function () {

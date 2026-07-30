@@ -18,15 +18,28 @@
  * decided on 2026-07-28 is scoped to the *front end* that consumes this, not to
  * this server.
  *
- * Security posture: binds to 127.0.0.1 only, refuses any workspace path outside
- * the root it was started with, and exposes nothing that writes. Read-only by
- * construction — the commit/PR/worktree actions are still blocked on open
- * product questions (see docs/specs/git-integration-layer.md), and this server
- * must not grow write endpoints ahead of those answers.
+ * Security posture: binds to 127.0.0.1 by default, refuses any workspace path
+ * outside the root it was started with, and exposes nothing that writes.
+ * Read-only by construction — the commit/PR/worktree actions are still blocked
+ * on open product questions (see docs/specs/git-integration-layer.md), and this
+ * server must not grow write endpoints ahead of those answers. `--host` can
+ * widen the bind (a container has to, or nothing outside it can connect); the
+ * CLI warns when it does, because a wider bind offers this workspace's contents
+ * to anything that can reach the port.
+ *
+ * It also serves the compiled dashboard from `web/dist`, so the whole thing is
+ * one command and one port with no Vite in the picture (docs/specs/web-app-
+ * dashboard.md). That is why this module requires `fs` even though
+ * core/inspect.js is meant to be the only module that touches the disk — the
+ * boundary that rule protects is *reading the workspace*, which still happens
+ * in exactly one place. Reading the app's own build output is a different
+ * concern, and serving bytes it already produced is not domain logic (see
+ * DECISIONS.md, 2026-07-30).
  */
 
 'use strict';
 
+const fs = require('fs');
 const http = require('http');
 const path = require('path');
 
@@ -50,6 +63,107 @@ function resolveWorkspace(root, requested) {
   const rel = path.relative(root, resolved);
   if (rel.split(path.sep)[0] === '..' || path.isAbsolute(rel)) return null;
   return resolved;
+}
+
+/** The compiled dashboard, when it has been built. */
+const DEFAULT_UI_DIR = path.resolve(__dirname, '..', 'web', 'dist');
+
+const CONTENT_TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.webp': 'image/webp',
+  '.ico': 'image/x-icon',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+  '.map': 'application/json; charset=utf-8',
+};
+
+/**
+ * Resolve a request path inside the UI directory, or null if it escapes.
+ *
+ * Same reasoning as resolveWorkspace: a page on another origin can still aim
+ * requests at localhost, so "../../etc/passwd" has to be refused here too
+ * rather than trusted because the directory is ours.
+ */
+function resolveAsset(uiDir, pathname) {
+  const decoded = decodeURIComponent(pathname);
+  const resolved = path.resolve(uiDir, '.' + (decoded.startsWith('/') ? decoded : '/' + decoded));
+  const rel = path.relative(uiDir, resolved);
+  if (rel && (rel.split(path.sep)[0] === '..' || path.isAbsolute(rel))) return null;
+  return resolved;
+}
+
+function readIfFile(file) {
+  try {
+    if (!fs.statSync(file).isFile()) return null;
+    return fs.readFileSync(file);
+  } catch (err) {
+    return null;
+  }
+}
+
+/**
+ * Serve the built dashboard.
+ *
+ * Unknown paths fall back to index.html rather than 404ing — the dashboard is a
+ * single page and its section state lives in the client, so a reload on any
+ * path has to reach the app rather than a not-found. `/api/*` never gets here.
+ *
+ * If the build is missing this says so in plain language instead of 404ing: an
+ * empty page with no explanation is the worst outcome, and "not built yet" is a
+ * normal state, not an error.
+ */
+function serveStatic(res, uiDir, pathname) {
+  const index = path.join(uiDir, 'index.html');
+  if (!readIfFile(index)) {
+    return sendText(
+      res,
+      503,
+      'The dashboard has not been built yet.\n\n' +
+        'Build it once with:\n' +
+        '  npm --prefix web install\n' +
+        '  npm --prefix web run build\n\n' +
+        'then restart this server. The JSON API at /api/dashboard is already working.\n'
+    );
+  }
+
+  const asset = pathname === '/' ? null : resolveAsset(uiDir, pathname);
+  if (asset !== null) {
+    const body = readIfFile(asset);
+    if (body) {
+      const type = CONTENT_TYPES[path.extname(asset).toLowerCase()] || 'application/octet-stream';
+      res.writeHead(200, {
+        'Content-Type': type,
+        'Content-Length': body.length,
+        // The build fingerprints its assets, so index.html is the only thing
+        // that must never be cached — a stale one would pin an old bundle.
+        'Cache-Control': asset === index ? 'no-store' : 'public, max-age=3600',
+      });
+      return res.end(body);
+    }
+  }
+
+  const html = readIfFile(index);
+  res.writeHead(200, {
+    'Content-Type': CONTENT_TYPES['.html'],
+    'Content-Length': html.length,
+    'Cache-Control': 'no-store',
+  });
+  res.end(html);
+}
+
+function sendText(res, status, body) {
+  res.writeHead(status, {
+    'Content-Type': 'text/plain; charset=utf-8',
+    'Content-Length': Buffer.byteLength(body),
+    'Cache-Control': 'no-store',
+  });
+  res.end(body);
 }
 
 function send(res, status, payload) {
@@ -152,8 +266,13 @@ function handle(root, pathname, query) {
   return { status: 404, body: { error: 'unknown endpoint: ' + pathname } };
 }
 
-function createServer(root) {
+function createServer(root, options) {
+  const opts = options || {};
   const resolvedRoot = path.resolve(root);
+  // `ui: false` keeps the server a pure JSON surface — what the test suite and
+  // the Vite dev proxy both want, since Vite serves the front end itself there.
+  const uiDir = opts.ui === false ? null : path.resolve(opts.uiDir || DEFAULT_UI_DIR);
+
   return http.createServer(function (req, res) {
     if (req.method !== 'GET') {
       return send(res, 405, { error: 'this server is read-only; only GET is supported' });
@@ -164,6 +283,15 @@ function createServer(root) {
     } catch (err) {
       return send(res, 400, { error: 'malformed request URL' });
     }
+
+    if (uiDir && parsed.pathname.indexOf('/api/') !== 0) {
+      try {
+        return serveStatic(res, uiDir, parsed.pathname);
+      } catch (err) {
+        return sendText(res, 500, String((err && err.message) || err));
+      }
+    }
+
     let result;
     try {
       result = handle(resolvedRoot, parsed.pathname, parsed.searchParams);
@@ -174,9 +302,11 @@ function createServer(root) {
   });
 }
 
-function listen(root, port, callback) {
-  const server = createServer(root);
-  server.listen(port, HOST, function () { callback(null, server); });
+function listen(root, port, callback, options) {
+  const opts = options || {};
+  const host = opts.host || HOST;
+  const server = createServer(root, opts);
+  server.listen(port, host, function () { callback(null, server); });
   server.on('error', function (err) { callback(err); });
   return server;
 }
@@ -186,5 +316,7 @@ module.exports = {
   listen: listen,
   handle: handle,
   resolveWorkspace: resolveWorkspace,
+  resolveAsset: resolveAsset,
+  DEFAULT_UI_DIR: DEFAULT_UI_DIR,
   HOST: HOST,
 };

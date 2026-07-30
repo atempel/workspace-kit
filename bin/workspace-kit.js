@@ -33,8 +33,10 @@ const HELP = [
   '                   directory. Exits non-zero when the verdict is unhealthy, so it',
   '                   is usable in CI.',
   '  status [dir]     Show what has changed in the workspace, in plain language.',
-  '  serve [dir]      Start the read-only local JSON server the Web App dashboard',
-  '                   consumes. Binds to 127.0.0.1 only.',
+  '  serve [dir]      Start the read-only local server: the dashboard on /, and the',
+  '                   JSON API on /api/*. Binds to 127.0.0.1 unless --host says',
+  '                   otherwise. Build the dashboard once with',
+  '                   `npm --prefix web install && npm --prefix web run build`.',
   '  inspect [dir]    Dump the raw workspace index as JSON (debugging aid).',
   '  report [dir]     Render the workspace\'s own planning docs (PRD, specs, design,',
   '                   DECISIONS/TASKS/SESSIONS) as a static, readable HTML report.',
@@ -51,6 +53,9 @@ const HELP = [
   '  --json           Machine-readable output instead of the terminal report.',
   '  --out <dir>      Output directory for `report` (default <dir>/reports).',
   '  --port <n>       Port for `serve` (default 4319).',
+  '  --host <addr>    Bind address for `serve` (default 127.0.0.1). Use 0.0.0.0 to',
+  '                   reach it from outside a container. Warns when you do: a wider',
+  '                   bind offers this workspace to anything that can reach the port.',
   '  --max-lines <n>  Override the always-loaded budget (default 300 lines, the',
   '                   figure from docs/specs/context-manager-conventions.md).',
   '  --path <p>       Place a new worktree somewhere other than the convention.',
@@ -68,7 +73,7 @@ const HELP = [
 function parseArgs(argv) {
   const args = {
     command: null, sub: null, name: null, dir: null, json: false, maxLines: null,
-    port: null, out: null, help: false, path: null, branch: null, force: false,
+    port: null, host: null, out: null, help: false, path: null, branch: null, force: false,
   };
   const positional = [];
   for (let i = 0; i < argv.length; i++) {
@@ -79,6 +84,7 @@ function parseArgs(argv) {
     else if (arg === '--out') args.out = argv[++i];
     else if (arg === '--max-lines') args.maxLines = parseInt(argv[++i], 10);
     else if (arg === '--port') args.port = parseInt(argv[++i], 10);
+    else if (arg === '--host') args.host = argv[++i];
     else if (arg === '--path') args.path = argv[++i];
     else if (arg === '--branch') args.branch = argv[++i];
     else positional.push(arg);
@@ -222,16 +228,38 @@ function main(argv) {
 
   if (args.command === 'serve') {
     const port = args.port || 4319;
+    const host = args.host || webServer.HOST;
+    const wide = host !== '127.0.0.1' && host !== 'localhost';
+    const uiBuilt = fs.existsSync(path.join(webServer.DEFAULT_UI_DIR, 'index.html'));
+
     webServer.listen(dir, port, function (err, instance) {
       if (err) {
         process.stderr.write('Could not start the server: ' + err.message + '\n');
         process.exit(1);
       }
       const actual = instance.address().port;
+      // A wildcard bind has no single URL to print, and the address the user
+      // needs is the host's, which this process cannot know.
+      const shown = wide ? 'localhost' : host;
       process.stdout.write('workspace//kit serving ' + dir + '\n');
-      process.stdout.write('  http://' + webServer.HOST + ':' + actual + '/api/dashboard\n');
-      process.stdout.write('Read-only; localhost only. Ctrl-C to stop.\n');
-    });
+      process.stdout.write('  dashboard  http://' + shown + ':' + actual + '/\n');
+      process.stdout.write('  API        http://' + shown + ':' + actual + '/api/dashboard\n');
+      if (!uiBuilt) {
+        process.stdout.write(
+          '\nThe dashboard is not built yet, so / explains how rather than rendering.\n' +
+            '  npm --prefix web install && npm --prefix web run build\n'
+        );
+      }
+      if (wide) {
+        process.stderr.write(
+          '\nWARNING: bound to ' + host + ', not just this machine.\n' +
+            'Anything that can reach this port can read this workspace. It is still\n' +
+            'read-only and rejects every non-GET, but only use a wide bind on a\n' +
+            'network you trust — inside a container, or behind a firewall.\n'
+        );
+      }
+      process.stdout.write('\nRead-only. Ctrl-C to stop.\n');
+    }, { host: host });
     return null; // keep the process alive
   }
 

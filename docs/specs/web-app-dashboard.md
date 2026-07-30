@@ -104,5 +104,9 @@ Two P0 criteria are enforced by test rather than by convention, because both are
 
 **Still open:** where suggestion dismissals, the workspace list and theme preference persist. Theme is in `localStorage`; the other two are not persisted at all, deliberately — inventing a store would answer that question by accident.
 
-**Not built (P1):** command palette, workspace switcher, suggestion dismissal, worktree conflict flag. Also not built: serving the compiled dashboard from `workspace-kit serve` itself, which would let it run without a Vite dev server and would not breach the read-only guarantee, since static assets are GETs.
+**Shipped 2026-07-30 — the dashboard runs on one command and one port.** `core/server.js` serves the compiled front end from `web/dist` at `/`, so `npm --prefix web run build` once and then `workspace-kit serve .` is the whole story; Vite is needed only to work on `web/` itself. Static assets are GETs, so the read-only guarantee is untouched — and the path-escape check that protects the workspace root now protects the asset directory too, with non-GET refused at `/` as well. `--host` widens the bind for use inside a container. See DECISIONS.md, 2026-07-30.
+
+**Verification, 2026-07-30 — two suites, deliberately not redundant.** `npm run test:web` (12 cases) renders the five sections server-side, cheaply, and is where the "no hard-coded data, no threshold of its own, every estimate labelled" rules are enforced. `npm run test:ui` (21 cases) builds the app, serves the build against the real `core/server.js` and drives it in Chromium. The second exists because the first stayed green for a day while the app opened as a blank page: it rendered `health.method`, an object, as a React child, and the crash was in the shell, which server-rendering the sections never touches. The harness came from the parallel `app/` implementation, which was retired the same day; the markup carries stable `data-*` hooks so restyling cannot silently break it.
+
+**Not built (P1):** command palette, workspace switcher, suggestion dismissal, worktree conflict flag.
 
