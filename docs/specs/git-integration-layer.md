@@ -90,6 +90,10 @@ Done: file-state tracking (untracked / modified-unstaged / staged / committed-cl
 
 The P0 acceptance criterion for this slice is tested directly rather than by proxy: two worktrees are created, the *same* file is edited independently in each, and the test asserts both edits survive, neither worktree sees the other's uncommitted change, file-state tracking reports each one correctly, and the parent workspace's copy is untouched.
 
+**Conflict surfacing added 2026-08-01** (P1; `npm run test:git` grew to 26 cases) as `worktreeConflicts()`: the files more than one worktree holds uncommitted changes to right now, each with the worktrees holding it, their branches and their individual states. It reports and judges nothing — two worktrees on one file is allowed and sometimes deliberate — which is the same boundary every other read here keeps, and resolution stays in the user's own tools per the P1 wording.
+
+Two scope choices, both tested: **"touched" means uncommitted** (staged, unstaged or untracked), because once work is committed it belongs to a branch and whether two branches conflict is a merge question rather than a worktree one; and **the main working copy counts as a holder** like any other worktree, since being the original does not exempt it from the collision. Untracked files count too — two worktrees creating the same new path collide just as surely as two editing an existing one. Served in the dashboard payload and rendered by the Source control section (docs/specs/web-app-dashboard.md → #169).
+
 **Deliberately not built:**
 - **The PR flow, and anything touching a remote** — this layer is local-only by decision (2026-07-29, see DECISIONS.md), not by omission: push and PR bring authentication and a hosting-provider surface the owner wants to treat as its own step. A test asserts `core/git.js` contains no push/fetch/clone/pull and no `gh pr` call, so the boundary fails the build if it erodes.
 

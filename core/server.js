@@ -246,8 +246,14 @@ function handle(root, pathname, query) {
         // them as P0 (docs/specs/web-app-dashboard.md). Listing is a read, so
         // it belongs on this server; creating and removing them are writes and
         // stay in the CLI, which is what `capabilities` below says.
+        //
+        // `worktreeConflicts` is the same kind of read one level up: which
+        // files two worktrees are both sitting on right now. It costs one
+        // `git status` per worktree, which is why it is computed here once for
+        // the whole payload rather than per section.
         git: Object.assign({}, summary, {
           worktrees: gitLayer.listWorktrees(target).worktrees,
+          worktreeConflicts: gitLayer.worktreeConflicts(target).conflicts,
         }),
         // What the UI may *do*, as opposed to what it may show. Every one of
         // these is false because this server is read-only by design and rejects
