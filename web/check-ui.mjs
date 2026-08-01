@@ -164,6 +164,65 @@ try {
 
   await page.screenshot({ path: path.join(shots, '01-overview-dark.png'), fullPage: true });
 
+  // ---- Command palette (P1) -----------------------------------------------
+  // Shell-only, like the crash this suite was built after: server-rendering the
+  // sections would never see any of it.
+  await page.keyboard.press('Control+k');
+  await page.waitForSelector('[data-palette]');
+  check('⌘K opens the command palette', (await page.locator('[data-palette]').count()) === 1);
+
+  await page.fill('[data-palette-input]', 'AGENTS');
+  await wait(150);
+  check(
+    'typing filters the palette down to matching entries',
+    (await page.locator('[data-palette-item="file:AGENTS.md"]').count()) === 1 &&
+      (await page.locator('[data-palette-item="section:queue"]').count()) === 0
+  );
+
+  await page.click('[data-palette-item="file:AGENTS.md"]');
+  await wait(300);
+  check(
+    'choosing a file goes to its row on Overview and marks it',
+    (await page.locator('[data-file="AGENTS.md"][data-focused="true"]').count()) === 1 &&
+      (await page.locator('[data-palette]').count()) === 0
+  );
+
+  await page.keyboard.press('Control+k');
+  await page.waitForSelector('[data-palette]');
+  await page.fill('[data-palette-input]', 'Queue');
+  await page.keyboard.press('Enter');
+  await wait(300);
+  check(
+    'choosing a section from the keyboard switches to it',
+    (await page.locator('[data-nav="queue"][aria-current="page"]').count()) === 1 &&
+      (await page.locator('[data-palette]').count()) === 0
+  );
+
+  await page.keyboard.press('Control+k');
+  await page.waitForSelector('[data-palette]');
+  await page.screenshot({ path: path.join(shots, '08-command-palette.png') });
+  await page.keyboard.press('Escape');
+  await wait(200);
+  check('Escape closes the palette', (await page.locator('[data-palette]').count()) === 0);
+
+  // ---- Workspace switcher (P1) --------------------------------------------
+  await page.click('[data-workspace-switcher]');
+  await page.waitForSelector('[data-workspace-menu]');
+  check(
+    'the switcher names the workspace being served as the open one',
+    (await page.getByText('Open now').count()) === 1
+  );
+  check(
+    'and says plainly that opening another means restarting the server',
+    (await page.getByText('restart it', { exact: false }).count()) === 1
+  );
+  await page.screenshot({ path: path.join(shots, '09-workspace-switcher.png') });
+  await page.keyboard.press('Escape');
+  await wait(200);
+
+  await page.click('[data-nav="overview"]');
+  await wait(200);
+
   // ---- Health check -------------------------------------------------------
   await goTo(page, 'health', 'Health check');
   await page.waitForSelector('[role="meter"]');
@@ -184,6 +243,49 @@ try {
     `meter ${meterNow} vs api ${api.health.budget.pctOfCap}`
   );
   await page.screenshot({ path: path.join(shots, '02-health-dark.png'), fullPage: true });
+
+  // ---- Suggestion dismissal (P1) ------------------------------------------
+  // The point of the feature is that it changes the *view* and nothing else, so
+  // that is what gets asserted: the verdict and the count must survive it.
+  const suggestionTotal = api.health.suggestions.length;
+  if (suggestionTotal > 0) {
+    await page.click('[data-dismiss]');
+    await wait(250);
+    check(
+      'dismissing a suggestion hides it from the list',
+      (await page.locator('[data-suggestion]').count()) === suggestionTotal - 1
+    );
+    check(
+      'the verdict and the total still come from the health check, not from the view',
+      (await page.locator(`[data-status="${api.health.verdict}"]`).count()) > 0 &&
+        (await page.getByText(String(suggestionTotal), { exact: true }).count()) > 0
+    );
+
+    // Persisted, not just held in memory — that is the claim lib/prefs.js makes.
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.click('[data-nav="health"]');
+    await page.waitForSelector('[data-show-dismissed]');
+    check(
+      'the dismissal survives a reload, which is what persisting it means',
+      (await page.locator('[data-suggestion]').count()) === suggestionTotal - 1
+    );
+
+    // And it is reversible, so a mistake costs nothing.
+    await page.click('[data-show-dismissed]');
+    await wait(200);
+    await page.click('[data-dismiss]');
+    await wait(250);
+    check(
+      'restoring brings the suggestion back',
+      (await page.locator('[data-suggestion]').count()) === suggestionTotal &&
+        (await page.locator('[data-show-dismissed]').count()) === 0
+    );
+  } else {
+    check(
+      'a workspace within every threshold says so instead of showing an empty list',
+      (await page.getByText('within every threshold', { exact: false }).count()) === 1
+    );
+  }
 
   // ---- Session log --------------------------------------------------------
   await goTo(page, 'sessions', 'Session log');

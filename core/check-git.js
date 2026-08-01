@@ -287,6 +287,75 @@ test('P0-9  listing reports every worktree, marking the main one and any custom 
   assert.strictEqual(byName['agent-2'].branch, 'agent-2');
 });
 
+test('P1  the same file uncommitted in two worktrees is reported as an overlap', function () {
+  const root = makeMixedRepo();
+  const a = gitLayer.createWorktree(root, 'agent-a', { io: io });
+  const b = gitLayer.createWorktree(root, 'agent-b', { io: io });
+
+  // Nothing overlaps until two copies actually touch the same path.
+  assert.deepStrictEqual(gitLayer.worktreeConflicts(root).conflicts, [],
+    'parallel worktrees are not a conflict by themselves');
+
+  fs.appendFileSync(path.join(a.path, 'PROJECT.md'), '- written by agent A\n');
+  fs.appendFileSync(path.join(b.path, 'PROJECT.md'), '- written by agent B\n');
+  // A file only one worktree touches must not be reported.
+  fs.writeFileSync(path.join(a.path, 'NOTES.md'), '- only agent A\n');
+
+  const result = gitLayer.worktreeConflicts(root);
+  assert.strictEqual(result.isRepo, true);
+  assert.strictEqual(result.conflicts.length, 1, 'exactly the shared file is flagged');
+  assert.strictEqual(result.conflicts[0].path, 'PROJECT.md');
+
+  const names = result.conflicts[0].worktrees.map(function (w) { return w.name; }).sort();
+  assert.deepStrictEqual(names, ['agent-a', 'agent-b'], 'both holders are named');
+  result.conflicts[0].worktrees.forEach(function (w) {
+    assert.strictEqual(w.state, 'modified-unstaged', 'each holder carries its own state');
+    assert.ok(w.branch, 'and its branch, so the reader can tell the copies apart');
+  });
+});
+
+test('P1  the main working copy counts as a holder like any other worktree', function () {
+  // makeMixedRepo leaves TASKS.md modified in the main copy. An agent editing
+  // the same file in a worktree is the everyday version of this collision, and
+  // the main copy being "the real one" does not exempt it.
+  const root = makeMixedRepo();
+  const a = gitLayer.createWorktree(root, 'agent-a', { io: io });
+  fs.appendFileSync(path.join(a.path, 'TASKS.md'), '- also touched by agent A\n');
+
+  const conflicts = gitLayer.worktreeConflicts(root).conflicts;
+  const tasks = conflicts.filter(function (c) { return c.path === 'TASKS.md'; })[0];
+  assert.ok(tasks, 'the shared file is flagged');
+  assert.deepStrictEqual(
+    tasks.worktrees.map(function (w) { return w.name; }).sort(),
+    [path.basename(root), 'agent-a'].sort(),
+    'the main copy is named among the holders'
+  );
+});
+
+test('P1  committing in one worktree clears the overlap — it is an uncommitted-work check', function () {
+  const root = makeMixedRepo();
+  const a = gitLayer.createWorktree(root, 'agent-a', { io: io });
+  const b = gitLayer.createWorktree(root, 'agent-b', { io: io });
+  fs.appendFileSync(path.join(a.path, 'PROJECT.md'), '- agent A\n');
+  fs.appendFileSync(path.join(b.path, 'PROJECT.md'), '- agent B\n');
+  assert.strictEqual(gitLayer.worktreeConflicts(root).conflicts.length, 1);
+
+  execFileSync('git', ['add', 'PROJECT.md'], { cwd: b.path, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-q', '-m', 'agent B lands its work'], { cwd: b.path, stdio: 'ignore' });
+
+  // Once committed it belongs to a branch, and whether two branches disagree is
+  // a merge question rather than a worktree one.
+  assert.deepStrictEqual(gitLayer.worktreeConflicts(root).conflicts, [],
+    'only uncommitted work counts as an overlap');
+});
+
+test('P1  a folder that is not a repository reports no overlaps rather than failing', function () {
+  const plain = fs.mkdtempSync(path.join(os.tmpdir(), 'wskit-git-plain-'));
+  const result = gitLayer.worktreeConflicts(plain);
+  assert.strictEqual(result.isRepo, false);
+  assert.deepStrictEqual(result.conflicts, []);
+});
+
 test('P0-10a removing a worktree that holds uncommitted work is refused, not silently done', function () {
   const root = makeMixedRepo();
   const wt = gitLayer.createWorktree(root, 'agent-2', { io: io });
