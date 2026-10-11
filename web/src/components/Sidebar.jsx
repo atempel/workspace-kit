@@ -6,7 +6,19 @@
  * mark, in the product's teal and amber.
  */
 
-import { BranchIcon, FileIcon, InboxIcon, MoonIcon, PulseIcon, SunIcon, HistoryIcon } from './icons.jsx';
+import { useEffect, useRef, useState } from 'react';
+import {
+  BranchIcon,
+  CheckIcon,
+  ChevronIcon,
+  FileIcon,
+  InboxIcon,
+  MoonIcon,
+  PulseIcon,
+  SearchIcon,
+  SunIcon,
+  HistoryIcon,
+} from './icons.jsx';
 import { Status } from './ui.jsx';
 import { statusLabel, statusTone } from '../lib/format.js';
 
@@ -54,7 +66,187 @@ function Logo() {
   );
 }
 
-export default function Sidebar({ data, active, onSelect, theme, onToggleTheme, counts }) {
+/**
+ * The workspace switcher (docs/specs/web-app-dashboard.md, P1) — a shell
+ * affordance, not #29's multi-project dashboard.
+ *
+ * It can remember where you have been and it cannot take you there, and the UI
+ * says so plainly instead of pretending otherwise. `core/server.js` binds one
+ * root for its whole lifetime, so opening another workspace means restarting it
+ * — the same thing the not-a-workspace screen already tells the user. Drawing a
+ * live-looking switcher over a server that cannot rebind would be exactly the
+ * dishonesty the Source control section's disabled buttons exist to avoid.
+ */
+function WorkspaceSwitcher({ data, name, recent, onForget }) {
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(null);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onAway = (event) => {
+      if (ref.current && !ref.current.contains(event.target)) setOpen(false);
+    };
+    const onKey = (event) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('mousedown', onAway);
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onAway);
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const others = recent.filter((w) => w.root !== data?.root);
+
+  const copy = (root) => {
+    const command = 'workspace-kit serve ' + root;
+    // Clipboard access is permission-gated and absent over plain http in some
+    // browsers; the command stays selectable on screen either way.
+    navigator.clipboard?.writeText(command).then(
+      () => {
+        setCopied(root);
+        setTimeout(() => setCopied(null), 1600);
+      },
+      () => setCopied(null)
+    );
+  };
+
+  return (
+    <div className="relative px-3 pb-3" ref={ref}>
+      <button
+        type="button"
+        data-workspace-switcher=""
+        aria-expanded={open}
+        aria-haspopup="menu"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-left"
+        style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
+      >
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-[13px] font-medium" title={name}>
+            {name}
+          </span>
+          <span
+            className="block truncate font-mono text-[10.5px]"
+            style={{ color: 'var(--muted-foreground)' }}
+            title={data?.root}
+          >
+            {data?.root || '—'}
+          </span>
+        </span>
+        <span style={{ color: 'var(--muted-foreground)' }}>
+          <ChevronIcon size={14} />
+        </span>
+      </button>
+
+      {open && (
+        <div
+          role="menu"
+          data-workspace-menu=""
+          className="absolute right-3 left-3 z-30 mt-1 overflow-hidden rounded-md"
+          style={{
+            background: 'var(--card)',
+            border: '1px solid var(--border)',
+            boxShadow: '0 12px 32px rgba(0,0,0,.35)',
+          }}
+        >
+          <div
+            className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider"
+            style={{ color: 'var(--muted-foreground)', borderBottom: '1px solid var(--border)' }}
+          >
+            Recent workspaces
+          </div>
+
+          <div className="max-h-64 overflow-y-auto">
+            <div className="flex items-start gap-2 px-3 py-2">
+              <span className="mt-0.5" style={{ color: 'var(--ok)' }}>
+                <CheckIcon size={13} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[12.5px] font-medium">{name}</span>
+                <span className="block text-[10.5px]" style={{ color: 'var(--muted-foreground)' }}>
+                  Open now
+                </span>
+              </span>
+            </div>
+
+            {others.length === 0 ? (
+              <p
+                className="px-3 pb-3 text-[11.5px]"
+                style={{ color: 'var(--muted-foreground)' }}
+              >
+                No other workspace has been opened in this browser yet.
+              </p>
+            ) : (
+              others.map((w) => (
+                <div
+                  key={w.root}
+                  data-recent-workspace={w.root}
+                  className="px-3 py-2"
+                  style={{ borderTop: '1px solid var(--border)' }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[12.5px] font-medium" title={w.name}>
+                        {w.name}
+                      </span>
+                      <span
+                        className="block truncate font-mono text-[10px]"
+                        style={{ color: 'var(--muted-foreground)' }}
+                        title={w.root}
+                      >
+                        {w.root}
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => copy(w.root)}
+                      className="cursor-pointer rounded px-1.5 py-0.5 text-[10.5px] font-medium"
+                      style={{ background: 'var(--muted)', color: 'var(--foreground)' }}
+                    >
+                      {copied === w.root ? 'Copied' : 'Copy command'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onForget(w.root)}
+                      title="Remove from this list"
+                      className="cursor-pointer rounded px-1.5 py-0.5 text-[10.5px]"
+                      style={{ color: 'var(--muted-foreground)' }}
+                    >
+                      Forget
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          <p
+            className="px-3 py-2 text-[11px]"
+            style={{ color: 'var(--muted-foreground)', borderTop: '1px solid var(--border)' }}
+          >
+            This server reads one workspace for as long as it runs. To open another, restart it
+            against that folder — the copied command does exactly that.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function Sidebar({
+  data,
+  active,
+  onSelect,
+  theme,
+  onToggleTheme,
+  counts,
+  recent = [],
+  onForgetWorkspace = () => {},
+  onOpenPalette,
+}) {
   const name = data?.root ? data.root.split('/').filter(Boolean).pop() : 'No workspace';
 
   return (
@@ -75,22 +267,30 @@ export default function Sidebar({ data, active, onSelect, theme, onToggleTheme, 
         </span>
       </div>
 
+      <WorkspaceSwitcher
+        data={data}
+        name={name}
+        recent={recent}
+        onForget={onForgetWorkspace}
+      />
+
       <div className="px-3 pb-3">
-        <div
-          className="rounded-md px-3 py-2"
-          style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
+        <button
+          type="button"
+          data-palette-trigger=""
+          onClick={onOpenPalette}
+          className="flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-[12.5px]"
+          style={{ color: 'var(--muted-foreground)', border: '1px solid var(--border)' }}
         >
-          <div className="truncate text-[13px] font-medium" title={name}>
-            {name}
-          </div>
-          <div
-            className="truncate font-mono text-[10.5px]"
-            style={{ color: 'var(--muted-foreground)' }}
-            title={data?.root}
+          <SearchIcon size={13} />
+          <span className="flex-1 text-left">Search…</span>
+          <kbd
+            className="rounded px-1 font-mono text-[10px]"
+            style={{ background: 'var(--muted)' }}
           >
-            {data?.root || '—'}
-          </div>
-        </div>
+            ⌘K
+          </kbd>
+        </button>
       </div>
 
       <nav className="flex flex-col gap-0.5 px-2">

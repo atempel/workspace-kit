@@ -102,6 +102,16 @@ test('the worktree list is served, since listing is a read', function () {
   assert.ok('branch' in body.git.worktrees[0]);
 });
 
+test('worktree overlaps are served alongside the list, so the UI need not compute them', function () {
+  const root = makeWorkspace();
+  const body = server.handle(root, '/api/dashboard', new URLSearchParams()).body;
+  assert.ok(Array.isArray(body.git.worktreeConflicts),
+    'the Source control section can flag overlaps without a second round trip');
+  // A single-worktree workspace has nothing to overlap with, and that must read
+  // as an empty answer rather than a missing field.
+  assert.deepStrictEqual(body.git.worktreeConflicts, []);
+});
+
 test('blocked actions are declared unavailable, not drawn as if they worked', function () {
   const root = makeWorkspace();
   const body = server.handle(root, '/api/dashboard', new URLSearchParams()).body;

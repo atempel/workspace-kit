@@ -9,7 +9,7 @@
  * structural, and the spec asks for both.
  */
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Badge,
   Card,
@@ -95,9 +95,34 @@ function CrossReferenceGraph({ graph }) {
   );
 }
 
-export default function Overview({ data }) {
+/**
+ * `focusPath` is the command palette pointing at a row. The file is not opened
+ * — this dashboard reads a workspace, it does not edit one — so navigating to a
+ * file means scrolling its row into view and marking it, which is the honest
+ * limit of what "go to file" can mean here.
+ */
+export default function Overview({ data, focusPath = null }) {
   const { overview } = data;
   const [showAll, setShowAll] = useState(false);
+
+  // The collapsed "other" group would hide the very row being navigated to.
+  const focusHidden =
+    focusPath &&
+    overview.files.some((f) => f.path === focusPath && !['anchor', 'agent', 'human'].includes(f.layer));
+  useEffect(() => {
+    if (focusHidden) setShowAll(true);
+  }, [focusHidden]);
+
+  useEffect(() => {
+    if (!focusPath) return;
+    // After the row is certainly rendered — expanding the group above may have
+    // been what put it on the page.
+    const id = requestAnimationFrame(() => {
+      const row = document.querySelector('[data-file="' + CSS.escape(focusPath) + '"]');
+      if (row) row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [focusPath, showAll]);
 
   // A file is flagged when it is the source of an unresolved edge.
   const brokenBySource = useMemo(() => {
@@ -190,8 +215,21 @@ export default function Overview({ data }) {
                 <tbody>
                   {visible.map((f) => {
                     const broken = brokenBySource.get(f.path);
+                    const focused = f.path === focusPath;
                     return (
-                      <tr key={f.path} data-file={f.path}>
+                      <tr
+                        key={f.path}
+                        data-file={f.path}
+                        data-focused={focused ? 'true' : undefined}
+                        style={
+                          focused
+                            ? {
+                                background: 'color-mix(in oklab, var(--brand) 12%, transparent)',
+                                outline: '1px solid var(--brand)',
+                              }
+                            : undefined
+                        }
+                      >
                         <Td mono>
                           <div className="flex flex-wrap items-center gap-2">
                             <span>{f.path}</span>

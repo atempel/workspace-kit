@@ -48,7 +48,7 @@ This spec is the **read/act surface over the other five**; it owns no domain log
 **Nice-to-Have (P1)**
 - Command palette (⌘K) for section/file navigation — in the prototype's shell, fits the Cursor/Notion reference directly.
 - Worktree conflict flag when two worktrees have touched the same file (#79's P1, already drawn in the prototype).
-- Suggestion dismissal state on the health check (prototype has the control; whether dismissals persist, and where, is an Open Question).
+- Suggestion dismissal state on the health check (prototype has the control; persistence resolved 2026-08-01 — browser `localStorage`, see Open Questions).
 - Workspace switcher across recently opened workspaces (shell affordance only, not #29's P2 multi-project dashboard).
 
 **Future Considerations (P2)**
@@ -64,7 +64,7 @@ This spec is the **read/act surface over the other five**; it owns no domain log
 - **(Resolved 2026-07-28, see DECISIONS.md)** Stack: React + Tailwind + shadcn/ui with a build step, scoped to the Web App surface only. The standalone HTML artifact's "no build step, no framework" constraint is unchanged and now explicitly per-surface rather than project-wide.
 - **(Resolved by the prototype)** Visual identity for this surface: neutral shadcn base, Inter + JetBrains Mono, amber/teal accent, dark and light equally first-class — distinct from the artifact's v3 terminal identity. Logged in DECISIONS.md; `DESIGN.md`'s corresponding Open Questions should be marked resolved when that file lands (it currently sits uncommitted in the `tasks-progress` worktree).
 - **(Engineering)** How the front-end reaches the file system: this depends on #29's still-open local-server vs. File System Access API question, and on #77's note that `core/inspect.js` assumes Node `fs`. The dashboard is blocked on that answer for real data, not for layout.
-- **(Engineering)** Whether suggestion dismissals, the workspace list, and theme preference persist — and if so, where (local config file vs. browser storage). Nothing in the prototype implies a store yet.
+- **(Resolved 2026-08-01, see DECISIONS.md)** Whether suggestion dismissals, the workspace list, and theme preference persist, and where: all three in browser `localStorage` (`web/src/lib/prefs.js`), keyed by workspace root where they are workspace-specific. A local config file was discarded because it needs a write path through a server that is read-only by construction, and because none of the three is a fact about the workspace — they are facts about how one person is looking at it.
 - **(Product — Alexandre)** Whether the Source control section's actions actually execute git from the UI in v1, or only display state and hand off to the CLI. #79's P0 commit/PR flows imply execution; scoping that to CLI-first would be a legitimate smaller v1.
 
 ## Timeline Considerations
@@ -102,11 +102,16 @@ Two P0 criteria are enforced by test rather than by convention, because both are
 - *How the front end reaches the file system* — through `core/server.js` over HTTP, decided 2026-07-29 and now built. Vite proxies `/api` in development so the browser stays on one origin.
 - *Whether Source control executes git in v1* — no: it displays state and hands execution to the CLI.
 
-**Still open:** where suggestion dismissals, the workspace list and theme preference persist. Theme is in `localStorage`; the other two are not persisted at all, deliberately — inventing a store would answer that question by accident.
+**Resolved 2026-08-01:** where suggestion dismissals, the workspace list and theme persist — all three in browser `localStorage`, see the Open Questions above and DECISIONS.md.
 
 **Shipped 2026-07-30 — the dashboard runs on one command and one port.** `core/server.js` serves the compiled front end from `web/dist` at `/`, so `npm --prefix web run build` once and then `workspace-kit serve .` is the whole story; Vite is needed only to work on `web/` itself. Static assets are GETs, so the read-only guarantee is untouched — and the path-escape check that protects the workspace root now protects the asset directory too, with non-GET refused at `/` as well. `--host` widens the bind for use inside a container. See DECISIONS.md, 2026-07-30.
 
 **Verification, 2026-07-30 — two suites, deliberately not redundant.** `npm run test:web` (12 cases) renders the five sections server-side, cheaply, and is where the "no hard-coded data, no threshold of its own, every estimate labelled" rules are enforced. `npm run test:ui` (21 cases) builds the app, serves the build against the real `core/server.js` and drives it in Chromium. The second exists because the first stayed green for a day while the app opened as a blank page: it rendered `health.method`, an object, as a React child, and the crash was in the shell, which server-rendering the sections never touches. The harness came from the parallel `app/` implementation, which was retired the same day; the markup carries stable `data-*` hooks so restyling cannot silently break it.
 
-**Not built (P1):** command palette, workspace switcher, suggestion dismissal, worktree conflict flag.
+**P1 implemented 2026-08-01 — all four.** Test counts moved to 15 render cases (`npm run test:web`) and 32 browser checks (`npm run test:ui`).
+
+- *Command palette (⌘K)* — sections and files, subsequence filtering, arrow keys and Enter, Escape to close; choosing a file goes to its Overview row, expanding the collapsed group if that is where it lives, and marks it. **Navigation only**, deliberately: every action in this dashboard is currently unavailable-with-a-reason, and a palette offering one it cannot perform would be worse than one that never offers it.
+- *Suggestion dismissal* — a view filter and nothing else. The verdict, the finding count and `workspace-kit doctor`'s output are untouched, the screen says so, and dismissed items stay one click from returning. Both suites assert the verdict and count survive a dismissal; the browser suite additionally asserts the dismissal survives a reload, which is what persisting it means.
+- *Workspace switcher* — lists recently opened workspaces, marks the one being served, and offers the `workspace-kit serve <path>` command for the others. It can remember and it cannot open: the server binds one root for its lifetime, and the UI states that rather than drawing a switcher over a server that cannot rebind.
+- *Worktree conflict flag* — `worktreeConflicts()` in `core/git.js` (#79's P1), served in the dashboard payload and rendered twice, as an overlap card naming each shared file and its holders, and as a badge on each worktree row. Scoped to *uncommitted* work on purpose: once committed it belongs to a branch, and whether two branches conflict is a merge question. The main working copy counts as a holder like any other.
 

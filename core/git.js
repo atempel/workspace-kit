@@ -391,6 +391,50 @@ function listWorktrees(root) {
 }
 
 /**
+ * Files that more than one worktree has uncommitted changes to right now.
+ *
+ * Worktrees exist so several agents can work in parallel without colliding;
+ * this is the check for whether that promise is currently holding. Two
+ * worktrees editing the same path is not an error — git allows it, and it is
+ * sometimes deliberate — so this reports the overlap and judges nothing, the
+ * same boundary every other read here keeps.
+ *
+ * "Touched" means uncommitted: staged, unstaged or untracked. Committed work is
+ * deliberately out of scope — once it is committed it belongs to a branch, and
+ * whether two branches conflict is a merge question, not a worktree question.
+ * Untracked files count because two worktrees creating the same new path
+ * collide just as surely as two editing an existing one.
+ */
+function worktreeConflicts(root) {
+  const listed = listWorktrees(root);
+  if (!listed.isRepo) return { isRepo: false, conflicts: [] };
+
+  const touchedBy = new Map();
+  listed.worktrees.forEach(function (worktree) {
+    // A bare worktree has no working copy, so nothing can be touched in it.
+    if (worktree.bare) return;
+    const states = fileStates(worktree.path);
+    Object.keys(states).forEach(function (file) {
+      if (!touchedBy.has(file)) touchedBy.set(file, []);
+      touchedBy.get(file).push({
+        name: worktree.name,
+        path: worktree.path,
+        branch: worktree.branch,
+        state: states[file],
+      });
+    });
+  });
+
+  const conflicts = [];
+  touchedBy.forEach(function (holders, file) {
+    if (holders.length > 1) conflicts.push({ path: file, worktrees: holders });
+  });
+  conflicts.sort(function (a, b) { return a.path < b.path ? -1 : a.path > b.path ? 1 : 0; });
+
+  return { isRepo: true, conflicts: conflicts };
+}
+
+/**
  * Create a worktree. `name` alone is enough — placement and branch name both
  * follow the convention. `options.path` overrides the location (the user may
  * put it anywhere, including outside the workspace) and `options.branch`
@@ -522,6 +566,7 @@ module.exports = {
   validateWorktreeName: validateWorktreeName,
   defaultWorktreePath: defaultWorktreePath,
   listWorktrees: listWorktrees,
+  worktreeConflicts: worktreeConflicts,
   createWorktree: createWorktree,
   removeWorktree: removeWorktree,
 };

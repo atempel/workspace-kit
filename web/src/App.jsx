@@ -6,17 +6,27 @@
  * server deliberately answers every section from a single scan so they cannot
  * disagree, and re-fetching per section would throw that away.
  *
- * Theme is the only state this app persists, in localStorage. Suggestion
- * dismissals and the workspace list are deliberately not persisted: where that
- * state should live is still an open question in the spec, and inventing a
- * store now would be answering it by accident.
+ * Theme, suggestion dismissals and the recent-workspace list all persist in
+ * localStorage — see lib/prefs.js for why the browser and not the server. This
+ * shell owns all three because it owns the fetch and the root they are keyed
+ * by; the sections stay pure renderers of the payload.
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Sidebar, { SECTIONS } from './components/Sidebar.jsx';
+import CommandPalette from './components/CommandPalette.jsx';
 import { Button, Card, Status } from './components/ui.jsx';
 import { AlertIcon, FolderIcon } from './components/icons.jsx';
 import { describeFailure, fetchDashboard } from './lib/api.js';
+import {
+  forgetWorkspace,
+  readDismissed,
+  readTheme,
+  readWorkspaces,
+  rememberWorkspace,
+  writeDismissed,
+  writeTheme,
+} from './lib/prefs.js';
 import Overview from './sections/Overview.jsx';
 import Health from './sections/Health.jsx';
 import Sessions from './sections/Sessions.jsx';
@@ -32,12 +42,10 @@ const VIEWS = {
 };
 
 function useTheme() {
-  const [theme, setTheme] = useState(
-    () => localStorage.getItem('wskit-theme') || 'dark'
-  );
+  const [theme, setTheme] = useState(readTheme);
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('wskit-theme', theme);
+    writeTheme(theme);
   }, [theme]);
   return [theme, () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))];
 }
@@ -98,6 +106,10 @@ export default function App() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState('overview');
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [focusPath, setFocusPath] = useState(null);
+  const [dismissed, setDismissed] = useState([]);
+  const [recent, setRecent] = useState(() => readWorkspaces());
 
   const load = useCallback(() => {
     const controller = new AbortController();
@@ -118,6 +130,63 @@ export default function App() {
 
   useEffect(() => load(), [load]);
 
+  // Both preferences are keyed by the workspace root, so they can only be read
+  // once the scan has told us which workspace this is.
+  useEffect(() => {
+    if (!data?.root) return;
+    setDismissed(readDismissed(data.root));
+    setRecent(rememberWorkspace(data.root, data.root.split('/').filter(Boolean).pop()));
+  }, [data?.root]);
+
+  const dismiss = useCallback(
+    (key) => {
+      setDismissed((current) => {
+        const next = current.indexOf(key) === -1 ? [...current, key] : current;
+        writeDismissed(data?.root, next);
+        return next;
+      });
+    },
+    [data?.root]
+  );
+
+  const restore = useCallback(
+    (key) => {
+      setDismissed((current) => {
+        const next = current.filter((k) => k !== key);
+        writeDismissed(data?.root, next);
+        return next;
+      });
+    },
+    [data?.root]
+  );
+
+  const forget = useCallback((root) => setRecent(forgetWorkspace(root)), []);
+
+  // ⌘K on macOS, Ctrl+K elsewhere. Both are bound: the dashboard is served to
+  // whatever browser the user has, and the sidebar hint showing ⌘ is cosmetic.
+  useEffect(() => {
+    const onKey = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setPaletteOpen((v) => !v);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  const goToSection = useCallback((id) => {
+    setFocusPath(null);
+    setActive(id);
+  }, []);
+
+  const goToFile = useCallback((path) => {
+    // Files only exist on the Overview table, so navigating to one means going
+    // there and pointing at the row rather than opening anything.
+    setActive('overview');
+    setFocusPath(path);
+  }, []);
+
   const counts = useMemo(() => {
     if (!data) return null;
     return {
@@ -136,10 +205,22 @@ export default function App() {
       <Sidebar
         data={data}
         active={active}
-        onSelect={setActive}
+        onSelect={goToSection}
         theme={theme}
         onToggleTheme={toggleTheme}
         counts={counts}
+        recent={recent}
+        onForgetWorkspace={forget}
+        onOpenPalette={() => setPaletteOpen(true)}
+      />
+
+      <CommandPalette
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        sections={SECTIONS}
+        files={data?.overview?.files || []}
+        onGoSection={goToSection}
+        onGoFile={goToFile}
       />
 
       <main className="flex-1 overflow-y-auto">
@@ -194,7 +275,16 @@ export default function App() {
           ) : data && !data.isWorkspace ? (
             <NotAWorkspace data={data} onRetry={load} />
           ) : data ? (
-            <View data={data} />
+            // Every section takes `data`; the rest are section-specific and the
+            // others simply ignore them, which keeps the shell from needing to
+            // know which section wants what.
+            <View
+              data={data}
+              dismissed={dismissed}
+              onDismiss={dismiss}
+              onRestore={restore}
+              focusPath={focusPath}
+            />
           ) : null}
         </div>
 

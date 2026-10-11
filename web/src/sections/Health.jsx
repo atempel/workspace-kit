@@ -10,8 +10,17 @@
  * History growth is a distinct block from per-file size, per the spec — a
  * decision log at 15/15 entries is a different kind of problem from a file
  * being too long, and merging them would blur that.
+ *
+ * Dismissing a suggestion (P1) hides it *here* and nowhere else. It does not
+ * touch the verdict, the counts, or what `workspace-kit doctor` reports — the
+ * finding is still true, the reader has simply decided they are not acting on
+ * it now. Letting a dismissal quiet the verdict would make the two surfaces
+ * disagree about the same workspace, which is the one thing this whole data
+ * layer is built to prevent. The screen says so rather than leaving it to be
+ * inferred, and dismissed items stay one click from coming back.
  */
 
+import { useState } from 'react';
 import {
   Badge,
   Card,
@@ -32,6 +41,7 @@ import {
   statusLabel,
   statusTone,
 } from '../lib/format.js';
+import { suggestionKey } from '../lib/prefs.js';
 
 function severityTone(severity) {
   if (severity === 'high') return 'bad';
@@ -39,10 +49,22 @@ function severityTone(severity) {
   return 'info';
 }
 
-export default function Health({ data }) {
+/**
+ * `dismissed`/`onDismiss`/`onRestore` are optional: the shell owns that state
+ * because it owns persistence, but the section must render correctly without
+ * it — which is also what lets the render tests exercise this file with nothing
+ * but a payload.
+ */
+export default function Health({ data, dismissed = [], onDismiss, onRestore }) {
   const { health } = data;
   const budget = health.budget || {};
   const alwaysLoaded = (health.files || []).filter((f) => f.alwaysLoaded);
+  const [showDismissed, setShowDismissed] = useState(false);
+
+  const all = health.suggestions || [];
+  const isDismissed = (s) => dismissed.indexOf(suggestionKey(s)) !== -1;
+  const hiddenCount = all.filter(isDismissed).length;
+  const visible = showDismissed ? all : all.filter((s) => !isDismissed(s));
 
   return (
     <div>
@@ -173,38 +195,85 @@ export default function Health({ data }) {
       <Card>
         <CardHeader
           title="Suggestions"
-          note="Each one names a specific file and a concrete action."
+          note={
+            'Each one names a specific file and a concrete action.' +
+            (hiddenCount
+              ? ' Dismissing one hides it on this screen only — the health check still counts it.'
+              : '')
+          }
           right={
-            <Badge tone={health.suggestions?.length ? 'warn' : 'ok'}>
-              {health.suggestions?.length || 0}
-            </Badge>
+            <div className="flex items-center gap-2">
+              {hiddenCount > 0 ? (
+                <button
+                  type="button"
+                  data-show-dismissed=""
+                  onClick={() => setShowDismissed((v) => !v)}
+                  className="cursor-pointer text-xs font-medium hover:underline"
+                  style={{ color: 'var(--brand-2)' }}
+                >
+                  {showDismissed ? 'Hide dismissed' : hiddenCount + ' dismissed'}
+                </button>
+              ) : null}
+              <Badge tone={all.length ? 'warn' : 'ok'}>{all.length}</Badge>
+            </div>
           }
         />
-        {(health.suggestions || []).length === 0 ? (
+        {all.length === 0 ? (
           <Empty>Nothing to suggest — this workspace is within every threshold.</Empty>
+        ) : visible.length === 0 ? (
+          <Empty>
+            All {all.length} suggestion{all.length === 1 ? '' : 's'} dismissed on this screen. The
+            health check still reports {all.length === 1 ? 'it' : 'them'}.
+          </Empty>
         ) : (
           <ul>
-            {health.suggestions.map((s, i) => (
-              <li
-                key={i}
-                data-suggestion={s.severity}
-                className="px-5 py-3.5"
-                style={{
-                  borderBottom:
-                    i === health.suggestions.length - 1 ? 'none' : '1px solid var(--border)',
-                }}
-              >
-                <div className="mb-1 flex items-center gap-2">
-                  <Status tone={severityTone(s.severity)}>{s.severity}</Status>
-                  {s.file ? (
-                    <span className="font-mono text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                      {s.file}
-                    </span>
+            {visible.map((s, i) => {
+              const key = suggestionKey(s);
+              const off = isDismissed(s);
+              return (
+                <li
+                  key={key + ':' + i}
+                  data-suggestion={s.severity}
+                  data-dismissed={off ? 'true' : 'false'}
+                  className="flex items-start gap-4 px-5 py-3.5"
+                  style={{
+                    borderBottom: i === visible.length - 1 ? 'none' : '1px solid var(--border)',
+                    opacity: off ? 0.5 : 1,
+                  }}
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-center gap-2">
+                      <Status tone={severityTone(s.severity)}>{s.severity}</Status>
+                      {s.file ? (
+                        <span
+                          className="font-mono text-xs"
+                          style={{ color: 'var(--muted-foreground)' }}
+                        >
+                          {s.file}
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="text-[13px]">{s.message}</p>
+                  </div>
+                  {onDismiss ? (
+                    <button
+                      type="button"
+                      data-dismiss={key}
+                      onClick={() => (off ? onRestore(key) : onDismiss(key))}
+                      className="shrink-0 cursor-pointer rounded px-2 py-1 text-[11.5px] font-medium"
+                      style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}
+                      title={
+                        off
+                          ? 'Show this suggestion again'
+                          : 'Hide this suggestion on this screen. The health check still reports it.'
+                      }
+                    >
+                      {off ? 'Restore' : 'Dismiss'}
+                    </button>
                   ) : null}
-                </div>
-                <p className="text-[13px]">{s.message}</p>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         )}
       </Card>

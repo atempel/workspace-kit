@@ -34,13 +34,31 @@ import Health from './src/sections/Health.jsx';
 import Sessions from './src/sections/Sessions.jsx';
 import Queue from './src/sections/Queue.jsx';
 import SourceControl from './src/sections/SourceControl.jsx';
+import CommandPalette from './src/components/CommandPalette.jsx';
+import { SECTIONS as NAV } from './src/components/Sidebar.jsx';
 
 const SECTIONS = { Overview, Health, Sessions, Queue, SourceControl };
 
-export function render(name, data) {
+export function render(name, data, props) {
   const Component = SECTIONS[name];
-  return renderToStaticMarkup(<Component data={data} />);
+  return renderToStaticMarkup(<Component data={data} {...(props || {})} />);
 }
+
+/** The palette open, with the shell's real section list behind it. */
+export function renderPalette(data) {
+  return renderToStaticMarkup(
+    <CommandPalette
+      open
+      onClose={() => {}}
+      sections={NAV}
+      files={data.overview.files}
+      onGoSection={() => {}}
+      onGoFile={() => {}}
+    />
+  );
+}
+
+export const SECTION_LABELS = NAV.map((s) => s.label);
 `;
 
 const built = esbuild.buildSync({
@@ -57,7 +75,7 @@ const compiled = new Module('dashboard-sections', null);
 compiled.filename = path.join(__dirname, 'dashboard-sections.js');
 compiled.paths = Module._nodeModulePaths(__dirname);
 compiled._compile(built.outputFiles[0].text, compiled.filename);
-const { render } = compiled.exports;
+const { render, renderPalette, SECTION_LABELS } = compiled.exports;
 
 // --- a real payload, from the real server, against a real workspace ---------
 
@@ -233,6 +251,81 @@ test('P0  the session log renders newest-first with its tool tag, never inferred
   });
   assert.ok(/tool not recorded/.test(render('Sessions', untagged)),
     'a missing tool is stated, not guessed');
+});
+
+test('P1  a worktree overlap is flagged on the file and on every worktree holding it', function () {
+  // The fixture has one worktree and no overlap, which is the state that must
+  // stay silent — a flag that fires when nothing overlaps is worse than none.
+  assert.deepStrictEqual(DATA.git.worktreeConflicts, []);
+  assert.ok(!/Worktree overlap/.test(render('SourceControl', DATA)),
+    'nothing is flagged when no file is shared');
+
+  const overlapping = Object.assign({}, DATA, {
+    git: Object.assign({}, DATA.git, {
+      worktrees: [
+        Object.assign({}, DATA.git.worktrees[0]),
+        { path: '/tmp/wt-agent-a', name: 'agent-a', branch: 'agent-a', isMain: false, byConvention: true },
+      ],
+      worktreeConflicts: [
+        {
+          path: 'TASKS.md',
+          worktrees: [
+            { name: DATA.git.worktrees[0].name, path: DATA.git.worktrees[0].path, branch: 'main', state: 'modified-unstaged' },
+            { name: 'agent-a', path: '/tmp/wt-agent-a', branch: 'agent-a', state: 'modified-unstaged' },
+          ],
+        },
+      ],
+    }),
+  });
+
+  const html = render('SourceControl', overlapping);
+  assert.ok(/Worktree overlap/.test(html), 'the overlap is stated');
+  assert.ok(html.indexOf('TASKS.md') !== -1, 'the shared file is named');
+  assert.ok(/agent-a/.test(html), 'and so is each worktree holding it');
+  assert.ok(/1 overlapping/.test(html), 'the worktree row carries the flag too');
+});
+
+test('P1  a dismissed suggestion is hidden on screen without changing what the check reports', function () {
+  const withSuggestions = Object.assign({}, DATA, {
+    health: Object.assign({}, DATA.health, {
+      verdict: 'needs-attention',
+      suggestions: [
+        { kind: 'rotate-log', file: 'DECISIONS.md', message: 'Rotate the decision log.', severity: 'low' },
+        { kind: 'split-file', file: 'AGENTS.md', message: 'Split this file.', severity: 'medium' },
+      ],
+    }),
+  });
+
+  const plain = render('Health', withSuggestions);
+  assert.ok(/Rotate the decision log/.test(plain) && /Split this file/.test(plain));
+
+  // The key the UI dismisses by is derived from the finding itself, so it must
+  // survive a round trip through the same helper the shell stores.
+  const key = 'rotate-log :: DECISIONS.md :: Rotate the decision log.';
+  const html = render('Health', withSuggestions, { dismissed: [key], onDismiss: function () {} });
+
+  assert.ok(!/Rotate the decision log/.test(html), 'the dismissed suggestion is hidden');
+  assert.ok(/Split this file/.test(html), 'the others are untouched');
+  assert.ok(/1 dismissed/.test(html), 'and it is recoverable, not gone');
+
+  // The load-bearing part: dismissing changes the view and nothing else.
+  assert.ok(/Needs attention/.test(html), 'the verdict still comes from the health check');
+  assert.ok(/>2</.test(html), 'the count still reports every finding');
+  assert.ok(/health check still counts it/.test(html), 'and the screen says so');
+});
+
+test('P1  the palette offers every section and every file, and navigates rather than opens', function () {
+  const items = renderPalette(DATA);
+  SECTION_LABELS.forEach(function (label) {
+    assert.ok(items.indexOf('>' + label + '<') !== -1, 'missing section: ' + label);
+  });
+  DATA.overview.files.slice(0, 5).forEach(function (f) {
+    assert.ok(items.indexOf(f.path) !== -1, 'missing file: ' + f.path);
+  });
+  // Navigation only: no action the read-only server cannot perform is offered.
+  [/Commit/, /Delete/, /Generate/, /Push/].forEach(function (pattern) {
+    assert.ok(!pattern.test(items), 'the palette offers an action it cannot perform: ' + pattern);
+  });
 });
 
 test('a folder that is not a workspace is a first-class result, not an error screen', function () {
