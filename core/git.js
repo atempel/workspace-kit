@@ -248,6 +248,27 @@ function buildCommitMessage(summary) {
   return subject + '\n\n' + body.join('\n') + '\n';
 }
 
+/**
+ * One-action commit (#98): stage the files the change summary lists and commit
+ * them locally. No remote is ever contacted. Paths from `git status` are
+ * relative to the repository top, so they are staged with a top-anchored,
+ * literal pathspec and work whatever folder the workspace sits in.
+ */
+function commitChanges(root, summary, message) {
+  if (!summary || !summary.isRepo) return { ok: false, error: 'Not a git repository.' };
+  if (!summary.files.length) return { ok: true, committed: false, files: [] };
+  const text = message || buildCommitMessage(summary);
+  try {
+    git(root, ['add', '-A', '--'].concat(summary.files.map(function (f) { return ':(top,literal)' + f.path; })));
+    git(root, ['commit', '-q', '-m', text]);
+  } catch (err) {
+    const detail = String((err.stderr || err.message || '')).trim();
+    return { ok: false, error: 'Could not commit' + (detail ? ': ' + detail : '.') };
+  }
+  const sha = (tryGit(root, ['rev-parse', '--short', 'HEAD']) || '').trim();
+  return { ok: true, committed: true, files: summary.files.map(function (f) { return f.path; }), sha: sha, message: text };
+}
+
 // ---------------------------------------------------------------------------
 // Worktrees
 //
@@ -563,6 +584,7 @@ module.exports = {
   describeChange: describeChange,
   safeEditCheck: safeEditCheck,
   buildCommitMessage: buildCommitMessage,
+  commitChanges: commitChanges,
   validateWorktreeName: validateWorktreeName,
   defaultWorktreePath: defaultWorktreePath,
   listWorktrees: listWorktrees,
