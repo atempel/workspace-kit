@@ -167,6 +167,20 @@ test('--visual adds the Visual communication section to the agent files', functi
   assert.strictEqual(a, expected['AGENTS.md']);
 });
 
+test('--docker writes the Docker files adapted to the kit; without it there are none', function () {
+  const on = path.join(tmp(), 'a');
+  const off = path.join(tmp(), 'b');
+  assert.strictEqual(run(['new', on, '-y', '--name', 'D', '--kit', 'dataml', '--docker']).code, 0);
+  assert.strictEqual(run(['new', off, '-y', '--name', 'D', '--kit', 'dataml']).code, 0);
+  ['Dockerfile', 'docker-compose.yml', '.dockerignore'].forEach(function (p) {
+    assert.ok(fs.existsSync(path.join(on, p)), 'missing ' + p);
+    assert.ok(!fs.existsSync(path.join(off, p)), p + ' without --docker');
+  });
+  const expected = generator.buildFileMap(scaffold.buildInput({ name: 'D', kit: 'dataml', extra: { docker: true } })).files;
+  assert.strictEqual(fs.readFileSync(path.join(on, 'Dockerfile'), 'utf8'), expected['Dockerfile']);
+  assert.ok(/jupyterlab/.test(expected['Dockerfile']), 'dataml should get the Python stack');
+});
+
 test('defaults to the current directory when no [dir] is given', function () {
   const dir = tmp();
   const r = spawnSync('node', [BIN, 'new', '-y', '--name', 'Here'], { cwd: dir, encoding: 'utf8', env: ENV });

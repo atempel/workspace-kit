@@ -275,6 +275,145 @@
     },
   };
 
+  // ── Docker environment (spec #33) ───────────────────────────────────────
+  // Kit → container mapping, kept next to KIT_CONFIG (the spec's default).
+  // Every kit gets the same skeleton (this repo's own Dockerfile/docker-compose.yml,
+  // minus what is specific to this repo); a profile only says what differs.
+  //   slim  — node:20-bookworm-slim + git/curl only, for kits with no build tooling
+  //   apt   — extra system packages        pip — packages installed into /opt/venv
+  //   ports — published on the host's loopback only
+  var DOCKER_BASE_APT = ['curl', 'git', 'unzip', 'wget', 'ca-certificates', 'python3', 'python3-pip', 'python3-venv', 'build-essential'];
+  var DOCKER_SLIM_APT = ['curl', 'git', 'wget', 'ca-certificates'];
+  var DOCKER_PROFILES = {
+    web:     {ports:[3000, 5173]},
+    node:    {},
+    mobile:  {ports:[8081, 19000, 19001]},
+    scripts: {},
+    python:  {apt:['python3-dev'], pip:['jupyterlab', 'numpy', 'pandas'], ports:[8888]},
+    embedded:{apt:['python3-dev'], pip:['platformio'], devices:true},
+    writing: {slim:true, apt:['pandoc']},
+    audio:   {slim:true, apt:['ffmpeg']},
+    minimal: {slim:true}
+  };
+  var DOCKER_KIT_PROFILE = {
+    produto:'web', site:'web', lib:'node', extension:'node', mobile:'mobile', automacao:'scripts',
+    dataml:'python', hardware:'embedded', escrita:'writing', pesquisa:'writing', course:'writing',
+    podcast:'audio', design:'minimal', jogo:'minimal', boardgame:'minimal', marketing:'minimal', generico:'minimal'
+  };
+
+  function buildDockerFiles(lang, slug, kitKey, opts){
+    opts = opts || {};
+    const en = lang==='en';
+    const p = DOCKER_PROFILES[DOCKER_KIT_PROFILE[kitKey] || 'minimal'];
+    const venv = !!(p.pip && p.pip.length);
+    const apt = (p.slim ? DOCKER_SLIM_APT : DOCKER_BASE_APT).concat(p.apt || []);
+    const aptLines = apt.map(a=>'    '+a+' \\').join('\n');
+    const L = [];
+    L.push(en ? '# Base: Node 20 LTS (Debian Bookworm) — includes npm/npx; the Claude Code CLI runs on it' : '# Base: Node 20 LTS (Debian Bookworm) — inclui npm/npx; o Claude Code CLI roda nela');
+    L.push(p.slim ? 'FROM node:20-bookworm-slim' : 'FROM node:20-bookworm');
+    L.push('');
+    L.push(en ? '# ── System packages ──' : '# ── Pacotes do sistema ──');
+    L.push('RUN apt-get update && apt-get install -y --no-install-recommends \\');
+    L.push(aptLines);
+    L.push('    && rm -rf /var/lib/apt/lists/*');
+    if(opts.git){
+      L.push('');
+      L.push(en ? '# ── GitHub CLI (its official apt repo) — so `git push` survives a container recreate ──' : '# ── GitHub CLI (repositório apt oficial) — para o `git push` sobreviver a recriar o container ──');
+      L.push('RUN mkdir -p /etc/apt/keyrings \\');
+      L.push('    && wget -nv -O- https://cli.github.com/packages/githubcli-archive-keyring.gpg \\');
+      L.push('       | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \\');
+      L.push('    && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \\');
+      L.push('    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \\');
+      L.push('       > /etc/apt/sources.list.d/github-cli.list \\');
+      L.push('    && apt-get update && apt-get install -y --no-install-recommends gh \\');
+      L.push('    && rm -rf /var/lib/apt/lists/*');
+    }
+    if(venv){
+      L.push('');
+      L.push(en ? '# ── Python environment (kept outside /workspace, so it is never committed) ──' : '# ── Ambiente Python (fora de /workspace, para nunca ser commitado) ──');
+      L.push('ENV VIRTUAL_ENV=/opt/venv');
+      L.push('RUN python3 -m venv $VIRTUAL_ENV');
+      L.push('ENV PATH="$VIRTUAL_ENV/bin:$PATH"');
+      L.push('RUN pip install --no-cache-dir ' + p.pip.join(' '));
+    }
+    L.push('');
+    L.push(en ? '# ── Global Node tools ──' : '# ── Ferramentas Node globais ──');
+    L.push('RUN npm install -g @anthropic-ai/claude-code');
+    L.push('');
+    L.push(en ? '# The project is bind-mounted at runtime (see docker-compose.yml), never copied in:' : '# O projeto é montado em tempo de execução (ver docker-compose.yml), nunca copiado:');
+    L.push(en ? '# nothing from it, and no credential, ends up inside the image.' : '# nada dele, e nenhuma credencial, vai parar dentro da imagem.');
+    L.push('WORKDIR /workspace');
+    L.push('');
+    L.push('CMD ["/bin/bash"]');
+    const dockerfile = L.join('\n') + '\n';
+
+    const C = [];
+    C.push('services:');
+    C.push(en ? '  # ── Dev environment ──' : '  # ── Ambiente de desenvolvimento ──');
+    C.push('  dev:');
+    C.push('    build:');
+    C.push('      context: .');
+    C.push('      dockerfile: Dockerfile');
+    C.push('    container_name: ' + slug);
+    C.push('    volumes:');
+    C.push(en ? '      # Project folder (bind mount — editable from the host)' : '      # Pasta do projeto (bind mount — editável a partir do host)');
+    C.push('      - .:/workspace');
+    C.push(en ? '      # Claude Code login/config. Lives on the host, outside the image' + (opts.git ? ', and is git-ignored.' : '. Add it to your ignore file if you use git.') : '      # Login/config do Claude Code. Fica no host, fora da imagem' + (opts.git ? ', e é ignorado pelo git.' : '. Adicione-a ao seu arquivo de ignore se usar git.'));
+    C.push('      - ./.claude_global:/root/.claude');
+    if(opts.git){
+      C.push(en ? '      # The gh token, on a named volume so it never lands in the repo.' : '      # O token do gh, num volume nomeado para nunca cair no repositório.');
+      C.push('      - ' + slug + '_gh:/root/.config/gh');
+    }
+    C.push('    environment:');
+    C.push('      - COLORTERM=truecolor');
+    C.push('      - TERM=xterm-256color');
+    C.push(en ? '      # Keeps Claude Code\'s account state inside the mounted folder above, so it survives a recreate.' : '      # Mantém o estado da conta do Claude Code na pasta montada acima, para sobreviver a recriar o container.');
+    C.push('      - CLAUDE_CONFIG_DIR=/root/.claude');
+    if(p.ports && p.ports.length){
+      C.push(en ? '    # Published on this machine only (127.0.0.1); bind servers to 0.0.0.0 inside the container.' : '    # Publicadas só nesta máquina (127.0.0.1); faça os servidores escutarem em 0.0.0.0 dentro do container.');
+      C.push('    ports:');
+      p.ports.forEach(n=>{ C.push('      - "127.0.0.1:'+n+':'+n+'"'); });
+    }
+    if(p.devices){
+      C.push(en ? '    # Uncomment to reach a board over USB serial (Linux hosts):' : '    # Descomente para acessar uma placa por serial USB (hosts Linux):');
+      C.push('    # devices:');
+      C.push('    #   - /dev/ttyUSB0:/dev/ttyUSB0');
+    }
+    C.push('    tty: true');
+    C.push('    stdin_open: true');
+    C.push('    working_dir: /workspace');
+    if(opts.git){
+      C.push('');
+      C.push('volumes:');
+      C.push('  ' + slug + '_gh: {}');
+    }
+    const compose = C.join('\n') + '\n';
+
+    const I = [];
+    I.push(en ? '# Keep these out of the build context — and so out of the image.' : '# Mantenha estes fora do contexto de build — e portanto fora da imagem.');
+    I.push('.git');
+    I.push('.claude_global/');
+    I.push('.env');
+    I.push('.env.*');
+    I.push('*.local.*');
+    I.push('CLAUDE.local.md');
+    I.push('node_modules/');
+    (opts.localOnlyFolderNames || []).forEach(f=>{ I.push(f + '/'); });
+    return {'Dockerfile': dockerfile, 'docker-compose.yml': compose, '.dockerignore': I.join('\n') + '\n'};
+  }
+
+  function buildDockerNote(lang){
+    return lang==='en'
+      ? '\n\n- Dev container: `docker compose up -d --build`, then `docker compose exec dev bash` (see `Dockerfile` and `docker-compose.yml`). Credentials live in `.claude_global/` or a named volume, never in the image.'
+      : '\n\n- Container de desenvolvimento: `docker compose up -d --build`, depois `docker compose exec dev bash` (ver `Dockerfile` e `docker-compose.yml`). Credenciais ficam em `.claude_global/` ou num volume nomeado, nunca na imagem.';
+  }
+
+  function buildDockerReadmeLine(lang){
+    return lang==='en'
+      ? '- `Dockerfile`, `docker-compose.yml` — dev container (`docker compose up -d --build`)\n'
+      : '- `Dockerfile`, `docker-compose.yml` — container de desenvolvimento (`docker compose up -d --build`)\n';
+  }
+
   var GITIGNORE_BASE = {
     en: `# OS\n.DS_Store\nThumbs.db\n\n# Editors\n.vscode/\n.idea/\n*.swp\n*.swo\n\n# Secrets & local overrides\n.env\n.env.local\n.env.*.local\n*.local.*\nCLAUDE.local.md\n\n# Logs\n*.log\n`,
     pt: `# Sistema operacional\n.DS_Store\nThumbs.db\n\n# Editores\n.vscode/\n.idea/\n*.swp\n*.swo\n\n# Segredos e overrides locais\n.env\n.env.local\n.env.*.local\n*.local.*\nCLAUDE.local.md\n\n# Logs\n*.log\n`,
@@ -290,7 +429,7 @@
 
   function todayStr(lang){ return new Date().toLocaleDateString(lang==='en' ? 'en-US' : 'pt-BR'); }
 
-  function buildGitignore(lang, localOnlyFolderNames){
+  function buildGitignore(lang, localOnlyFolderNames, opts){
     localOnlyFolderNames = localOnlyFolderNames || [];
     let content = GITIGNORE_BASE[lang];
     if(localOnlyFolderNames.length){
@@ -298,6 +437,12 @@
         ? '\n# Local-only folders (heavy or sensitive) — kept out of version control\n'
         : '\n# Pastas locais (pesadas ou sensíveis) — fora do controle de versão\n';
       localOnlyFolderNames.forEach(f=>{ content += `${f}/*\n!${f}/.gitkeep\n`; });
+    }
+    if(opts && opts.docker){
+      content += lang==='en'
+        ? '\n# Docker: the container\'s Claude Code login/config — credentials, never commit\n'
+        : '\n# Docker: login/config do Claude Code no container — credenciais, nunca commitar\n';
+      content += '.claude_global/\n';
     }
     return content;
   }
@@ -339,8 +484,8 @@
 
   function buildAgentBody(d, lang, opts){
     return lang==='en'
-      ? `# ${d.name}\n\n${d.desc}\n\n## Stack & commands\n${d.stack || '(fill in: how to build, test, and run this project)'}\n\n## Limits — don't do this without asking\n${d.limits || '- (fill in)'}\n${buildAgentExtras(lang, opts)}\n## See also\n- PROJECT.md — overview for humans\n- DECISIONS.md — decision history (update on every relevant decision)\n- TASKS.md — active tasks\n- SESSIONS.md — per-session tool-handoff log (append every session, see above)\n- queue/ — saved-but-not-yet-ingested references\n`
-      : `# ${d.name}\n\n${d.desc}\n\n## Stack & comandos\n${d.stack || '(preencher: como buildar, testar e rodar este projeto)'}\n\n## Limites — o que não fazer sem perguntar\n${d.limits || '- (preencher)'}\n${buildAgentExtras(lang, opts)}\n## Ver também\n- PROJECT.md — visão geral para humanos\n- DECISIONS.md — histórico de decisões (atualizar a cada decisão relevante)\n- TASKS.md — tarefas ativas\n- SESSIONS.md — log de passagem de bastão entre ferramentas (acrescentar a cada sessão, ver acima)\n- queue/ — referências salvas ainda não incorporadas\n`;
+      ? `# ${d.name}\n\n${d.desc}\n\n## Stack & commands\n${d.stack || '(fill in: how to build, test, and run this project)'}${opts && opts.docker ? buildDockerNote('en') : ''}\n\n## Limits — don't do this without asking\n${d.limits || '- (fill in)'}\n${buildAgentExtras(lang, opts)}\n## See also\n- PROJECT.md — overview for humans\n- DECISIONS.md — decision history (update on every relevant decision)\n- TASKS.md — active tasks\n- SESSIONS.md — per-session tool-handoff log (append every session, see above)\n- queue/ — saved-but-not-yet-ingested references\n`
+      : `# ${d.name}\n\n${d.desc}\n\n## Stack & comandos\n${d.stack || '(preencher: como buildar, testar e rodar este projeto)'}${opts && opts.docker ? buildDockerNote('pt') : ''}\n\n## Limites — o que não fazer sem perguntar\n${d.limits || '- (preencher)'}\n${buildAgentExtras(lang, opts)}\n## Ver também\n- PROJECT.md — visão geral para humanos\n- DECISIONS.md — histórico de decisões (atualizar a cada decisão relevante)\n- TASKS.md — tarefas ativas\n- SESSIONS.md — log de passagem de bastão entre ferramentas (acrescentar a cada sessão, ver acima)\n- queue/ — referências salvas ainda não incorporadas\n`;
   }
 
   function buildSkillFile(d, slug, lang){
@@ -390,13 +535,13 @@
       : `- \`${f}/\``).join('\n');
 
     if(lang==='en'){
-      files['README.md'] = `# ${d.name}\n\nIndex of this workspace:\n- \`PROJECT.md\` — overview and goal\n- \`DECISIONS.md\` — decision history\n- \`CONTEXT.md\` — accumulated context for the AI\n- \`TASKS.md\` — active tasks\n- \`SESSIONS.md\` — per-session log of who worked here and what state was left\n- \`queue/\` — saved references waiting to be incorporated\n${folderList ? '\nFolders:\n'+folderList : ''}\n\n> The AI is a tool that extends human judgment, not a substitute for it. Relevant decisions go into DECISIONS.md.\n`;
+      files['README.md'] = `# ${d.name}\n\nIndex of this workspace:\n- \`PROJECT.md\` — overview and goal\n- \`DECISIONS.md\` — decision history\n- \`CONTEXT.md\` — accumulated context for the AI\n- \`TASKS.md\` — active tasks\n- \`SESSIONS.md\` — per-session log of who worked here and what state was left\n- \`queue/\` — saved references waiting to be incorporated\n${input.docker ? buildDockerReadmeLine('en') : ''}${folderList ? '\nFolders:\n'+folderList : ''}\n\n> The AI is a tool that extends human judgment, not a substitute for it. Relevant decisions go into DECISIONS.md.\n`;
       files['PROJECT.md'] = `# ${d.name}\n\n## Overview\n${d.desc}\n\n## Main goal\n${d.obj}\n\n## Project type\n${cfg.label[lang]}\n\n## Stack\n${d.stack || '(fill in)'}\n\n## Status\n🟡 In definition\n\n---\nCreated on ${date} via workspace//kit.\n`;
       files['DECISIONS.md'] = `# Decisions — ${d.name}\n\nChronological record of decisions made in this project. Each entry should contain what, why, and discarded alternatives. Once this file passes ~15 entries, move the oldest to individual files under \`decisions/\` and leave one line plus a link per entry here.\n\n## ${date}\n- **Decision:** —\n- **Reason:** —\n- **Alternatives considered:** —\n`;
       files['CONTEXT.md'] = `# Context — ${d.name}\n\nContext the AI should know to work well on this project: conventions, constraints, vocabulary, people involved.\n\n## Conventions\n- \n\n## Constraints\n- \n\n## Vocabulary / specific terms\n- \n`;
       files['TASKS.md'] = `# Tasks — ${d.name}\n\n## In progress\n- [ ] \n\n## Next\n- [ ] \n\n## Recurring\nSuggestions for this project type; keep, edit or delete.\n${buildRecurringList(cfg, 'en')}\n## Done\n- [x] Workspace created (${date})\n`;
     } else {
-      files['README.md'] = `# ${d.name}\n\nÍndice deste workspace:\n- \`PROJECT.md\` — visão geral e objetivo\n- \`DECISIONS.md\` — histórico de decisões\n- \`CONTEXT.md\` — contexto acumulado para a IA\n- \`TASKS.md\` — tarefas ativas\n- \`SESSIONS.md\` — log por sessão de quem trabalhou aqui e em que estado deixou\n- \`queue/\` — referências salvas aguardando incorporação\n${folderList ? '\nPastas:\n'+folderList : ''}\n\n> A IA é uma ferramenta que amplia julgamento humano, não um substituto para ele. Decisões relevantes vão para DECISIONS.md.\n`;
+      files['README.md'] = `# ${d.name}\n\nÍndice deste workspace:\n- \`PROJECT.md\` — visão geral e objetivo\n- \`DECISIONS.md\` — histórico de decisões\n- \`CONTEXT.md\` — contexto acumulado para a IA\n- \`TASKS.md\` — tarefas ativas\n- \`SESSIONS.md\` — log por sessão de quem trabalhou aqui e em que estado deixou\n- \`queue/\` — referências salvas aguardando incorporação\n${input.docker ? buildDockerReadmeLine('pt') : ''}${folderList ? '\nPastas:\n'+folderList : ''}\n\n> A IA é uma ferramenta que amplia julgamento humano, não um substituto para ele. Decisões relevantes vão para DECISIONS.md.\n`;
       files['PROJECT.md'] = `# ${d.name}\n\n## Visão geral\n${d.desc}\n\n## Objetivo principal\n${d.obj}\n\n## Tipo de projeto\n${cfg.label[lang]}\n\n## Stack\n${d.stack || '(preencher)'}\n\n## Status\n🟡 Em definição\n\n---\nCriado em ${date} via workspace//kit.\n`;
       files['DECISIONS.md'] = `# Decisões — ${d.name}\n\nRegistro cronológico de decisões tomadas neste projeto. Cada entrada deve conter o quê, por quê, e alternativas descartadas. Quando este arquivo passar de ~15 entradas, mova as mais antigas para arquivos individuais em \`decisions/\` e deixe aqui uma linha com link para cada uma.\n\n## ${date}\n- **Decisão:** —\n- **Motivo:** —\n- **Alternativas consideradas:** —\n`;
       files['CONTEXT.md'] = `# Contexto — ${d.name}\n\nContexto que a IA deve conhecer para trabalhar bem neste projeto: convenções, restrições, vocabulário, pessoas envolvidas.\n\n## Convenções\n- \n\n## Restrições\n- \n\n## Vocabulário / termos específicos\n- \n`;
@@ -409,9 +554,10 @@
   files['ONBOARDING.md'] = buildOnboardingFile(d, lang, cfg, folders);
     files[`queue/${keepName}`] = '';
     if(cfg.extraFile){ files[cfg.extraFile.path[lang]] = cfg.extraFile.build(d.name, lang); }
-    if(input.git){ files['.gitignore'] = buildGitignore(lang, localOnlyFolderNames); }
+    if(input.git){ files['.gitignore'] = buildGitignore(lang, localOnlyFolderNames, {docker: !!input.docker}); }
+    if(input.docker){ Object.assign(files, buildDockerFiles(lang, slug, d.kit, {git: !!input.git, localOnlyFolderNames: localOnlyFolderNames})); }
 
-    const agentBody = buildAgentBody(d, lang, {git: !!input.git, visual: !!input.visual});
+    const agentBody = buildAgentBody(d, lang, {git: !!input.git, visual: !!input.visual, docker: !!input.docker});
     const agents = input.agents || {};
     const wantsAgentsmd = !!agents.agentsmd;
     if(agents.claude){
@@ -499,6 +645,8 @@ Comece revisando os arquivos do workspace e depois siga o ONBOARDING.md: ele gui
     slugify: slugify,
     todayStr: todayStr,
     buildGitignore: buildGitignore,
+    buildDockerFiles: buildDockerFiles,
+    DOCKER_KIT_PROFILE: DOCKER_KIT_PROFILE,
     buildAgentBody: buildAgentBody,
     buildSkillFile: buildSkillFile,
     buildAgentFileList: buildAgentFileList,
