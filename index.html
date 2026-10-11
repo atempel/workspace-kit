@@ -708,6 +708,7 @@ const KIT_CONFIG = {
     ],
     defaults:[true,true,true],
     stackPh:{en:'e.g. Tauri v2 + React + SQLite · pnpm · tests with vitest', pt:'Ex: Tauri v2 + React + SQLite · pnpm · testes com vitest'},
+    recurring:{en:["Weekly: review open decisions and update PROJECT.md status", "Weekly: prune the backlog; move stale tasks out of \"Next\"", "Per release: record scope changes in docs/PRD.md and DECISIONS.md"], pt:["Semanal: revisar decisões em aberto e atualizar o status em PROJECT.md", "Semanal: podar o backlog; tirar tarefas paradas de \"Próximas\"", "A cada release: registrar mudanças de escopo em docs/PRD.md e DECISIONS.md"]},
     limitsPh:{en:"e.g. don't commit directly to main · don't use paid libraries without asking", pt:'Ex: não commitar direto na main · não usar libs pagas sem avisar'},
     extraFile:{path:{en:'docs/PRD.md', pt:'docs/PRD.md'}, build:(n,lang)=> lang==='en'
       ? `# PRD — ${n}\n\n## Problem\n\n## Proposed solution\n\n## Scope\n\n## Out of scope\n\n## Success metrics\n`
@@ -722,6 +723,7 @@ const KIT_CONFIG = {
     ],
     defaults:[true,true,true],
     stackPh:{en:'e.g. Python + pandas + Jupyter · dataset in /data', pt:'Ex: Python + pandas + Jupyter · dataset em /dados'},
+    recurring:{en:["Weekly: add new sources to the notes folder, one note per source", "Weekly: re-check open questions and note what changed", "Per milestone: record which outputs came from which data, and how"], pt:["Semanal: adicionar novas fontes à pasta de notas, uma nota por fonte", "Semanal: revisar perguntas em aberto e anotar o que mudou", "A cada marco: registrar quais outputs vieram de quais dados, e como"]},
     limitsPh:{en:'e.g. never modify raw data, only copy before processing', pt:'Ex: nunca alterar os dados brutos, só copiar antes de processar'},
   },
   escrita: {
@@ -733,6 +735,7 @@ const KIT_CONFIG = {
     ],
     defaults:[true,true,false],
     stackPh:{en:'e.g. Markdown · published on Medium (PT/EN)', pt:'Ex: Markdown · publicação no Medium (PT/EN)'},
+    recurring:{en:["Weekly: review drafts and mark which are ready, stalled or dropped", "Weekly: add new references with a one-line note on why they matter", "Per publication: move the final text out of drafts and log it in DECISIONS.md"], pt:["Semanal: revisar rascunhos e marcar quais estão prontos, parados ou descartados", "Semanal: adicionar novas referências com uma linha sobre por que importam", "A cada publicação: tirar o texto final de rascunhos e registrar em DECISIONS.md"]},
     limitsPh:{en:"e.g. keep a first-person tone · never present the AI as the text's author", pt:'Ex: manter tom em primeira pessoa · nunca apresentar a IA como autora do texto'},
   },
   design: {
@@ -744,6 +747,7 @@ const KIT_CONFIG = {
     ],
     defaults:[true,true,true],
     stackPh:{en:'e.g. Figma as source of truth · tokens exported to /assets', pt:'Ex: Figma como fonte da verdade · tokens exportados em /assets'},
+    recurring:{en:["Weekly: file new references and drop the ones no longer relevant", "Per design round: sync assets and wireframes, and note what changed", "Before handoff: update handoff/SPEC.md (tokens, components, states)"], pt:["Semanal: arquivar novas referências e descartar as que perderam relevância", "A cada rodada de design: sincronizar assets e wireframes e anotar o que mudou", "Antes do handoff: atualizar handoff/SPEC.md (tokens, componentes, estados)"]},
     limitsPh:{en:"e.g. don't generate final assets with AI without clearly marking them as drafts", pt:'Ex: não gerar peças finais com IA sem marcar claramente como rascunho'},
     extraFile:{path:{en:'handoff/SPEC.md', pt:'handoff/SPEC.md'}, build:(n,lang)=> lang==='en'
       ? `# Handoff spec — ${n}\n\n## Tokens\n\n## Components\n\n## States\n\n## Breakpoints\n`
@@ -758,6 +762,7 @@ const KIT_CONFIG = {
     ],
     defaults:[true,true,true],
     stackPh:{en:'e.g. Python + PyTorch · data versioned outside git', pt:'Ex: Python + PyTorch · dados versionados fora do git'},
+    recurring:{en:["Per experiment: log parameters, data version and result in DECISIONS.md", "Weekly: clean up stale notebooks and outputs", "Monthly: check that the data and models folders still match what the notebooks expect"], pt:["A cada experimento: registrar parâmetros, versão dos dados e resultado em DECISIONS.md", "Semanal: limpar notebooks e outputs obsoletos", "Mensal: conferir se as pastas de dados e modelos ainda batem com o que os notebooks esperam"]},
     limitsPh:{en:'e.g. never push the full dataset to the repository', pt:'Ex: nunca subir dataset completo pro repositório'},
   },
   automacao: {
@@ -769,6 +774,7 @@ const KIT_CONFIG = {
     ],
     defaults:[true,true,false],
     stackPh:{en:'e.g. Node.js + node-cron · runs via PowerShell 7', pt:'Ex: Node.js + node-cron · roda via PowerShell 7'},
+    recurring:{en:["Weekly: check the logs for failures and note recurring ones", "Monthly: review scripts that nobody uses and ask whether to keep them", "Per change: list new config keys or credentials (names only, never values) in CONTEXT.md"], pt:["Semanal: checar os logs em busca de falhas e anotar as recorrentes", "Mensal: revisar scripts que ninguém usa e perguntar se devem ficar", "A cada mudança: listar novas chaves de config ou credenciais (só os nomes, nunca os valores) em CONTEXT.md"]},
     limitsPh:{en:'e.g. never commit credentials or tokens in /config', pt:'Ex: nunca commitar credenciais ou tokens em /config'},
   },
   jogo: {
@@ -780,6 +786,7 @@ const KIT_CONFIG = {
     ],
     defaults:[true,false,true],
     stackPh:{en:'e.g. Construct 3 / Unreal Engine 5 · Blueprints only', pt:'Ex: Construct 3 / Unreal Engine 5 · só Blueprints'},
+    recurring:{en:["Weekly: playtest the current build and log what felt wrong", "Weekly: cut or defer anything outside the scope in design/GDD.md", "Per build: note the version and known bugs next to the file in builds"], pt:["Semanal: jogar o build atual e anotar o que pareceu errado", "Semanal: cortar ou adiar o que estiver fora do escopo em design/GDD.md", "A cada build: anotar a versão e os bugs conhecidos junto ao arquivo em builds"]},
     limitsPh:{en:'e.g. single mechanic, scope of a few days · no multi-layer systems', pt:'Ex: mecânica única, escopo de poucos dias · nada de sistemas multi-camada'},
     extraFile:{path:{en:'design/GDD.md', pt:'design/GDD.md'}, build:(n,lang)=> lang==='en'
       ? `# GDD — ${n}\n\n## One-sentence concept\n\n## Core mechanic (core loop)\n\n## Scope (what fits the timeline)\n\n## Out of scope\n`
@@ -794,6 +801,7 @@ const KIT_CONFIG = {
     ],
     defaults:[true,true,true],
     stackPh:{en:'e.g. cooperative, WWII aviation theme · print-and-play for testing', pt:'Ex: cooperativo, tema WWII aviação · print-and-play pra testar'},
+    recurring:{en:["Per playtest: record players, rule questions and what to change", "Weekly: update the rules text and mark the version it matches", "Weekly: list prototype changes still untested"], pt:["A cada playtest: registrar jogadores, dúvidas de regra e o que mudar", "Semanal: atualizar o texto das regras e marcar a versão a que corresponde", "Semanal: listar mudanças de protótipo ainda não testadas"]},
     limitsPh:{en:'e.g. every balance change must be logged with a reason', pt:'Ex: todo ajuste de balanceamento precisa ser registrado com o motivo'},
     extraFile:{path:{en:'rules/RULEBOOK.md', pt:'regras/RULEBOOK.md'}, build:(n,lang)=> lang==='en'
       ? `# Rulebook — ${n}\n\n## Theme\n\n## Game objective\n\n## Components\n\n## Setup\n\n## Turn / flow\n\n## Win and loss conditions\n`
@@ -808,6 +816,7 @@ const KIT_CONFIG = {
     ],
     defaults:[true,true,true],
     stackPh:{en:'e.g. Astro/Next.js · deployed on Vercel', pt:'Ex: Astro/Next.js · deploy na Vercel'},
+    recurring:{en:["Weekly: review content for outdated pages and broken links", "Per release: check performance and accessibility, and note the results", "Monthly: review dependencies and flag the ones that need upgrading"], pt:["Semanal: revisar o conteúdo em busca de páginas desatualizadas e links quebrados", "A cada release: checar performance e acessibilidade e anotar os resultados", "Mensal: revisar dependências e sinalizar as que precisam de atualização"]},
     limitsPh:{en:'e.g. keep Lighthouse performance score above 90', pt:'Ex: manter Lighthouse acima de 90 em performance'},
   },
   lib: {
@@ -819,6 +828,7 @@ const KIT_CONFIG = {
     ],
     defaults:[true,true,true],
     stackPh:{en:'e.g. TypeScript · published on npm · strict semver', pt:'Ex: TypeScript · publicado no npm · semver estrito'},
+    recurring:{en:["Weekly: triage open issues and label them", "Per release: update the changelog and check that the examples still run", "Monthly: review dependencies and flag the ones that need upgrading"], pt:["Semanal: triar as issues abertas e classificá-las", "A cada release: atualizar o changelog e conferir se os exemplos ainda rodam", "Mensal: revisar dependências e sinalizar as que precisam de atualização"]},
     limitsPh:{en:'e.g. every public API change needs a changelog entry', pt:'Ex: toda mudança pública de API precisa de entrada no changelog'},
     extraFile:{path:{en:'docs/API.md', pt:'docs/API.md'}, build:(n,lang)=> lang==='en'
       ? `# API reference — ${n}\n\n## Installation\n\n## Basic usage\n\n## Public API\n\n## Versioning\n`
@@ -833,6 +843,7 @@ const KIT_CONFIG = {
     ],
     defaults:[true,true,false],
     stackPh:{en:'e.g. React Native + Expo · TestFlight for iOS beta · target Android 8+', pt:'Ex: React Native + Expo · TestFlight pra beta iOS · Android 8+ como alvo'},
+    recurring:{en:["Per release: update store listing text and screenshots", "Monthly: check the platform changes that affect the app and note them", "Weekly: review crash reports and user feedback, and list what to fix"], pt:["A cada release: atualizar texto e screenshots da ficha na loja", "Mensal: checar mudanças de plataforma que afetam o app e anotá-las", "Semanal: revisar relatórios de crash e feedback de usuários e listar o que corrigir"]},
     limitsPh:{en:"e.g. don't submit to app stores without review · keep requested permissions minimal", pt:'Ex: não submeter às lojas sem revisão · manter permissões pedidas no mínimo'},
     extraFile:{path:{en:'store/LISTING.md', pt:'store/LISTING.md'}, build:(n,lang)=> lang==='en'
       ? `# Store listing — ${n}\n\n## App name\n\n## Short description\n\n## Full description\n\n## Screenshots\n\n## Keywords\n\n## Privacy policy URL\n\n## Support contact\n`
@@ -847,6 +858,7 @@ const KIT_CONFIG = {
     ],
     defaults:[true,true,false],
     stackPh:{en:'e.g. Manifest V3 · Chrome Web Store + Firefox Add-ons · TypeScript', pt:'Ex: Manifest V3 · Chrome Web Store + Firefox Add-ons · TypeScript'},
+    recurring:{en:["Per release: update the store listing and re-check the requested permissions", "Monthly: test on the latest browser versions and note any breakage", "Weekly: review user feedback and list what to fix"], pt:["A cada release: atualizar a ficha na loja e rever as permissões solicitadas", "Mensal: testar nas versões mais recentes do navegador e anotar problemas", "Semanal: revisar feedback de usuários e listar o que corrigir"]},
     limitsPh:{en:"e.g. don't request broader permissions than needed · document every permission's purpose", pt:'Ex: não pedir permissões além do necessário · documentar o motivo de cada permissão'},
     extraFile:{path:{en:'docs/PERMISSIONS.md', pt:'docs/PERMISSIONS.md'}, build:(n,lang)=> lang==='en'
       ? `# Permissions — ${n}\n\n## Requested permissions\n\n## Why each one is needed\n\n## Data collected\n\n## Store listing notes\n`
@@ -861,6 +873,7 @@ const KIT_CONFIG = {
     ],
     defaults:[true,true,true],
     stackPh:{en:'e.g. ESP32 + Arduino framework · KiCad for schematics · 3D-printed enclosure', pt:'Ex: ESP32 + framework Arduino · KiCad pra esquemas · case impresso em 3D'},
+    recurring:{en:["Per hardware revision: update docs (pinout, wiring) and note the firmware version it matches", "Weekly: list open bugs and which revision each affects", "Per firmware release: record the changes and how it was tested"], pt:["A cada revisão de hardware: atualizar docs (pinagem, ligações) e anotar a versão de firmware correspondente", "Semanal: listar bugs abertos e qual revisão cada um afeta", "A cada firmware: registrar as mudanças e como foi testado"]},
     limitsPh:{en:"e.g. don't change pinout without updating the schematic · flag any part with lead time over 2 weeks", pt:'Ex: não mudar pinagem sem atualizar o esquema · avisar sobre peças com prazo de entrega acima de 2 semanas'},
     extraFile:{path:{en:'hardware/BOM.md', pt:'hardware/BOM.md'}, build:(n,lang)=> lang==='en'
       ? `# Bill of materials — ${n}\n\n## Components\n\n## Sourcing / suppliers\n\n## Estimated cost\n\n## Lead-time risks\n`
@@ -875,6 +888,7 @@ const KIT_CONFIG = {
     ],
     defaults:[true,true,false],
     stackPh:{en:'e.g. delivered via Notion + recorded video · cohort-based, 6 weeks', pt:'Ex: entregue via Notion + vídeo gravado · em turma, 6 semanas'},
+    recurring:{en:["Per module: review it against the learning objectives", "Per cohort: collect learner feedback and list changes to make", "Monthly: check materials for outdated content and broken links"], pt:["A cada módulo: revisá-lo frente aos objetivos de aprendizagem", "A cada turma: coletar feedback dos alunos e listar mudanças a fazer", "Mensal: checar materiais em busca de conteúdo desatualizado e links quebrados"]},
     limitsPh:{en:"e.g. don't change learning objectives without updating the syllabus · keep exercises aligned to stated objectives", pt:'Ex: não mudar objetivos de aprendizagem sem atualizar a ementa · manter exercícios alinhados aos objetivos'},
     extraFile:{path:{en:'docs/SYLLABUS.md', pt:'docs/SYLLABUS.md'}, build:(n,lang)=> lang==='en'
       ? `# Syllabus — ${n}\n\n## Audience\n\n## Learning objectives\n\n## Module breakdown\n\n## Assessment criteria\n\n## Prerequisites\n`
@@ -889,6 +903,7 @@ const KIT_CONFIG = {
     ],
     defaults:[true,true,true],
     stackPh:{en:'e.g. Meta Ads + Google Ads · scheduled via Buffer · landing page on Webflow', pt:'Ex: Meta Ads + Google Ads · agendado via Buffer · landing page na Webflow'},
+    recurring:{en:["Weekly: update the calendar and mark what is published, scheduled or late", "Per campaign: record results next to the copy that was used", "Monthly: review which assets are still current"], pt:["Semanal: atualizar o calendário e marcar o que está publicado, agendado ou atrasado", "A cada campanha: registrar os resultados junto ao texto usado", "Mensal: revisar quais assets ainda estão atuais"]},
     limitsPh:{en:"e.g. don't publish paid ads without approval · keep messaging consistent with brand guidelines", pt:'Ex: não publicar anúncios pagos sem aprovação · manter mensagem consistente com as diretrizes de marca'},
     extraFile:{path:{en:'docs/BRIEF.md', pt:'docs/BRIEF.md'}, build:(n,lang)=> lang==='en'
       ? `# Campaign brief — ${n}\n\n## Objective\n\n## Target audience\n\n## Key message\n\n## Channels\n\n## Budget\n\n## Success metrics\n\n## Timeline\n`
@@ -903,6 +918,7 @@ const KIT_CONFIG = {
     ],
     defaults:[true,true,false],
     stackPh:{en:'e.g. recorded in Riverside.fm · edited in Descript · published via Spotify for Podcasters', pt:'Ex: gravado no Riverside.fm · editado no Descript · publicado via Spotify for Podcasters'},
+    recurring:{en:["Per episode: log guests, topics and publish date; move the final file to published", "Weekly: keep a list of upcoming episode ideas", "Monthly: review the raw folder and clear what is no longer needed, after asking"], pt:["A cada episódio: registrar convidados, temas e data de publicação; mover o arquivo final para publicado", "Semanal: manter uma lista de ideias de próximos episódios", "Mensal: revisar a pasta raw e limpar o que não é mais necessário, depois de perguntar"]},
     limitsPh:{en:"e.g. don't publish an episode without a reviewed transcript · credit guests accurately", pt:'Ex: não publicar episódio sem transcrição revisada · creditar convidados corretamente'},
     extraFile:{path:{en:'docs/SHOW-BIBLE.md', pt:'docs/SHOW-BIBLE.md'}, build:(n,lang)=> lang==='en'
       ? `# Show bible — ${n}\n\n## Premise\n\n## Format\n\n## Target audience\n\n## Episode structure\n\n## Tone & voice guidelines\n`
@@ -917,6 +933,7 @@ const KIT_CONFIG = {
     ],
     defaults:[false,false,false],
     stackPh:{en:'e.g. tools and conventions used in this project', pt:'Ex: ferramentas e convenções usadas neste projeto'},
+    recurring:{en:["Weekly: review TASKS.md and move stale items out of \"In progress\"", "Weekly: add anything you decided to DECISIONS.md", "Monthly: check whether the folder structure still fits the work"], pt:["Semanal: revisar TASKS.md e tirar itens parados de \"Em andamento\"", "Semanal: registrar em DECISIONS.md o que foi decidido", "Mensal: conferir se a estrutura de pastas ainda serve ao trabalho"]},
     limitsPh:{en:'e.g. what the AI should not decide on its own here', pt:'Ex: o que a IA não deve decidir sozinha aqui'},
   },
 };
@@ -1050,6 +1067,17 @@ function buildGitignore(){
   return content;
 }
 
+function buildRecurringList(cfg, lang){
+  return cfg.recurring[lang].map(s=>'- '+s).join('\n') + '\n';
+}
+
+function buildOnboardingFile(d, lang, cfg, folders){
+  const fl = folders.length ? folders.map(f=>'`'+f+'/`').join(', ') : (lang==='en' ? '(none selected)' : '(nenhuma selecionada)');
+  return lang==='en'
+    ? `# Onboarding — ${d.name}\n\nRead this once, at the start of the project. It guides the first conversation; it is not a standing rule. When it is done, delete this file.\n\n## 1. Fill in the basics (one at a time, with me)\n- PROJECT.md — confirm the overview, goal and stack; ask what is missing.\n- CONTEXT.md — ask about conventions, constraints, vocabulary and the people involved.\n- DECISIONS.md — record any decision already made, with the discarded alternatives.\n- TASKS.md — turn the goal into a short first list of tasks. Also review the \`Recurring\` section, which holds suggestions for this project type: keep, edit or delete each one.\n\n## 2. Plan and explore\n- Look at the folders created for this project: ${fl}. Say what you understand each is for and ask whether that is right.\n- Propose a first plan: the next 3 to 5 steps, the open questions, and the risks you can already see. Present options and trade-offs; I decide.\n- Mark what is fact, inference or assumption.\n\n## 3. Suggest improvements, don't apply them\n- If the structure could be better (folders, names, splitting or merging files), describe the change and why, and wait for my approval.\n- Never move, rename or delete existing files on your own.\n\n## 4. Close the onboarding\n- Append an entry to SESSIONS.md.\n- Delete this file (ONBOARDING.md). Nothing else needs to change; the agent file only mentions it while it exists.\n`
+    : `# Onboarding — ${d.name}\n\nLeia isto uma vez, no início do projeto. Serve para guiar a primeira conversa; não é uma regra permanente. Quando terminar, apague este arquivo.\n\n## 1. Preencher o básico (um de cada vez, comigo)\n- PROJECT.md — confirme a visão geral, o objetivo e a stack; pergunte o que falta.\n- CONTEXT.md — pergunte sobre convenções, restrições, vocabulário e pessoas envolvidas.\n- DECISIONS.md — registre qualquer decisão já tomada, com as alternativas descartadas.\n- TASKS.md — transforme o objetivo em uma lista curta de primeiras tarefas. Revise também a seção \`Recorrentes\`, com sugestões para este tipo de projeto: mantenha, edite ou apague cada uma.\n\n## 2. Planejar e explorar\n- Olhe as pastas criadas para este projeto: ${fl}. Diga o que entendeu de cada uma e pergunte se está certo.\n- Proponha um primeiro plano: os próximos 3 a 5 passos, as perguntas em aberto e os riscos que já dá para ver. Apresente opções e trade-offs; eu decido.\n- Marque o que é fato, inferência ou suposição.\n\n## 3. Sugerir melhorias, sem aplicá-las\n- Se a estrutura puder melhorar (pastas, nomes, dividir ou juntar arquivos), descreva a mudança e o motivo, e espere minha aprovação.\n- Nunca mova, renomeie ou apague arquivos existentes por conta própria.\n\n## 4. Encerrar o onboarding\n- Acrescente uma entrada em SESSIONS.md.\n- Apague este arquivo (ONBOARDING.md). Nada mais precisa mudar; o arquivo do agente só o menciona enquanto ele existir.\n`;
+}
+
 function buildSessionsFile(d, lang, isoDate){
   return lang==='en'
     ? `# Sessions — ${d.name}\n\nAppend-only log of who touched this workspace, in what tool, and what state it was left in. One entry per session, added by whichever agent or tool is ending its session — a mechanical handoff record, not project history (the reasons behind decisions live in DECISIONS.md).\n\n## Entries\n\n### ${isoDate} — workspace//kit\n**Did:** Workspace generated from the form answers.\n**Left at:** Base files created; nothing filled in beyond the form. Next: review PROJECT.md and CONTEXT.md, then start on TASKS.md.\n`
@@ -1059,8 +1087,8 @@ function buildSessionsFile(d, lang, isoDate){
 function buildAgentExtras(lang, opts){
   opts = opts || {};
   let out = lang==='en'
-    ? `\n## Every session\n- Before ending your session, append one entry to \`SESSIONS.md\`: which tool/surface you ran in, what was done, and the state you left behind. This applies to every session, not just the first.\n- If you saved a reference you haven't incorporated yet (a voice note, document, link), file a stub under \`queue/\` — one \`.md\` file per reference, in this format:\n\n  \`\`\`\n  # Queue item — <Title>\n\n  - **Type:** <Voice note | Document | Link | Board | Other>\n  - **Source:** <URL or description>\n  - **Added:** <YYYY-MM-DD>\n  - **Status:** Pending\n\n  ## Notes\n  <what this covers and what to extract when ingesting>\n  \`\`\`\n\n- When you ingest a queue item, edit that same file: set \`Status: Ingested (<date>)\` and add an \`Ingested into:\` line. \`grep -l "Status: Pending" queue/*.md\` lists what's still open.\n- Keep DECISIONS.md short: once it passes ~15 entries, move the oldest to individual files under \`decisions/\` (e.g. \`decisions/001-short-title.md\`), leaving one line plus a link per moved entry in DECISIONS.md.\n`
-    : `\n## Toda sessão\n- Antes de encerrar a sessão, acrescente uma entrada em \`SESSIONS.md\`: em qual ferramenta/superfície você rodou, o que foi feito e o estado em que deixou. Vale para toda sessão, não só a primeira.\n- Se você salvou uma referência que ainda não foi incorporada (nota de voz, documento, link), crie um stub em \`queue/\` — um arquivo \`.md\` por referência, neste formato:\n\n  \`\`\`\n  # Queue item — <Título>\n\n  - **Type:** <Voice note | Document | Link | Board | Other>\n  - **Source:** <URL ou descrição>\n  - **Added:** <AAAA-MM-DD>\n  - **Status:** Pending\n\n  ## Notes\n  <o que isto cobre e o que extrair ao incorporar>\n  \`\`\`\n\n- Ao incorporar um item da fila, edite o próprio arquivo: troque para \`Status: Ingested (<data>)\` e adicione uma linha \`Ingested into:\`. \`grep -l "Status: Pending" queue/*.md\` lista o que ainda está aberto.\n- Mantenha o DECISIONS.md enxuto: quando passar de ~15 entradas, mova as mais antigas para arquivos individuais em \`decisions/\` (ex: \`decisions/001-titulo-curto.md\`), deixando em DECISIONS.md uma linha com link para cada entrada movida.\n`;
+    ? `\n## First session\n- If \`ONBOARDING.md\` exists in this folder, follow it first. When it is done it gets deleted; if the file is not there, ignore this section.\n\n## Every session\n- Before ending your session, append one entry to \`SESSIONS.md\`: which tool/surface you ran in, what was done, and the state you left behind. This applies to every session, not just the first.\n- If you saved a reference you haven't incorporated yet (a voice note, document, link), file a stub under \`queue/\` — one \`.md\` file per reference, in this format:\n\n  \`\`\`\n  # Queue item — <Title>\n\n  - **Type:** <Voice note | Document | Link | Board | Other>\n  - **Source:** <URL or description>\n  - **Added:** <YYYY-MM-DD>\n  - **Status:** Pending\n\n  ## Notes\n  <what this covers and what to extract when ingesting>\n  \`\`\`\n\n- When you ingest a queue item, edit that same file: set \`Status: Ingested (<date>)\` and add an \`Ingested into:\` line. \`grep -l "Status: Pending" queue/*.md\` lists what's still open.\n- Keep DECISIONS.md short: once it passes ~15 entries, move the oldest to individual files under \`decisions/\` (e.g. \`decisions/001-short-title.md\`), leaving one line plus a link per moved entry in DECISIONS.md.\n- If you see a better way to organize the workspace (folders, names, splitting a long file), suggest it and wait for approval. Never move, rename or delete files on your own.\n`
+    : `\n## Primeira sessão\n- Se existir \`ONBOARDING.md\` nesta pasta, siga-o primeiro. Quando terminar, ele é apagado; se o arquivo não estiver aí, ignore esta seção.\n\n## Toda sessão\n- Antes de encerrar a sessão, acrescente uma entrada em \`SESSIONS.md\`: em qual ferramenta/superfície você rodou, o que foi feito e o estado em que deixou. Vale para toda sessão, não só a primeira.\n- Se você salvou uma referência que ainda não foi incorporada (nota de voz, documento, link), crie um stub em \`queue/\` — um arquivo \`.md\` por referência, neste formato:\n\n  \`\`\`\n  # Queue item — <Título>\n\n  - **Type:** <Voice note | Document | Link | Board | Other>\n  - **Source:** <URL ou descrição>\n  - **Added:** <AAAA-MM-DD>\n  - **Status:** Pending\n\n  ## Notes\n  <o que isto cobre e o que extrair ao incorporar>\n  \`\`\`\n\n- Ao incorporar um item da fila, edite o próprio arquivo: troque para \`Status: Ingested (<data>)\` e adicione uma linha \`Ingested into:\`. \`grep -l "Status: Pending" queue/*.md\` lista o que ainda está aberto.\n- Mantenha o DECISIONS.md enxuto: quando passar de ~15 entradas, mova as mais antigas para arquivos individuais em \`decisions/\` (ex: \`decisions/001-titulo-curto.md\`), deixando em DECISIONS.md uma linha com link para cada entrada movida.\n- Se enxergar uma forma melhor de organizar o workspace (pastas, nomes, dividir um arquivo longo), sugira e espere aprovação. Nunca mova, renomeie ou apague arquivos por conta própria.\n`;
   if(opts.git){
     out += lang==='en'
       ? `\n## Working with git\n- Commit small, coherent changes, with a message that says what changed and why. Never commit secrets or files listed in \`.gitignore\`.\n- Work on a branch named after the task, not directly on the main branch.\n- When several agents or sessions work in parallel, give each its own git worktree (\`git worktree add ../<name> -b <branch>\`) so their working folders don't collide; remove it once its branch is merged.\n- Propose changes through a pull request: describe what changed, why, and how it was checked. A human decides when to merge.\n- Don't force-push or rewrite shared history without asking.\n`
@@ -1116,18 +1144,19 @@ function buildFileMap(){
     files['PROJECT.md'] = `# ${d.name}\n\n## Overview\n${d.desc}\n\n## Main goal\n${d.obj}\n\n## Project type\n${cfg.label[LANG]}\n\n## Stack\n${d.stack || '(fill in)'}\n\n## Status\n🟡 In definition\n\n---\nCreated on ${date} via workspace//kit.\n`;
     files['DECISIONS.md'] = `# Decisions — ${d.name}\n\nChronological record of decisions made in this project. Each entry should contain what, why, and discarded alternatives. Once this file passes ~15 entries, move the oldest to individual files under \`decisions/\` and leave one line plus a link per entry here.\n\n## ${date}\n- **Decision:** —\n- **Reason:** —\n- **Alternatives considered:** —\n`;
     files['CONTEXT.md'] = `# Context — ${d.name}\n\nContext the AI should know to work well on this project: conventions, constraints, vocabulary, people involved.\n\n## Conventions\n- \n\n## Constraints\n- \n\n## Vocabulary / specific terms\n- \n`;
-    files['TASKS.md'] = `# Tasks — ${d.name}\n\n## In progress\n- [ ] \n\n## Next\n- [ ] \n\n## Done\n- [x] Workspace created (${date})\n`;
+    files['TASKS.md'] = `# Tasks — ${d.name}\n\n## In progress\n- [ ] \n\n## Next\n- [ ] \n\n## Recurring\nSuggestions for this project type; keep, edit or delete.\n${buildRecurringList(cfg, 'en')}\n## Done\n- [x] Workspace created (${date})\n`;
   } else {
     files['README.md'] = `# ${d.name}\n\nÍndice deste workspace:\n- \`PROJECT.md\` — visão geral e objetivo\n- \`DECISIONS.md\` — histórico de decisões\n- \`CONTEXT.md\` — contexto acumulado para a IA\n- \`TASKS.md\` — tarefas ativas\n- \`SESSIONS.md\` — log por sessão de quem trabalhou aqui e em que estado deixou\n- \`queue/\` — referências salvas aguardando incorporação\n${folderList ? '\nPastas:\n'+folderList : ''}\n\n> A IA é uma ferramenta que amplia julgamento humano, não um substituto para ele. Decisões relevantes vão para DECISIONS.md.\n`;
     files['PROJECT.md'] = `# ${d.name}\n\n## Visão geral\n${d.desc}\n\n## Objetivo principal\n${d.obj}\n\n## Tipo de projeto\n${cfg.label[LANG]}\n\n## Stack\n${d.stack || '(preencher)'}\n\n## Status\n🟡 Em definição\n\n---\nCriado em ${date} via workspace//kit.\n`;
     files['DECISIONS.md'] = `# Decisões — ${d.name}\n\nRegistro cronológico de decisões tomadas neste projeto. Cada entrada deve conter o quê, por quê, e alternativas descartadas. Quando este arquivo passar de ~15 entradas, mova as mais antigas para arquivos individuais em \`decisions/\` e deixe aqui uma linha com link para cada uma.\n\n## ${date}\n- **Decisão:** —\n- **Motivo:** —\n- **Alternativas consideradas:** —\n`;
     files['CONTEXT.md'] = `# Contexto — ${d.name}\n\nContexto que a IA deve conhecer para trabalhar bem neste projeto: convenções, restrições, vocabulário, pessoas envolvidas.\n\n## Convenções\n- \n\n## Restrições\n- \n\n## Vocabulário / termos específicos\n- \n`;
-    files['TASKS.md'] = `# Tarefas — ${d.name}\n\n## Em andamento\n- [ ] \n\n## Próximas\n- [ ] \n\n## Concluídas\n- [x] Workspace criado (${date})\n`;
+    files['TASKS.md'] = `# Tarefas — ${d.name}\n\n## Em andamento\n- [ ] \n\n## Próximas\n- [ ] \n\n## Recorrentes\nSugestões para este tipo de projeto; mantenha, edite ou apague.\n${buildRecurringList(cfg, 'pt')}\n## Concluídas\n- [x] Workspace criado (${date})\n`;
   }
 
   const keepName = els.optGit.checked ? '.gitkeep' : '.keep';
   folders.forEach(f => { files[`${f}/${keepName}`] = ''; });
   files['SESSIONS.md'] = buildSessionsFile(d, LANG, new Date().toISOString().slice(0, 10));
+files['ONBOARDING.md'] = buildOnboardingFile(d, LANG, cfg, folders);
   files[`queue/${keepName}`] = '';
   if(cfg.extraFile){ files[cfg.extraFile.path[LANG]] = cfg.extraFile.build(d.name, LANG); }
   if(els.optGit.checked){ files['.gitignore'] = buildGitignore(); }
@@ -1219,7 +1248,7 @@ HOW TO WORK
 - You are a tool that extends my judgment — at points of strategic ambiguity, don't decide on your own: bring options and trade-offs for me to decide.
 - Be explicit about what is fact, inference, or assumption.
 
-Start by reviewing the workspace files and tell me what's missing before we begin.`
+Start by reviewing the workspace files, then follow ONBOARDING.md: it guides this first conversation. Tell me what's missing before we begin.`
     : `Você vai atuar como parceiro de trabalho neste projeto: "${d.name}".
 
 CONTEXTO
@@ -1235,7 +1264,7 @@ COMO TRABALHAR
 - Seja explícito sobre o que é fato, inferência ou suposição.
 - Este chat é em português, mas a documentação gerada (PROJECT.md, DECISIONS.md, etc.) deve continuar em inglês por padrão — só escreva a documentação em português se eu pedir isso explicitamente.
 
-Comece revisando os arquivos do workspace e me diga o que falta preencher antes de começarmos.`;
+Comece revisando os arquivos do workspace e depois siga o ONBOARDING.md: ele guia esta primeira conversa. Me diga o que falta preencher antes de começarmos.`;
 
   els.prompt.value = text;
 }
