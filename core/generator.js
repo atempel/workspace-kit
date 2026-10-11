@@ -285,10 +285,34 @@
     return content;
   }
 
-  function buildAgentBody(d, lang){
+  function buildSessionsFile(d, lang, isoDate){
     return lang==='en'
-      ? `# ${d.name}\n\n${d.desc}\n\n## Stack & commands\n${d.stack || '(fill in: how to build, test, and run this project)'}\n\n## Limits — don't do this without asking\n${d.limits || '- (fill in)'}\n\n## See also\n- PROJECT.md — overview for humans\n- DECISIONS.md — decision history (update on every relevant decision)\n- TASKS.md — active tasks\n`
-      : `# ${d.name}\n\n${d.desc}\n\n## Stack & comandos\n${d.stack || '(preencher: como buildar, testar e rodar este projeto)'}\n\n## Limites — o que não fazer sem perguntar\n${d.limits || '- (preencher)'}\n\n## Ver também\n- PROJECT.md — visão geral para humanos\n- DECISIONS.md — histórico de decisões (atualizar a cada decisão relevante)\n- TASKS.md — tarefas ativas\n`;
+      ? `# Sessions — ${d.name}\n\nAppend-only log of who touched this workspace, in what tool, and what state it was left in. One entry per session, added by whichever agent or tool is ending its session — a mechanical handoff record, not project history (the reasons behind decisions live in DECISIONS.md).\n\n## Entries\n\n### ${isoDate} — workspace//kit\n**Did:** Workspace generated from the form answers.\n**Left at:** Base files created; nothing filled in beyond the form. Next: review PROJECT.md and CONTEXT.md, then start on TASKS.md.\n`
+      : `# Sessões — ${d.name}\n\nLog append-only de quem mexeu neste workspace, em qual ferramenta, e em que estado deixou. Uma entrada por sessão, adicionada por quem estiver encerrando a sessão — um registro mecânico de passagem de bastão, não histórico do projeto (o porquê das decisões fica em DECISIONS.md).\n\n## Entradas\n\n### ${isoDate} — workspace//kit\n**Feito:** Workspace gerado a partir das respostas do formulário.\n**Estado final:** Arquivos base criados; nada preenchido além do formulário. Próximo: revisar PROJECT.md e CONTEXT.md, depois começar por TASKS.md.\n`;
+  }
+
+  function buildAgentExtras(lang, opts){
+    opts = opts || {};
+    let out = lang==='en'
+      ? `\n## Every session\n- Before ending your session, append one entry to \`SESSIONS.md\`: which tool/surface you ran in, what was done, and the state you left behind. This applies to every session, not just the first.\n- If you saved a reference you haven't incorporated yet (a voice note, document, link), file a stub under \`queue/\` — one \`.md\` file per reference, in this format:\n\n  \`\`\`\n  # Queue item — <Title>\n\n  - **Type:** <Voice note | Document | Link | Board | Other>\n  - **Source:** <URL or description>\n  - **Added:** <YYYY-MM-DD>\n  - **Status:** Pending\n\n  ## Notes\n  <what this covers and what to extract when ingesting>\n  \`\`\`\n\n- When you ingest a queue item, edit that same file: set \`Status: Ingested (<date>)\` and add an \`Ingested into:\` line. \`grep -l "Status: Pending" queue/*.md\` lists what's still open.\n- Keep DECISIONS.md short: once it passes ~15 entries, move the oldest to individual files under \`decisions/\` (e.g. \`decisions/001-short-title.md\`), leaving one line plus a link per moved entry in DECISIONS.md.\n`
+      : `\n## Toda sessão\n- Antes de encerrar a sessão, acrescente uma entrada em \`SESSIONS.md\`: em qual ferramenta/superfície você rodou, o que foi feito e o estado em que deixou. Vale para toda sessão, não só a primeira.\n- Se você salvou uma referência que ainda não foi incorporada (nota de voz, documento, link), crie um stub em \`queue/\` — um arquivo \`.md\` por referência, neste formato:\n\n  \`\`\`\n  # Queue item — <Título>\n\n  - **Type:** <Voice note | Document | Link | Board | Other>\n  - **Source:** <URL ou descrição>\n  - **Added:** <AAAA-MM-DD>\n  - **Status:** Pending\n\n  ## Notes\n  <o que isto cobre e o que extrair ao incorporar>\n  \`\`\`\n\n- Ao incorporar um item da fila, edite o próprio arquivo: troque para \`Status: Ingested (<data>)\` e adicione uma linha \`Ingested into:\`. \`grep -l "Status: Pending" queue/*.md\` lista o que ainda está aberto.\n- Mantenha o DECISIONS.md enxuto: quando passar de ~15 entradas, mova as mais antigas para arquivos individuais em \`decisions/\` (ex: \`decisions/001-titulo-curto.md\`), deixando em DECISIONS.md uma linha com link para cada entrada movida.\n`;
+    if(opts.git){
+      out += lang==='en'
+        ? `\n## Working with git\n- Commit small, coherent changes, with a message that says what changed and why. Never commit secrets or files listed in \`.gitignore\`.\n- Work on a branch named after the task, not directly on the main branch.\n- When several agents or sessions work in parallel, give each its own git worktree (\`git worktree add ../<name> -b <branch>\`) so their working folders don't collide; remove it once its branch is merged.\n- Propose changes through a pull request: describe what changed, why, and how it was checked. A human decides when to merge.\n- Don't force-push or rewrite shared history without asking.\n`
+        : `\n## Trabalhando com git\n- Faça commits pequenos e coerentes, com mensagem dizendo o que mudou e por quê. Nunca commite segredos nem arquivos listados no \`.gitignore\`.\n- Trabalhe numa branch com o nome da tarefa, não direto na branch principal.\n- Quando vários agentes ou sessões trabalham em paralelo, dê a cada um seu próprio git worktree (\`git worktree add ../<nome> -b <branch>\`) para que as pastas de trabalho não colidam; remova-o depois que a branch for mesclada.\n- Proponha mudanças por pull request: descreva o que mudou, por quê e como foi verificado. Uma pessoa decide quando mesclar.\n- Não faça force-push nem reescreva histórico compartilhado sem perguntar.\n`;
+    }
+    if(opts.visual){
+      out += lang==='en'
+        ? `\n## Visual communication\nThe person you work with is a visual thinker. When the task allows it, favor a diagram, mockup, chart or other visualization over a text-only answer — for example a flowchart for a process, a sketch for a layout, a table or chart for a comparison. Keep text for what a picture can't carry, and say so when a visual wouldn't help.\n`
+        : `\n## Comunicação visual\nA pessoa com quem você trabalha pensa de forma visual. Quando a tarefa permitir, prefira um diagrama, mockup, gráfico ou outra visualização a uma resposta só em texto — por exemplo um fluxograma para um processo, um esboço para um layout, uma tabela ou gráfico para uma comparação. Reserve o texto para o que uma imagem não consegue carregar, e avise quando uma visualização não ajudar.\n`;
+    }
+    return out;
+  }
+
+  function buildAgentBody(d, lang, opts){
+    return lang==='en'
+      ? `# ${d.name}\n\n${d.desc}\n\n## Stack & commands\n${d.stack || '(fill in: how to build, test, and run this project)'}\n\n## Limits — don't do this without asking\n${d.limits || '- (fill in)'}\n${buildAgentExtras(lang, opts)}\n## See also\n- PROJECT.md — overview for humans\n- DECISIONS.md — decision history (update on every relevant decision)\n- TASKS.md — active tasks\n- SESSIONS.md — per-session tool-handoff log (append every session, see above)\n- queue/ — saved-but-not-yet-ingested references\n`
+      : `# ${d.name}\n\n${d.desc}\n\n## Stack & comandos\n${d.stack || '(preencher: como buildar, testar e rodar este projeto)'}\n\n## Limites — o que não fazer sem perguntar\n${d.limits || '- (preencher)'}\n${buildAgentExtras(lang, opts)}\n## Ver também\n- PROJECT.md — visão geral para humanos\n- DECISIONS.md — histórico de decisões (atualizar a cada decisão relevante)\n- TASKS.md — tarefas ativas\n- SESSIONS.md — log de passagem de bastão entre ferramentas (acrescentar a cada sessão, ver acima)\n- queue/ — referências salvas ainda não incorporadas\n`;
   }
 
   function buildSkillFile(d, slug, lang){
@@ -334,28 +358,31 @@
     const localOnlyFolderNames = folderEntries.filter(f=>f.localOnly).map(f=>f.name);
     const localOnlySet = new Set(localOnlyFolderNames);
     const folderList = folders.map(f=> localOnlySet.has(f)
-      ? `- \`${f}/\` — ${lang==='en' ? 'local only, see .gitignore' : 'só local, ver .gitignore'}`
+      ? `- \`${f}/\` — ${lang==='en' ? 'local only' : 'só local'}${input.git ? (lang==='en' ? ', see .gitignore' : ', ver .gitignore') : ''}`
       : `- \`${f}/\``).join('\n');
 
     if(lang==='en'){
-      files['README.md'] = `# ${d.name}\n\nIndex of this workspace:\n- \`PROJECT.md\` — overview and goal\n- \`DECISIONS.md\` — decision history\n- \`CONTEXT.md\` — accumulated context for the AI\n- \`TASKS.md\` — active tasks\n${folderList ? '\nFolders:\n'+folderList : ''}\n\n> The AI is a tool that extends human judgment, not a substitute for it. Relevant decisions go into DECISIONS.md.\n`;
+      files['README.md'] = `# ${d.name}\n\nIndex of this workspace:\n- \`PROJECT.md\` — overview and goal\n- \`DECISIONS.md\` — decision history\n- \`CONTEXT.md\` — accumulated context for the AI\n- \`TASKS.md\` — active tasks\n- \`SESSIONS.md\` — per-session log of who worked here and what state was left\n- \`queue/\` — saved references waiting to be incorporated\n${folderList ? '\nFolders:\n'+folderList : ''}\n\n> The AI is a tool that extends human judgment, not a substitute for it. Relevant decisions go into DECISIONS.md.\n`;
       files['PROJECT.md'] = `# ${d.name}\n\n## Overview\n${d.desc}\n\n## Main goal\n${d.obj}\n\n## Project type\n${cfg.label[lang]}\n\n## Stack\n${d.stack || '(fill in)'}\n\n## Status\n🟡 In definition\n\n---\nCreated on ${date} via workspace//kit.\n`;
-      files['DECISIONS.md'] = `# Decisions — ${d.name}\n\nChronological record of decisions made in this project. Each entry should contain what, why, and discarded alternatives.\n\n## ${date}\n- **Decision:** —\n- **Reason:** —\n- **Alternatives considered:** —\n`;
+      files['DECISIONS.md'] = `# Decisions — ${d.name}\n\nChronological record of decisions made in this project. Each entry should contain what, why, and discarded alternatives. Once this file passes ~15 entries, move the oldest to individual files under \`decisions/\` and leave one line plus a link per entry here.\n\n## ${date}\n- **Decision:** —\n- **Reason:** —\n- **Alternatives considered:** —\n`;
       files['CONTEXT.md'] = `# Context — ${d.name}\n\nContext the AI should know to work well on this project: conventions, constraints, vocabulary, people involved.\n\n## Conventions\n- \n\n## Constraints\n- \n\n## Vocabulary / specific terms\n- \n`;
       files['TASKS.md'] = `# Tasks — ${d.name}\n\n## In progress\n- [ ] \n\n## Next\n- [ ] \n\n## Done\n- [x] Workspace created (${date})\n`;
     } else {
-      files['README.md'] = `# ${d.name}\n\nÍndice deste workspace:\n- \`PROJECT.md\` — visão geral e objetivo\n- \`DECISIONS.md\` — histórico de decisões\n- \`CONTEXT.md\` — contexto acumulado para a IA\n- \`TASKS.md\` — tarefas ativas\n${folderList ? '\nPastas:\n'+folderList : ''}\n\n> A IA é uma ferramenta que amplia julgamento humano, não um substituto para ele. Decisões relevantes vão para DECISIONS.md.\n`;
+      files['README.md'] = `# ${d.name}\n\nÍndice deste workspace:\n- \`PROJECT.md\` — visão geral e objetivo\n- \`DECISIONS.md\` — histórico de decisões\n- \`CONTEXT.md\` — contexto acumulado para a IA\n- \`TASKS.md\` — tarefas ativas\n- \`SESSIONS.md\` — log por sessão de quem trabalhou aqui e em que estado deixou\n- \`queue/\` — referências salvas aguardando incorporação\n${folderList ? '\nPastas:\n'+folderList : ''}\n\n> A IA é uma ferramenta que amplia julgamento humano, não um substituto para ele. Decisões relevantes vão para DECISIONS.md.\n`;
       files['PROJECT.md'] = `# ${d.name}\n\n## Visão geral\n${d.desc}\n\n## Objetivo principal\n${d.obj}\n\n## Tipo de projeto\n${cfg.label[lang]}\n\n## Stack\n${d.stack || '(preencher)'}\n\n## Status\n🟡 Em definição\n\n---\nCriado em ${date} via workspace//kit.\n`;
-      files['DECISIONS.md'] = `# Decisões — ${d.name}\n\nRegistro cronológico de decisões tomadas neste projeto. Cada entrada deve conter o quê, por quê, e alternativas descartadas.\n\n## ${date}\n- **Decisão:** —\n- **Motivo:** —\n- **Alternativas consideradas:** —\n`;
+      files['DECISIONS.md'] = `# Decisões — ${d.name}\n\nRegistro cronológico de decisões tomadas neste projeto. Cada entrada deve conter o quê, por quê, e alternativas descartadas. Quando este arquivo passar de ~15 entradas, mova as mais antigas para arquivos individuais em \`decisions/\` e deixe aqui uma linha com link para cada uma.\n\n## ${date}\n- **Decisão:** —\n- **Motivo:** —\n- **Alternativas consideradas:** —\n`;
       files['CONTEXT.md'] = `# Contexto — ${d.name}\n\nContexto que a IA deve conhecer para trabalhar bem neste projeto: convenções, restrições, vocabulário, pessoas envolvidas.\n\n## Convenções\n- \n\n## Restrições\n- \n\n## Vocabulário / termos específicos\n- \n`;
       files['TASKS.md'] = `# Tarefas — ${d.name}\n\n## Em andamento\n- [ ] \n\n## Próximas\n- [ ] \n\n## Concluídas\n- [x] Workspace criado (${date})\n`;
     }
 
-    folders.forEach(f => { files[`${f}/.gitkeep`] = ''; });
+    const keepName = input.git ? '.gitkeep' : '.keep';
+    folders.forEach(f => { files[`${f}/${keepName}`] = ''; });
+    files['SESSIONS.md'] = buildSessionsFile(d, lang, new Date().toISOString().slice(0, 10));
+    files[`queue/${keepName}`] = '';
     if(cfg.extraFile){ files[cfg.extraFile.path[lang]] = cfg.extraFile.build(d.name, lang); }
-    files['.gitignore'] = buildGitignore(lang, localOnlyFolderNames);
+    if(input.git){ files['.gitignore'] = buildGitignore(lang, localOnlyFolderNames); }
 
-    const agentBody = buildAgentBody(d, lang);
+    const agentBody = buildAgentBody(d, lang, {git: !!input.git, visual: !!input.visual});
     const agents = input.agents || {};
     const wantsAgentsmd = !!agents.agentsmd;
     if(agents.claude){
