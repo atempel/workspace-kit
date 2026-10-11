@@ -41,6 +41,7 @@ When the owner asks for a report, write it here as HTML rather than answering on
 ## See also
 - PROJECT.md — overview for humans
 - DECISIONS.md — decision history (update on every relevant decision)
+- CHANGELOG.md — narrative product history; on-demand only (grep it, don't read it every session), pruning policy in its header
 - TASKS.md — active tasks
 - SESSIONS.md — per-session tool-handoff log (append every session, see above)
 - queue/ — saved-but-not-yet-ingested references
