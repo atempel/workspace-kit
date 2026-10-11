@@ -22,6 +22,7 @@ const webServer = require('../core/server.js');
 const reportLayer = require('../core/report.js');
 const generator = require('../core/generator.js');
 const scaffold = require('../core/scaffold.js');
+const queueWriter = require('../core/queue.js');
 const readline = require('readline');
 
 const HELP = [
@@ -43,6 +44,10 @@ const HELP = [
   '                   JSON API on /api/*. Binds to 127.0.0.1 unless --host says',
   '                   otherwise. Build the dashboard once with',
   '                   `npm --prefix web install && npm --prefix web run build`.',
+  '  commit [dir]     Commit the workspace\'s changes in one step: shows what changed',
+  '                   and the commit message, asks to confirm (-y skips), stages the',
+  '                   changed files and commits. Local only, never pushes.',
+  '                   --message "<text>" replaces the generated message.',
   '  inspect [dir]    Dump the raw workspace index as JSON (debugging aid).',
   '  report [dir]     Render the workspace\'s own planning docs (PRD, specs, design,',
   '                   DECISIONS/TASKS/SESSIONS) as a static, readable HTML report.',
@@ -54,6 +59,14 @@ const HELP = [
   '                                   name; --path and --branch override either.',
   '  worktree remove <name> [dir]     Remove one. Refuses if it holds uncommitted',
   '                                   work unless --force. The branch is kept.',
+  '',
+  '  queue add [dir]                  Save a reference as a stub in queue/. Takes',
+  '                                   --title, --type, --source, --note; prompts',
+  '                                   for any not given. Never overwrites.',
+  '  queue list [dir]                 List queue items, pending first.',
+  '  queue done <file> --into <where> [dir]',
+  '                                   Mark a stub Ingested in place, naming where',
+  '                                   it went.',
   '',
   'Options:',
   '  --json           Machine-readable output instead of the terminal report.',
@@ -104,6 +117,7 @@ function parseArgs(argv) {
     port: null, host: null, out: null, help: false, path: null, branch: null, force: false,
     gen: {}, extra: {}, sets: [], git: false, noCommit: false, yes: false, dryRun: false,
     noFolders: false, promptOut: null, visual: false, docker: false,
+    title: null, type: null, source: null, note: null, into: null, message: null,
   };
   const genericSpecs = scaffold.genericOptions();
   const positional = [];
@@ -125,6 +139,12 @@ function parseArgs(argv) {
     else if (arg === '--no-commit') args.noCommit = true;
     else if (arg === '--dry-run') args.dryRun = true;
     else if (arg === '--no-folders') args.noFolders = true;
+    else if (arg === '--title') args.title = argv[++i];
+    else if (arg === '--type') args.type = argv[++i];
+    else if (arg === '--source') args.source = argv[++i];
+    else if (arg === '--note') args.note = argv[++i];
+    else if (arg === '--into') args.into = argv[++i];
+    else if (arg === '--message') args.message = argv[++i];
     else if (arg === '--prompt-out') args.promptOut = argv[++i];
     else if (arg === '--set') args.sets.push(argv[++i]);
     else if (/^--(name|kit|lang|desc|obj|stack|limits|agents|folders)$/.test(arg)) args.gen[arg.slice(2)] = argv[++i];
@@ -149,6 +169,14 @@ function parseArgs(argv) {
       args.name = positional[2] || null;
       args.dir = positional[3] || null;
     }
+  } else if (args.command === 'queue') {
+    args.sub = positional[1] || null;
+    if (args.sub === 'done') {
+      args.name = positional[2] || null;
+      args.dir = positional[3] || null;
+    } else {
+      args.dir = positional[2] || null;
+    }
   } else {
     args.dir = positional[1] || null;
   }
@@ -156,17 +184,10 @@ function parseArgs(argv) {
 }
 
 /**
- * `new`: collect inputs (flags first, prompts for the rest), have
- * core/generator.js build the file map, and let core/scaffold.js put it on
- * disk. No generation logic lives here.
+ * Prompts read from a line queue rather than rl.question so piped answers (and
+ * tests) cannot be lost between questions. Questions go to stderr.
  */
-async function runNew(args, dir) {
-  const err = function (m) { process.stderr.write(m + '\n'); };
-  const g = args.gen;
-
-  // Prompts read from a line queue rather than rl.question so piped answers
-  // (and tests) cannot be lost between questions.
-  const interactive = !args.yes;
+function makePrompter(interactive) {
   let rl = null;
   const queue = [];
   const waiting = [];
@@ -185,6 +206,21 @@ async function runNew(args, dir) {
       else waiting.push(done);
     });
   }
+  return { interactive: interactive, ask: ask, close: function () { if (rl) rl.close(); } };
+}
+
+/**
+ * `new`: collect inputs (flags first, prompts for the rest), have
+ * core/generator.js build the file map, and let core/scaffold.js put it on
+ * disk. No generation logic lives here.
+ */
+async function runNew(args, dir) {
+  const err = function (m) { process.stderr.write(m + '\n'); };
+  const g = args.gen;
+
+  const prompter = makePrompter(!args.yes);
+  const interactive = prompter.interactive;
+  const ask = prompter.ask;
   async function field(key, question, def) {
     if (g[key] != null) return g[key];
     return interactive ? ask(question, def) : (def || '');
@@ -233,9 +269,11 @@ async function runNew(args, dir) {
 
     let wantVisual = args.visual;
     if (!wantVisual && interactive) wantVisual = /^y/i.test(await ask('Does a visual person work on this (adds a Visual communication section)? y/n', 'n'));
+    let wantDocker = args.docker;
+    if (!wantDocker && interactive) wantDocker = /^y/i.test(await ask('Include a Docker environment (Dockerfile + docker-compose.yml)? y/n', 'n'));
     args.extra.git = !!wantGit;
     args.extra.visual = !!wantVisual;
-    if (args.docker) args.extra.docker = true;
+    if (wantDocker) args.extra.docker = true;
 
     const input = scaffold.buildInput({
       name: name, kit: kitKey, lang: lang, desc: desc, obj: obj, stack: stack, limits: limits,
@@ -289,8 +327,104 @@ async function runNew(args, dir) {
     err(e.message);
     return 1;
   } finally {
-    if (rl) rl.close();
+    prompter.close();
   }
+}
+
+/** `queue add|list|done` — thin over core/queue.js (writer) and inspect (reader). */
+async function runQueue(args, dir) {
+  const err = function (m) { process.stderr.write(m + '\n'); };
+  const sub = args.sub;
+
+  if (sub === 'list' || sub === null) {
+    const items = inspector.inspect(dir).queue.slice().sort(function (a, b) {
+      if (a.status !== b.status) return a.status === 'pending' ? -1 : 1;
+      return String(b.added || '').localeCompare(String(a.added || ''));
+    });
+    if (args.json) { process.stdout.write(JSON.stringify(items, null, 2) + '\n'); return 0; }
+    if (!items.length) {
+      process.stdout.write('The queue is empty. Save a reference with:  workspace-kit queue add\n');
+      return 0;
+    }
+    const pending = items.filter(function (i) { return i.status === 'pending'; }).length;
+    const out = [pending + ' pending, ' + (items.length - pending) + ' ingested:', ''];
+    items.forEach(function (i) {
+      out.push('  [' + (i.status === 'pending' ? 'pending ' : 'ingested') + ']  ' + i.title
+        + '  (' + (i.type || 'untyped') + ', added ' + (i.added || '?') + ')');
+      out.push('              ' + i.path + (i.ingestedInto ? '  -> ' + i.ingestedInto : ''));
+    });
+    process.stdout.write(out.join('\n') + '\n');
+    return 0;
+  }
+
+  if (sub === 'add') {
+    const prompter = makePrompter(!args.yes);
+    try {
+      const field = async function (value, question, def) {
+        if (value != null) return value;
+        return prompter.interactive ? prompter.ask(question, def) : (def || '');
+      };
+      const title = await field(args.title, 'Title', '');
+      const type = await field(args.type, 'Type (' + queueWriter.TYPES.join(' | ') + ')', 'Other');
+      const source = await field(args.source, 'Source (URL or description)', '');
+      const note = await field(args.note, 'Note (optional)', '');
+      const result = queueWriter.add(dir, { title: title, type: type, source: source, note: note });
+      if (args.json) { process.stdout.write(JSON.stringify(result, null, 2) + '\n'); return result.ok ? 0 : 1; }
+      if (!result.ok) { err(result.error); return 1; }
+      process.stdout.write('Saved ' + result.path + ' (Status: Pending).\n');
+      return 0;
+    } finally {
+      prompter.close();
+    }
+  }
+
+  if (sub === 'done') {
+    if (!args.name) { err('Usage: workspace-kit queue done <file> --into <where> [dir]'); return 2; }
+    const result = queueWriter.markDone(dir, args.name, args.into);
+    if (args.json) { process.stdout.write(JSON.stringify(result, null, 2) + '\n'); return result.ok ? 0 : 1; }
+    if (!result.ok) { err(result.error); return 1; }
+    process.stdout.write('Marked ' + result.path + ' as Ingested (' + result.date + ') into ' + result.into + '.\n');
+    return 0;
+  }
+
+  err('Unknown queue subcommand: ' + sub + '\nExpected one of: add, list, done.');
+  return 2;
+}
+
+/** `commit`: summary, confirmation, then core/git.js stages and commits locally. */
+async function runCommit(args, dir) {
+  const err = function (m) { process.stderr.write(m + '\n'); };
+  const summary = gitLayer.changeSummary(dir, inspector.inspect(dir));
+  if (!summary.isRepo) {
+    process.stdout.write('Not a git repository — nothing to commit here.\n');
+    return 0;
+  }
+  if (!summary.files.length) {
+    process.stdout.write('On ' + summary.branch + ': nothing has changed, so nothing was committed.\n');
+    return 0;
+  }
+  const message = args.message != null ? String(args.message).trim() + '\n' : gitLayer.buildCommitMessage(summary);
+  if (!message.trim()) { err('The commit message is empty.'); return 1; }
+
+  const out = [summary.files.length + (summary.files.length === 1 ? ' file has' : ' files have') + ' changed on ' + summary.branch + ':', ''];
+  summary.files.forEach(function (f) { out.push('  ' + f.path + '  (' + f.what + ')'); });
+  out.push('', 'Commit message:', '');
+  message.split('\n').forEach(function (line) { out.push(line ? '  ' + line : ''); });
+  out.push('This commits locally only. Nothing is pushed.', '');
+  err(out.join('\n'));
+
+  if (!args.yes) {
+    const prompter = makePrompter(true);
+    let answer;
+    try { answer = await prompter.ask('Commit these changes? y/n', 'n'); } finally { prompter.close(); }
+    if (!/^y/i.test(answer)) { err('Cancelled. Nothing was committed.'); return 1; }
+  }
+
+  const result = gitLayer.commitChanges(dir, summary, message);
+  if (!result.ok) { err(result.error); return 1; }
+  process.stdout.write('Committed ' + result.files.length + (result.files.length === 1 ? ' file' : ' files')
+    + (result.sha ? ' as ' + result.sha : '') + '. Nothing was pushed.\n');
+  return 0;
 }
 
 function main(argv) {
@@ -309,6 +443,14 @@ function main(argv) {
       process.exit(1);
     });
     return null; // async: the process exits when the promise settles
+  }
+
+  if (args.command === 'queue' || args.command === 'commit') {
+    (args.command === 'queue' ? runQueue : runCommit)(args, dir).then(function (c) { process.exit(c); }, function (e) {
+      process.stderr.write(e.message + '\n');
+      process.exit(1);
+    });
+    return null;
   }
 
   if (args.command === 'status') {

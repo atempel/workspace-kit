@@ -59,12 +59,12 @@ const FLAGS = ['--name', 'Infinite List', '--desc', 'A test app.', '--obj', 'val
 test('no flags: prompts for every field the HTML form collects', function () {
   const dir = path.join(tmp(), 'ws');
   // Answers in prompt order: lang, kit, name, desc, obj, stack, limits, agents,
-  // then one y/n per folder of the kit, then git, then visual.
+  // then one y/n per folder of the kit, then git, then visual, then docker.
   const r = run(['new', dir], ['pt', '2', 'Meu Estudo', 'descr', 'meta', 'Python', 'sem rede',
-    'claude,gemini', 'y', 'n', 'n', 'n', 'n'].join('\n') + '\n');
+    'claude,gemini', 'y', 'n', 'n', 'n', 'n', 'n'].join('\n') + '\n');
   assert.strictEqual(r.code, 0, r.err);
   ['Language', 'Project type', 'Project name', 'Short description', 'Main goal', 'Stack',
-    'Limits', 'Agents', 'Create dados/', 'Use git', 'visual person'].forEach(function (p) {
+    'Limits', 'Agents', 'Create dados/', 'Use git', 'visual person', 'Docker environment'].forEach(function (p) {
     assert.ok(r.err.indexOf(p) !== -1, 'never prompted for: ' + p);
   });
   const project = fs.readFileSync(path.join(dir, 'PROJECT.md'), 'utf8');
