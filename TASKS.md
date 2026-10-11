@@ -34,7 +34,7 @@ Foundational surface: generates workspaces from a terminal instead of only the b
 - [x] ~~Shared-generation-engine blocker~~ — resolved 2026-07-22, `core/generator.js` created as a standalone shared module (see DECISIONS.md).
 - [x] ~~Parity test harness~~ — `core/parity-check.js`/`core/check-fixtures.js` confirm `core/generator.js` matches `src/workspace-kit.html`'s output (see DECISIONS.md).
 - [x] ~~`workspace-kit new` MVP~~ — done 2026-10-11 ([#197](https://github.com/atempel/workspace-kit/pull/197), closes #20, #21, #112–#116): writes the full human layer, agent layer, `.gitignore` and kit anchor into a folder via `core/scaffold.js` and `core/generator.js`; prompts, flags, `--git`, `--force`, `--dry-run`; `npm run test:new`. See DECISIONS.md, 2026-10-11.
-- [ ] Open: `queue` and `commit` subcommands (#104, #98) — in flight as PRs at time of writing.
+- [x] ~~`queue add|list|done` and `commit` subcommands~~ — done 2026-10-11 ([#199](https://github.com/atempel/workspace-kit/pull/199), closes #104, #98): `core/queue.js`, `commitChanges` in `core/git.js`, `npm run test:queue`. `commit` asks y/n (default no) and never pushes. See DECISIONS.md, 2026-10-11.
 
 ### Local Web App (planning — 2026-07-21)
 Generates *and* manages workspaces; hosts capabilities the standalone HTML can't (git, Templates management, Docker spin-up). Full spec + issue: docs/specs/local-web-app.md → [#29](https://github.com/atempel/workspace-kit/issues/29). Its "open an existing workspace" P0 bullet is being absorbed into the Workspace inspection layer below rather than built as its own reader.
@@ -94,6 +94,10 @@ Gathered 2026-10-11 from the PRs merged that day. None is settled; each is waiti
 **CLI (`workspace-kit new`, [#197](https://github.com/atempel/workspace-kit/pull/197))**
 - Where should the option list come from: should `core/generator.js` export `OPTIONS`, or should the CLI read it elsewhere? Until then only `--set k=v` reaches the new options.
 - Packaging: ship from this repo, publish to npm, or `npx`? A `bin` entry already exists.
+
+**Queue and commit CLI ([#199](https://github.com/atempel/workspace-kit/pull/199))**
+- `workspace-kit commit` uses a whole-repository change summary, so for a workspace in a repo subfolder it also commits changes outside the workspace. Scope it to the workspace folder (a change to `changeSummary`)?
+- Should `queue done` also offer to commit, per the spec's P2 note?
 
 **Templates technical design (docs/specs/templates-technical-design.md, [#195](https://github.com/atempel/workspace-kit/pull/195))**
 1. Merge-tag marker: confirm `%tag%` with a `%%` escape, or choose another.
