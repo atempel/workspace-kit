@@ -59,19 +59,19 @@ const FLAGS = ['--name', 'Infinite List', '--desc', 'A test app.', '--obj', 'val
 test('no flags: prompts for every field the HTML form collects', function () {
   const dir = path.join(tmp(), 'ws');
   // Answers in prompt order: lang, kit, name, desc, obj, stack, limits, agents,
-  // then one y/n per folder of the kit, then git.
+  // then one y/n per folder of the kit, then git, then visual.
   const r = run(['new', dir], ['pt', '2', 'Meu Estudo', 'descr', 'meta', 'Python', 'sem rede',
-    'claude,gemini', 'y', 'n', 'n', 'n'].join('\n') + '\n');
+    'claude,gemini', 'y', 'n', 'n', 'n', 'n'].join('\n') + '\n');
   assert.strictEqual(r.code, 0, r.err);
   ['Language', 'Project type', 'Project name', 'Short description', 'Main goal', 'Stack',
-    'Limits', 'Agents', 'Create dados/', 'git init'].forEach(function (p) {
+    'Limits', 'Agents', 'Create dados/', 'Use git', 'visual person'].forEach(function (p) {
     assert.ok(r.err.indexOf(p) !== -1, 'never prompted for: ' + p);
   });
   const project = fs.readFileSync(path.join(dir, 'PROJECT.md'), 'utf8');
   assert.ok(project.indexOf('# Meu Estudo') !== -1 && project.indexOf('Python') !== -1);
   assert.ok(project.indexOf(generator.KIT_CONFIG.pesquisa.label.pt) !== -1, 'kit answer "2" not honoured');
   assert.ok(fs.existsSync(path.join(dir, 'GEMINI.md')) && !fs.existsSync(path.join(dir, 'AGENTS.md')));
-  assert.ok(fs.existsSync(path.join(dir, 'dados', '.gitkeep')) && !fs.existsSync(path.join(dir, 'notas')));
+  assert.ok(fs.existsSync(path.join(dir, 'dados', '.keep')) && !fs.existsSync(path.join(dir, 'notas')));
 });
 
 test('flags: a field passed on the command line is not prompted for', function () {
@@ -124,13 +124,47 @@ test('output matches core/generator.js for all 17 kits in both languages', funct
 
 test('writes human layer, agent layer, .gitignore and the kit anchor file', function () {
   const dir = path.join(tmp(), 'ws');
-  assert.strictEqual(run(['new', dir].concat(FLAGS, ['--kit', 'produto'])).code, 0);
+  assert.strictEqual(run(['new', dir].concat(FLAGS, ['--kit', 'produto', '--git'])).code, 0);
   ['README.md', 'PROJECT.md', 'DECISIONS.md', 'CONTEXT.md', 'TASKS.md', 'CLAUDE.md', 'AGENTS.md',
     '.gitignore', 'docs/PRD.md', 'research/.gitkeep'].forEach(function (p) {
     assert.ok(fs.existsSync(path.join(dir, p)), 'missing ' + p);
   });
   assert.ok(walk(dir).some(function (p) { return /^\.cursor\/rules\/.+\.mdc$/.test(p); }));
   assert.ok(walk(dir).some(function (p) { return /^\.claude\/skills\/.+\/SKILL\.md$/.test(p); }));
+});
+
+test('--git sets the generator git option: .gitignore, .gitkeep, byte-identical to git:true', function () {
+  const dir = path.join(tmp(), 'ws');
+  assert.strictEqual(run(['new', dir].concat(FLAGS, ['--kit', 'produto', '--git'])).code, 0);
+  const expected = generator.buildFileMap(scaffold.buildInput({
+    name: 'Infinite List', kit: 'produto', lang: 'en', desc: 'A test app.', obj: 'validate first', stack: 'Node',
+    limits: 'no deploys', agents: ['claude', 'agentsmd', 'cursor', 'skill'], extra: { git: true, visual: false },
+  })).files;
+  assert.ok('.gitignore' in expected && fs.existsSync(path.join(dir, '.gitignore')));
+  assert.deepStrictEqual(walk(dir), Object.keys(expected).sort());
+  Object.keys(expected).forEach(function (p) {
+    assert.strictEqual(fs.readFileSync(path.join(dir, p), 'utf8'), expected[p], p);
+  });
+});
+
+test('without --git there is no .gitignore and no repo', function () {
+  const dir = path.join(tmp(), 'ws');
+  assert.strictEqual(run(['new', dir, '-y', '--name', 'N']).code, 0);
+  assert.ok(!fs.existsSync(path.join(dir, '.gitignore')));
+  assert.ok(!fs.existsSync(path.join(dir, '.git')));
+});
+
+test('--visual adds the Visual communication section to the agent files', function () {
+  const on = path.join(tmp(), 'a');
+  const off = path.join(tmp(), 'b');
+  assert.strictEqual(run(['new', on, '-y', '--name', 'V', '--visual']).code, 0);
+  assert.strictEqual(run(['new', off, '-y', '--name', 'V']).code, 0);
+  const a = fs.readFileSync(path.join(on, 'AGENTS.md'), 'utf8');
+  const b = fs.readFileSync(path.join(off, 'AGENTS.md'), 'utf8');
+  assert.ok(/Visual communication/i.test(a), 'section missing');
+  assert.ok(!/Visual communication/i.test(b));
+  const expected = generator.buildFileMap(scaffold.buildInput({ name: 'V', extra: { git: false, visual: true } })).files;
+  assert.strictEqual(a, expected['AGENTS.md']);
 });
 
 test('defaults to the current directory when no [dir] is given', function () {

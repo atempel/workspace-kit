@@ -79,7 +79,9 @@ const HELP = [
   '                   Default: ' + scaffold.DEFAULT_AGENTS.join(',') + '.',
   '  --folders <list> Comma list of the kit\'s folders to create (default: the kit\'s',
   '                   own defaults). --no-folders creates none.',
-  '  --git            Run `git init` in the folder, then make the first commit.',
+  '  --git            Run `git init`, make the first commit, and have the generated',
+  '                   files assume a repo (.gitignore, .gitkeep, git section).',
+  '  --visual         Add the "Visual communication" section to the agent files.',
   '  --no-commit      With --git: initialise only, do not commit.',
   '  --force          Write into a non-empty folder; lists what it overwrote.',
   '  --dry-run        Print the files that would be written; write nothing.',
@@ -99,7 +101,7 @@ function parseArgs(argv) {
     command: null, sub: null, name: null, dir: null, json: false, maxLines: null,
     port: null, host: null, out: null, help: false, path: null, branch: null, force: false,
     gen: {}, extra: {}, sets: [], git: false, noCommit: false, yes: false, dryRun: false,
-    noFolders: false, promptOut: null,
+    noFolders: false, promptOut: null, visual: false,
   };
   const genericSpecs = scaffold.genericOptions();
   const positional = [];
@@ -116,6 +118,7 @@ function parseArgs(argv) {
     else if (arg === '--branch') args.branch = argv[++i];
     else if (arg === '-y' || arg === '--yes') args.yes = true;
     else if (arg === '--git') args.git = true;
+    else if (arg === '--visual') args.visual = true;
     else if (arg === '--no-commit') args.noCommit = true;
     else if (arg === '--dry-run') args.dryRun = true;
     else if (arg === '--no-folders') args.noFolders = true;
@@ -223,7 +226,12 @@ async function runNew(args, dir) {
     }
 
     let wantGit = args.git;
-    if (!wantGit && interactive && !args.dryRun) wantGit = /^y/i.test(await ask('Run git init and commit? y/n', 'n'));
+    if (!wantGit && interactive) wantGit = /^y/i.test(await ask('Use git for this folder (init + first commit)? y/n', 'n'));
+
+    let wantVisual = args.visual;
+    if (!wantVisual && interactive) wantVisual = /^y/i.test(await ask('Does a visual person work on this (adds a Visual communication section)? y/n', 'n'));
+    args.extra.git = !!wantGit;
+    args.extra.visual = !!wantVisual;
 
     const input = scaffold.buildInput({
       name: name, kit: kitKey, lang: lang, desc: desc, obj: obj, stack: stack, limits: limits,
