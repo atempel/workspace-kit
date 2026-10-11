@@ -6,14 +6,15 @@ See `queue/` for saved-but-not-yet-ingested references (`grep -l "Status: Pendin
 
 ## Next
 - [x] ~~Take the high-fidelity prototype back from Claude Design and reconcile `DESIGN.md` against it~~ — done 2026-07-28/29: prototype markup versioned at `docs/design/workspace-kit-dashboard.dc.html`, `docs/specs/web-app-dashboard.md` written as the bridge spec, and all three of `DESIGN.md`'s Open Questions marked resolved (scope stays Web-App-only, accent is amber/teal, token values live in the prototype).
-- [ ] Add option for user to enable Git files in the generation (asking if the folder will be a git repo). If the user doesn't mark it, files and instructions on files won't include nothing about git. We also need to plan and implement specific git instructions in the files (AGENT.md) so the agents using it know how to work in git, collaborate with worktree, commit, create PRs, etc. — scope note (2026-07-26): this is about *generated text* (instructions teaching an agent to use git/worktrees inside a workspace). Workspace//kit itself operating git is a separate capability — see "Git as the integration layer" below.
+- [x] ~~Add option for user to enable Git files in the generation~~ — done 2026-10-11 ([#196](https://github.com/atempel/workspace-kit/pull/196), closes #12): "This folder will be a git repo" form option (default off). Off: no git wording and `.keep` placeholders — and, following #12 literally, no `.gitignore` either (open question below). On: `.gitignore` plus a tool-neutral "Working with git" section (commits, branches, worktrees, PRs). Scope note stands: this is generated text; workspace//kit operating git is "Git as the integration layer".
 - [x] ~~Review starter-prompt wording per language~~ — done 2026-07-27: added the chat-language-vs-documentation-language line to the PT starter prompt (English needed none), in both `src/workspace-kit.html` and `core/generator.js` (kept in sync per DECISIONS.md's manual-backport policy), fixture updated, `test:fixtures`/`test:parity` both pass. Still open: whether to add a form option to opt into native-language docs — that's a new feature/UX decision, left for the owner.
-- [ ] Project onboarding in the generated instructions: guide the user to fill in PROJECT/DECISIONS/CONTEXT/TASKS, plan and explore the project in the first conversation with the agent
-- [ ] Recurring task suggestions in the generated files, adapted to the folder structure and chosen kit
-- [ ] Wording in the generated texts that nudges the agent to suggest organizational improvements non-destructively — solve the "first-run instruction" problem (should fire once, at project start) ending up permanently in CLAUDE.md/AGENTS.md and repeating in every future conversation
-- [ ] Add "I'm a visual person" checkbox to the form: when checked, append instructions to the generated files (CLAUDE.md/AGENTS.md and per-tool variants) nudging the agent to favor visual representations — diagrams, mockups, charts, visualizations — over text-only answers when the task allows it
+- [x] ~~Project onboarding in the generated instructions~~ — done 2026-10-11 ([#198](https://github.com/atempel/workspace-kit/pull/198), closes #7): every workspace gets a one-time `ONBOARDING.md` guiding the first conversation.
+- [x] ~~Recurring task suggestions in the generated files~~ — done 2026-10-11 ([#198](https://github.com/atempel/workspace-kit/pull/198), closes #8): a "Recurring" section in the generated `TASKS.md`, three kit-specific suggestions for each of the 17 kits, EN + PT.
+- [x] ~~Non-destructive organizational-improvement wording and the "first-run instruction" problem~~ — done 2026-10-11 ([#198](https://github.com/atempel/workspace-kit/pull/198), closes #9): a two-line conditional "First session" pointer to the self-deleting `ONBOARDING.md`, plus one permanent bullet (suggest, wait for approval, never move/rename/delete unprompted). See DECISIONS.md, 2026-10-11.
+- [x] ~~Add "I'm a visual person" checkbox to the form~~ — done 2026-10-11 ([#196](https://github.com/atempel/workspace-kit/pull/196), closes #14): appends a "Visual communication" section to the generated agent files, EN + PT.
 - [x] ~~Resolve the "Phase 1 vs. context manager" tension~~ — resolved 2026-07-22, see DECISIONS.md.
 - [x] ~~Adopt the CHANGELOG.md + ADR-style DECISIONS.md rotation pattern for this repo's own docs~~ — DECISIONS.md half executed 2026-07-26 (8 oldest entries rotated to `decisions/` with an index). CHANGELOG.md deliberately not created yet — premature until CONTEXT.md accumulates narrative history to split out. Full spec + issue: docs/specs/context-manager-conventions.md → [#34](https://github.com/atempel/workspace-kit/issues/34)
+- [x] ~~Create CHANGELOG.md with its pruning policy~~ — done 2026-10-11 ([#193](https://github.com/atempel/workspace-kit/pull/193), closes #117, #118): `CHANGELOG.md` at the repo root, one dated line per item linked to the DECISIONS entry holding the why; entries older than ~3 months are summarised or removed. Completes the half deferred on 2026-07-26.
 - [x] ~~Propagate the 2026-07-26 positioning + "kits" rename decision into CONTEXT.md's vocabulary section~~ — done 2026-07-27: added the "Kit"/"system kit" vocabulary entry, updated the "Anchor file" definition, and logged the model-agnostic/positioning constraint alongside PROJECT.md/docs/PRD.md (updated 2026-07-27).
 - [x] ~~Rename "project type" to **"kit"** (built-ins become "system kits")~~ — executed 2026-07-29 across both copies of the generation logic (`KIT_CONFIG`, `kit` input key, `pkit`/`pkitLabel`, `applyKitDefaults`), `core/fixtures.json` + parity harness, the `Kit` form label in EN/PT, `research/kits/` (renamed from `research/project-types/`), and README/specs wording. Fixture `expected` output was left untouched and both suites still pass — proof the rename changed no generated workspace. **Scope boundary decided here** (see DECISIONS.md, 2026-07-29): generated text still says "Project type"/"Tipo de projeto". Open for the owner to overrule if the generated heading should change too.
 - [x] ~~Adopt a per-feature parallel workstream approach ...; record the stated non-functional bar in PROJECT.md's pillars / CONTEXT.md's constraints~~ — non-functional bar (modern, complete, modular, functional, secure, reliable) recorded in both files 2026-07-27. The parallel-workstream-per-feature convention itself is already how docs/specs/ + TASKS.md are organized (one spec + one issue per feature); no further doc change needed.
@@ -32,6 +33,8 @@ See `queue/` for saved-but-not-yet-ingested references (`grep -l "Status: Pendin
 Foundational surface: generates workspaces from a terminal instead of only the browser artifact. Full spec + issue: docs/specs/cli-generator.md → [#20](https://github.com/atempel/workspace-kit/issues/20). Supersedes the older, narrower "CLI init" line (issue #6).
 - [x] ~~Shared-generation-engine blocker~~ — resolved 2026-07-22, `core/generator.js` created as a standalone shared module (see DECISIONS.md).
 - [x] ~~Parity test harness~~ — `core/parity-check.js`/`core/check-fixtures.js` confirm `core/generator.js` matches `src/workspace-kit.html`'s output (see DECISIONS.md).
+- [x] ~~`workspace-kit new` MVP~~ — done 2026-10-11 ([#197](https://github.com/atempel/workspace-kit/pull/197), closes #20, #21, #112–#116): writes the full human layer, agent layer, `.gitignore` and kit anchor into a folder via `core/scaffold.js` and `core/generator.js`; prompts, flags, `--git`, `--force`, `--dry-run`; `npm run test:new`. See DECISIONS.md, 2026-10-11.
+- [x] ~~`queue add|list|done` and `commit` subcommands~~ — done 2026-10-11 ([#199](https://github.com/atempel/workspace-kit/pull/199), closes #104, #98): `core/queue.js`, `commitChanges` in `core/git.js`, `npm run test:queue`. `commit` asks y/n (default no) and never pushes. See DECISIONS.md, 2026-10-11.
 
 ### Local Web App (planning — 2026-07-21)
 Generates *and* manages workspaces; hosts capabilities the standalone HTML can't (git, Templates management, Docker spin-up). Full spec + issue: docs/specs/local-web-app.md → [#29](https://github.com/atempel/workspace-kit/issues/29). Its "open an existing workspace" P0 bullet is being absorbed into the Workspace inspection layer below rather than built as its own reader.
@@ -54,7 +57,8 @@ Evaluates a workspace's instruction/file-size health and gives concrete improvem
 
 ### Cross-tool session log (planning — ingested from voice note, 2026-07-26)
 A per-session log recording what happened where across tools (Claude Design/Cowork/Claude Code) — cheapest of the 2026-07-26 batch, ships as plain generated text on all three surfaces. Full spec + issue: docs/specs/cross-tool-session-log.md → [#81](https://github.com/atempel/workspace-kit/issues/81).
-- [x] ~~Read side~~ — `core/inspect.js` parses `SESSIONS.md` into `index.sessions` (2026-07-29). Still open: generating `SESSIONS.md` + the standing instruction into new workspaces.
+- [x] ~~Read side~~ — `core/inspect.js` parses `SESSIONS.md` into `index.sessions` (2026-07-29).
+- [x] ~~Generation side~~ — every generated workspace now includes `SESSIONS.md` (with a worked first entry) and the standing "every session" instruction, 2026-10-11 ([#196](https://github.com/atempel/workspace-kit/pull/196), closes #110).
 
 ### Git as the integration layer (planning — ingested from voice note, 2026-07-26)
 Workspace//kit itself operating git (file-state tracking, worktrees, user-friendly commit/PR flows) — strictly model-agnostic (see DECISIONS.md, 2026-07-26), CLI/Web-App-only. Full spec + issue: docs/specs/git-integration-layer.md → [#79](https://github.com/atempel/workspace-kit/issues/79). Design brief for a Claude Design prototype (no UI existed yet for this spec): docs/design/git-layer-dashboard-brief.md.
@@ -65,16 +69,49 @@ Workspace//kit itself operating git (file-state tracking, worktrees, user-friend
 
 ### Document ingestion queue (planning — ingested from voice note, 2026-07-26)
 A per-workspace queue for references saved but not yet incorporated; dogfooded immediately in this repo's own `queue/` folder. Full spec + issue: docs/specs/document-ingestion-queue.md → [#80](https://github.com/atempel/workspace-kit/issues/80).
-- [x] ~~Read side~~ — `core/inspect.js` parses `queue/*.md` into `index.queue` (2026-07-29). Still open: generating the convention into new workspaces.
+- [x] ~~Read side~~ — `core/inspect.js` parses `queue/*.md` into `index.queue` (2026-07-29).
+- [x] ~~Generation side~~ — generated workspaces ship an empty `queue/` and the stub convention in the agent layer, 2026-10-11 ([#196](https://github.com/atempel/workspace-kit/pull/196)).
 
 ### Templates feature (planning — ingested from voice notes, 2026-07-14 and 2026-07-26)
 Lets a user define and reuse their own workspace structure via a form + merge tags. The home nav already has a non-functional "Templates" pill (`navTemplates` in `src/workspace-kit.html`). Full spec + issue: docs/specs/templates-feature.md → [#32](https://github.com/atempel/workspace-kit/issues/32).
 - [x] ~~Open decision: single HTML file vs. full app vs. HTML+backend~~ — resolved 2026-07-21, see DECISIONS.md.
 - [x] ~~Rename question: should built-in "project types" be called "templates"?~~ — resolved 2026-07-26: no, built-ins are renamed "kits" instead (see `## Next`), avoiding a naming collision with this feature.
+- [x] ~~Technical design~~ — done 2026-10-11 ([#195](https://github.com/atempel/workspace-kit/pull/195), closes #22): docs/specs/templates-technical-design.md. A recommendation with 12 open questions for the owner, below.
 
 ### Docker environment generation (planning — requested 2026-07-21, extended 2026-07-26)
 Generates a Dockerfile/docker-compose per workspace, adapted per kit; templates can now also carry a Docker environment definition. Full spec + issue: docs/specs/docker-environment-generation.md → [#33](https://github.com/atempel/workspace-kit/issues/33).
 - [x] ~~Surface split to clarify~~ — resolved 2026-07-21, see DECISIONS.md.
+
+## Open questions for the owner
+Gathered 2026-10-11 from the PRs merged that day. None is settled; each is waiting on a call.
+
+**Generated text**
+- `.gitignore` when the git option is off ([#196](https://github.com/atempel/workspace-kit/pull/196)): it is no longer generated, following #12 literally ("nothing about git"). That changes the default output and may conflict with the security & privacy pillar. Keep, or always generate `.gitignore`?
+- Should the starter prompt mention `SESSIONS.md` and `queue/`? It was left unchanged.
+- Should `doctor` flag a lingering `ONBOARDING.md` (stale after many sessions), or is that left to the agent? ([#198](https://github.com/atempel/workspace-kit/pull/198))
+- Should the recurring list react to which folders are ticked (e.g. drop the podcast "raw" item if that folder is off), or stay per-kit only? A cadence/reminder mechanism would be a separate feature.
+
+**CLI (`workspace-kit new`, [#197](https://github.com/atempel/workspace-kit/pull/197))**
+- Where should the option list come from: should `core/generator.js` export `OPTIONS`, or should the CLI read it elsewhere? Until then only `--set k=v` reaches the new options.
+- Packaging: ship from this repo, publish to npm, or `npx`? A `bin` entry already exists.
+
+**Queue and commit CLI ([#199](https://github.com/atempel/workspace-kit/pull/199))**
+- `workspace-kit commit` uses a whole-repository change summary, so for a workspace in a repo subfolder it also commits changes outside the workspace. Scope it to the workspace folder (a change to `changeSummary`)?
+- Should `queue done` also offer to commit, per the spec's P2 note?
+
+**Templates technical design (docs/specs/templates-technical-design.md, [#195](https://github.com/atempel/workspace-kit/pull/195))**
+1. Merge-tag marker: confirm `%tag%` with a `%%` escape, or choose another.
+2. Can a template extend a built-in kit (add/override/remove)? The design says no.
+3. Storage: are `~/.workspace-kit/templates` and `<ws>/.workspace-kit/templates` acceptable (XDG/APPDATA)?
+4. When does the local server gain write endpoints (blocks Web App authoring)?
+5. May `inspect`/`doctor` skip `.workspace-kit/templates/`?
+6. Keep the `{{slug:tag}}` derived default, or zero expressions?
+7. Single-language templates, or per-language file sets?
+8. Field types beyond text/textarea?
+9. Policy for a non-empty target folder.
+10. Ship template subcommands before CLI generate (#20)? (Moot for ordering: `new` has shipped.)
+11. Binary assets in v1?
+12. Built-in kits as system templates eventually?
 
 ## Done
 - [x] v3 visual redesign promoted to `src/workspace-kit.html`, archived previous version at `src/workspace-kit-v2-archive.html`, removed redundant preview file, and pushed everything to GitHub (atempel/workspace-kit) — new Figma-referenced interface (dark glass-card UI, centered pill nav, sticky workspace-preview sidebar, outlined-wordmark logo, SVG flag language selector) with full v2 functional parity, fixed across 3 review rounds (cropped logo, emoji flags, header/spacing, low text contrast, agent-card overflow + uniform sizing, unnecessary preview-panel scroll) (2026-07-10)
