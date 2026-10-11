@@ -81,6 +81,7 @@ Lets a user define and reuse their own workspace structure via a form + merge ta
 ### Docker environment generation (planning — requested 2026-07-21, extended 2026-07-26)
 Generates a Dockerfile/docker-compose per workspace, adapted per kit; templates can now also carry a Docker environment definition. Full spec + issue: docs/specs/docker-environment-generation.md → [#33](https://github.com/atempel/workspace-kit/issues/33).
 - [x] ~~Surface split to clarify~~ — resolved 2026-07-21, see DECISIONS.md.
+- [x] ~~Base template, kit → Docker mapping, content from all three surfaces~~ ([#125](https://github.com/atempel/workspace-kit/issues/125), [#126](https://github.com/atempel/workspace-kit/issues/126), [#127](https://github.com/atempel/workspace-kit/issues/127)) — done 2026-10-11, [PR #200](https://github.com/atempel/workspace-kit/pull/200). #128 (spin it up) still open; #31 only partly settled.
 
 ## Open questions for the owner
 Gathered 2026-10-11 from the PRs merged that day. None is settled; each is waiting on a call.
@@ -94,6 +95,14 @@ Gathered 2026-10-11 from the PRs merged that day. None is settled; each is waiti
 **CLI (`workspace-kit new`, [#197](https://github.com/atempel/workspace-kit/pull/197))**
 - Where should the option list come from: should `core/generator.js` export `OPTIONS`, or should the CLI read it elsewhere? Until then only `--set k=v` reaches the new options.
 - Packaging: ship from this repo, publish to npm, or `npx`? A `bin` entry already exists.
+
+**Docker generation ([#200](https://github.com/atempel/workspace-kit/pull/200))**
+- The generated image installs the Claude Code CLI, as spec P0 #125 says. That sits against the model-agnostic positioning ([decisions/018](decisions/018-positioning-and-kit-rename.md)). Keep, make it optional, or drop it?
+- The gh CLI install (when git is on) presumes GitHub while hosting-provider scope is deferred. Keep, or leave it out until that is decided?
+- #31 remainder: extra services (DB/Redis), base image / runtime version override, per-type SDK choices.
+- Should Docker be on by default for some kits (e.g. dataml)?
+- Should dataml get a Python-first base image instead of Node plus a venv?
+- `docker compose build && up` is unverified for every kit: the authoring container has no Docker. Run it once on a host with Docker.
 
 **Queue and commit CLI ([#199](https://github.com/atempel/workspace-kit/pull/199))**
 - `workspace-kit commit` uses a whole-repository change summary, so for a workspace in a repo subfolder it also commits changes outside the workspace. Scope it to the workspace folder (a change to `changeSummary`)?
