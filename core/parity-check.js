@@ -58,6 +58,9 @@ function runRealHtml(input, FixedDate) {
     doc.getElementById(id).checked = !!(input.agents && input.agents[key]);
   });
 
+  doc.getElementById('optGit').checked = !!input.git;
+  doc.getElementById('optVisual').checked = !!input.visual;
+
   const fileMap = win.buildFileMap();
   win.renderPrompt();
   const starterPrompt = doc.getElementById('promptOut').value;
