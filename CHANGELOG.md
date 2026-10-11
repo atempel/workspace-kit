@@ -1,0 +1,35 @@
+# Changelog — workspace//kit
+
+Narrative product history: what shipped and which decisions shaped it, coarse-grained. Reading mode is **on-demand / grep-only** — this file is not part of the always-read set, so open it when you need history, not at the start of every session. The per-session tool-handoff record is [SESSIONS.md](SESSIONS.md); the *why* behind each decision lives in [DECISIONS.md](DECISIONS.md) and `decisions/`.
+
+**Pruning policy** (docs/specs/context-manager-conventions.md → #34, #118): entries older than ~3 months are summarized to one line or removed. Each entry is written as a single line so it can be summarized in place without rewriting it. Applied manually when an entry crosses the threshold, the same way the DECISIONS.md rotation is applied.
+
+Newest first. Hashes point at the commit that shipped the item; decision links point at the recorded reasoning.
+
+- **2026-08-01** — Dashboard P1 shell affordances: command palette (sections and files only), recent-workspace list, dismissable suggestions, theme toggle; view state persists in the browser, not on the server; worktree-overlap report added to the git layer. (ee55279, merged via PR #192 on 2026-10-11; [DECISIONS.md](DECISIONS.md) 2026-08-01)
+- **2026-07-30** — `workspace-kit serve` serves the built dashboard from the same port as the JSON API; `--host` exists for container access, with ports published to loopback only. (31e6312; [DECISIONS.md](DECISIONS.md) 2026-07-30)
+- **2026-07-30** — Two parallel dashboard implementations compared side by side; `web/` kept as the dashboard, and the browser harness (`npm run test:ui`) ported into it. (5ddf46d; [DECISIONS.md](DECISIONS.md) 2026-07-30)
+- **2026-07-29** — Dashboard front end in `web/` (React 19 + Tailwind v4): five read-only sections over the local server; every write action is shown as unavailable with its reason. (3272090; [DECISIONS.md](DECISIONS.md) 2026-07-29)
+- **2026-07-29** — Report layer: `workspace-kit report` renders the planning documents and the decision, task and session history into HTML under `reports/`. (4f3665c, 71eacf4, c87f485)
+- **2026-07-29** — Local server: `workspace-kit serve` exposes a read-only JSON API bound to 127.0.0.1, refusing non-GET methods and paths outside its root. (f13f8df, PR #188; `decisions/` and [DECISIONS.md](DECISIONS.md) 2026-07-29)
+- **2026-07-29** — Git layer: `workspace-kit status` (file state, safe-edit check, change summary, commit template) and local worktree create/list/remove; push and PR flows deliberately not built. (626ee6f, c24878e, PR #187; [DECISIONS.md](DECISIONS.md) 2026-07-29)
+- **2026-07-29** — Health check: `workspace-kit doctor` judges the workspace (context budget, file size, decision-log growth, broken references, stale instructions) and exits non-zero when unhealthy. (0262edf, PR #185; [DECISIONS.md](DECISIONS.md) 2026-07-29)
+- **2026-07-29** — Inspection layer: `core/inspect.js` indexes a workspace's files, agent-layer instructions and cross-reference graph, and reads `queue/` and `SESSIONS.md`. (0d680e5, 7e563b7, PRs #184 and #186; [DECISIONS.md](DECISIONS.md) 2026-07-29)
+- **2026-07-29** — Decision-log rotation: DECISIONS.md keeps a one-line index and the full entries moved to `decisions/` (first rotation 2026-07-26, most recent 2026-08-01). (2520b71, a916101, PR #189)
+- **2026-07-29** — "Project type" renamed to "kit" across the surface, code and docs; the text the tool generates keeps "Project type". (9fc20d0; [decisions/021-kit-rename-executed.md](decisions/021-kit-rename-executed.md))
+- **2026-07-28** — Dashboard spec (docs/specs/web-app-dashboard.md → #169) and its prototype markup added to the repo. (PR #167)
+- **2026-07-28** — Local Web App gets its own stack (React, Tailwind, shadcn/ui), scoped to that surface only. ([decisions/020-local-web-app-stack.md](decisions/020-local-web-app-stack.md))
+- **2026-07-27** — CHANGELOG.md vs. SESSIONS.md boundary resolved (product history vs. tool handoff); SESSIONS.md introduced as the per-session log. (a71dd1a; [decisions/019-changelog-sessions-boundary.md](decisions/019-changelog-sessions-boundary.md))
+- **2026-07-26** — Positioning sharpened: workspace management and versioning for instructions, prose and documentation, not code versioning; model- and tool-agnostic is a product principle. ([decisions/018-positioning-and-kit-rename.md](decisions/018-positioning-and-kit-rename.md))
+- **2026-07-22** — "Phase 1" framing retired: the product's scope covers the whole project lifecycle, not only initial setup. (00db67d; [decisions/017-phase-1-retired.md](decisions/017-phase-1-retired.md))
+- **2026-07-22** — Shared generation module `core/generator.js` seeded for the CLI; the standalone HTML artifact keeps its own inline copy. (803af75; [decisions/016-shared-generation-module-seeded.md](decisions/016-shared-generation-module-seeded.md))
+- **2026-07-21** — Three surfaces agreed (CLI generator, Local Web App, standalone HTML artifact) and one shared generation engine across them. (ea4d408; [decisions/013-multi-surface-strategy.md](decisions/013-multi-surface-strategy.md), [decisions/014-shared-generation-engine.md](decisions/014-shared-generation-engine.md))
+- **2026-07-16** — Static site published with GitHub Pages. (PRs #16 and #17)
+- **2026-07-10** — Bilingual README: `README.md` (English) and `README.pt-BR.md`. (ea2cfd4; [decisions/015-bilingual-readme.md](decisions/015-bilingual-readme.md))
+- **2026-07-10** — v3 visual redesign promoted to the official `src/workspace-kit.html`; v2 kept as an archive. (e8b196f; [decisions/012-v3-visual-redesign.md](decisions/012-v3-visual-redesign.md))
+- **2026-07-02** — Generated workspaces include a `.gitignore` that keeps heavy or sensitive folders out of git; project types grew from 11 to 17. (715fecb; [decisions/011-gitignore-and-17-kits.md](decisions/011-gitignore-and-17-kits.md))
+- **2026-07-01** — Repository docs translated to English; PT/EN language selector added to the artifact. (ccbf045, 1fd08ea; [decisions/009-repo-translated-to-english.md](decisions/009-repo-translated-to-english.md))
+- **2026-07-01** — Project pillars recorded: security & privacy, collaboration. (4e6343a; [decisions/010-project-pillars.md](decisions/010-project-pillars.md))
+- **2026-07-01** — v2 standalone artifact (`src/workspace-kit.html`), generated 100% client-side, with the agent layer (CLAUDE.md imports AGENTS.md) and the two file layers. (f2b803e, 98e4045; [decisions/002-v2-agent-layer.md](decisions/002-v2-agent-layer.md), [decisions/003-v2-two-file-layers.md](decisions/003-v2-two-file-layers.md), [decisions/005-v2-100-percent-client-side.md](decisions/005-v2-100-percent-client-side.md))
+- **2026-07-01** — Project named workspace//kit (repository `workspace-kit`), replacing the working name ctx//forge. (f2b803e; [decisions/007-renaming-workspace-kit.md](decisions/007-renaming-workspace-kit.md))
+- **2026-07-01** — v1 base structure: base files always generated (PROJECT, DECISIONS, CONTEXT, TASKS, README). The decision is undated; the date is the repository's initial commit (22f3013). ([decisions/001-v1-base-structure.md](decisions/001-v1-base-structure.md))

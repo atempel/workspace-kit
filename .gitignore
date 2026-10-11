@@ -39,3 +39,7 @@ web/screenshots/
 .zed/
 .vscode/
 .idea/
+
+# Rendered docs and hand-authored one-off reports — local output, not source
+# (see DECISIONS.md, 2026-10-11). Markdown stays the source of truth.
+reports/
