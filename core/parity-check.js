@@ -60,6 +60,7 @@ function runRealHtml(input, FixedDate) {
 
   doc.getElementById('optGit').checked = !!input.git;
   doc.getElementById('optVisual').checked = !!input.visual;
+  doc.getElementById('optDocker').checked = !!input.docker;
 
   const fileMap = win.buildFileMap();
   win.renderPrompt();

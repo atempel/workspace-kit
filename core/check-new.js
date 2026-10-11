@@ -59,12 +59,12 @@ const FLAGS = ['--name', 'Infinite List', '--desc', 'A test app.', '--obj', 'val
 test('no flags: prompts for every field the HTML form collects', function () {
   const dir = path.join(tmp(), 'ws');
   // Answers in prompt order: lang, kit, name, desc, obj, stack, limits, agents,
-  // then one y/n per folder of the kit, then git, then visual.
+  // then one y/n per folder of the kit, then git, then visual, then docker.
   const r = run(['new', dir], ['pt', '2', 'Meu Estudo', 'descr', 'meta', 'Python', 'sem rede',
-    'claude,gemini', 'y', 'n', 'n', 'n', 'n'].join('\n') + '\n');
+    'claude,gemini', 'y', 'n', 'n', 'n', 'n', 'n'].join('\n') + '\n');
   assert.strictEqual(r.code, 0, r.err);
   ['Language', 'Project type', 'Project name', 'Short description', 'Main goal', 'Stack',
-    'Limits', 'Agents', 'Create dados/', 'Use git', 'visual person'].forEach(function (p) {
+    'Limits', 'Agents', 'Create dados/', 'Use git', 'visual person', 'Docker environment'].forEach(function (p) {
     assert.ok(r.err.indexOf(p) !== -1, 'never prompted for: ' + p);
   });
   const project = fs.readFileSync(path.join(dir, 'PROJECT.md'), 'utf8');
@@ -165,6 +165,20 @@ test('--visual adds the Visual communication section to the agent files', functi
   assert.ok(!/Visual communication/i.test(b));
   const expected = generator.buildFileMap(scaffold.buildInput({ name: 'V', extra: { git: false, visual: true } })).files;
   assert.strictEqual(a, expected['AGENTS.md']);
+});
+
+test('--docker writes the Docker files adapted to the kit; without it there are none', function () {
+  const on = path.join(tmp(), 'a');
+  const off = path.join(tmp(), 'b');
+  assert.strictEqual(run(['new', on, '-y', '--name', 'D', '--kit', 'dataml', '--docker']).code, 0);
+  assert.strictEqual(run(['new', off, '-y', '--name', 'D', '--kit', 'dataml']).code, 0);
+  ['Dockerfile', 'docker-compose.yml', '.dockerignore'].forEach(function (p) {
+    assert.ok(fs.existsSync(path.join(on, p)), 'missing ' + p);
+    assert.ok(!fs.existsSync(path.join(off, p)), p + ' without --docker');
+  });
+  const expected = generator.buildFileMap(scaffold.buildInput({ name: 'D', kit: 'dataml', extra: { docker: true } })).files;
+  assert.strictEqual(fs.readFileSync(path.join(on, 'Dockerfile'), 'utf8'), expected['Dockerfile']);
+  assert.ok(/jupyterlab/.test(expected['Dockerfile']), 'dataml should get the Python stack');
 });
 
 test('defaults to the current directory when no [dir] is given', function () {

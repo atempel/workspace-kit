@@ -95,6 +95,8 @@ const HELP = [
   '  --git            Run `git init`, make the first commit, and have the generated',
   '                   files assume a repo (.gitignore, .gitkeep, git section).',
   '  --visual         Add the "Visual communication" section to the agent files.',
+  '  --docker         Also write a Dockerfile, docker-compose.yml and .dockerignore',
+  '                   adapted to the kit (nothing is built or started).',
   '  --no-commit      With --git: initialise only, do not commit.',
   '  --force          Write into a non-empty folder; lists what it overwrote.',
   '  --dry-run        Print the files that would be written; write nothing.',
@@ -114,7 +116,7 @@ function parseArgs(argv) {
     command: null, sub: null, name: null, dir: null, json: false, maxLines: null,
     port: null, host: null, out: null, help: false, path: null, branch: null, force: false,
     gen: {}, extra: {}, sets: [], git: false, noCommit: false, yes: false, dryRun: false,
-    noFolders: false, promptOut: null, visual: false,
+    noFolders: false, promptOut: null, visual: false, docker: false,
     title: null, type: null, source: null, note: null, into: null, message: null,
   };
   const genericSpecs = scaffold.genericOptions();
@@ -133,6 +135,7 @@ function parseArgs(argv) {
     else if (arg === '-y' || arg === '--yes') args.yes = true;
     else if (arg === '--git') args.git = true;
     else if (arg === '--visual') args.visual = true;
+    else if (arg === '--docker') args.docker = true;
     else if (arg === '--no-commit') args.noCommit = true;
     else if (arg === '--dry-run') args.dryRun = true;
     else if (arg === '--no-folders') args.noFolders = true;
@@ -266,8 +269,11 @@ async function runNew(args, dir) {
 
     let wantVisual = args.visual;
     if (!wantVisual && interactive) wantVisual = /^y/i.test(await ask('Does a visual person work on this (adds a Visual communication section)? y/n', 'n'));
+    let wantDocker = args.docker;
+    if (!wantDocker && interactive) wantDocker = /^y/i.test(await ask('Include a Docker environment (Dockerfile + docker-compose.yml)? y/n', 'n'));
     args.extra.git = !!wantGit;
     args.extra.visual = !!wantVisual;
+    if (wantDocker) args.extra.docker = true;
 
     const input = scaffold.buildInput({
       name: name, kit: kitKey, lang: lang, desc: desc, obj: obj, stack: stack, limits: limits,
