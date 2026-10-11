@@ -2,12 +2,10 @@
 /**
  * workspace//kit CLI.
  *
- * Currently carries one command, `doctor`, which is docs/specs/
- * workspace-health-check.md's (→ #78) P0 command surface. The generate flow --
- * the CLI's first command, docs/specs/cli-generator.md (→ #20) -- is not built
- * yet; this entry point exists so `doctor` can ship without waiting on it, and
- * is deliberately shaped to take more subcommands rather than to be a
- * doctor-specific script.
+ * Carries `doctor` (docs/specs/workspace-health-check.md → #78), the status,
+ * worktree and dashboard commands, and `new` (docs/specs/cli-generator.md →
+ * #20), the generate flow. Deliberately shaped to take more subcommands rather
+ * than to be a script for any one of them.
  *
  * Zero dependencies, no build step, same as the rest of core/.
  */
@@ -22,6 +20,9 @@ const doctor = require('../core/doctor.js');
 const gitLayer = require('../core/git.js');
 const webServer = require('../core/server.js');
 const reportLayer = require('../core/report.js');
+const generator = require('../core/generator.js');
+const scaffold = require('../core/scaffold.js');
+const readline = require('readline');
 
 const HELP = [
   'workspace//kit — workspace management and versioning for instructions and docs',
@@ -29,6 +30,11 @@ const HELP = [
   'Usage: workspace-kit <command> [options]',
   '',
   'Commands:',
+  '  new [dir]        Create a workspace: the human layer, the agent layer, .gitignore',
+  '                   and the anchor file, written straight into <dir> (default: the',
+  '                   current directory). Prompts for anything not given as a flag.',
+  '                   Refuses a non-empty folder unless --force. Prints the starter',
+  '                   prompt to stdout; progress goes to stderr.',
   '  doctor [dir]     Check a workspace\'s context health. Defaults to the current',
   '                   directory. Exits non-zero when the verdict is unhealthy, so it',
   '                   is usable in CI.',
@@ -63,6 +69,24 @@ const HELP = [
   '  --force          Remove a worktree even though it holds uncommitted work.',
   '  -h, --help       Show this help.',
   '',
+  'Options for `new` (any left out are prompted for; -y takes the defaults instead):',
+  '  --name <s>       Project name.',
+  '  --kit <k>        Project type: ' + scaffold.kitKeys().join(', ') + '.',
+  '  --lang <en|pt>   Language of the generated files (default en).',
+  '  --desc <s>       Short description.        --obj <s>     Main goal.',
+  '  --stack <s>      Stack.                    --limits <s>  Limits.',
+  '  --agents <list>  Comma list of: ' + scaffold.AGENT_KEYS.join(', ') + '.',
+  '                   Default: ' + scaffold.DEFAULT_AGENTS.join(',') + '.',
+  '  --folders <list> Comma list of the kit\'s folders to create (default: the kit\'s',
+  '                   own defaults). --no-folders creates none.',
+  '  --git            Run `git init` in the folder, then make the first commit.',
+  '  --no-commit      With --git: initialise only, do not commit.',
+  '  --force          Write into a non-empty folder; lists what it overwrote.',
+  '  --dry-run        Print the files that would be written; write nothing.',
+  '  --prompt-out <f> Also write the starter prompt to this file.',
+  '  --set k=v        Set any other generator input (e.g. --set agents.skill=true).',
+  '  -y, --yes        Never prompt; use defaults for whatever is not given.',
+  '',
   'Worktrees are local-only: nothing is pushed and no remote is contacted.',
   '',
   'Note on token figures: every token count reported is an estimate derived from',
@@ -74,7 +98,10 @@ function parseArgs(argv) {
   const args = {
     command: null, sub: null, name: null, dir: null, json: false, maxLines: null,
     port: null, host: null, out: null, help: false, path: null, branch: null, force: false,
+    gen: {}, extra: {}, sets: [], git: false, noCommit: false, yes: false, dryRun: false,
+    noFolders: false, promptOut: null,
   };
+  const genericSpecs = scaffold.genericOptions();
   const positional = [];
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
@@ -87,6 +114,21 @@ function parseArgs(argv) {
     else if (arg === '--host') args.host = argv[++i];
     else if (arg === '--path') args.path = argv[++i];
     else if (arg === '--branch') args.branch = argv[++i];
+    else if (arg === '-y' || arg === '--yes') args.yes = true;
+    else if (arg === '--git') args.git = true;
+    else if (arg === '--no-commit') args.noCommit = true;
+    else if (arg === '--dry-run') args.dryRun = true;
+    else if (arg === '--no-folders') args.noFolders = true;
+    else if (arg === '--prompt-out') args.promptOut = argv[++i];
+    else if (arg === '--set') args.sets.push(argv[++i]);
+    else if (/^--(name|kit|lang|desc|obj|stack|limits|agents|folders)$/.test(arg)) args.gen[arg.slice(2)] = argv[++i];
+    else if (genericSpecs.some(function (o) { return arg === '--' + o.flag || arg === '--no-' + o.flag; })) {
+      // Options the generator itself declares (core/generator.js OPTIONS) map
+      // to flags with no change here.
+      const neg = arg.indexOf('--no-') === 0;
+      const spec = genericSpecs.filter(function (o) { return arg === '--' + (neg ? 'no-' : '') + o.flag; })[0];
+      args.extra[spec.key] = spec.type === 'boolean' ? !neg : argv[++i];
+    }
     else positional.push(arg);
   }
   args.command = positional[0] || null;
@@ -107,6 +149,138 @@ function parseArgs(argv) {
   return args;
 }
 
+/**
+ * `new`: collect inputs (flags first, prompts for the rest), have
+ * core/generator.js build the file map, and let core/scaffold.js put it on
+ * disk. No generation logic lives here.
+ */
+async function runNew(args, dir) {
+  const err = function (m) { process.stderr.write(m + '\n'); };
+  const g = args.gen;
+
+  // Prompts read from a line queue rather than rl.question so piped answers
+  // (and tests) cannot be lost between questions.
+  const interactive = !args.yes;
+  let rl = null;
+  const queue = [];
+  const waiting = [];
+  let closed = false;
+  if (interactive) {
+    rl = readline.createInterface({ input: process.stdin, terminal: false });
+    rl.on('line', function (l) { if (waiting.length) waiting.shift()(l); else queue.push(l); });
+    rl.on('close', function () { closed = true; while (waiting.length) waiting.shift()(''); });
+  }
+  function ask(question, def) {
+    process.stderr.write(question + (def ? ' [' + def + ']' : '') + ': ');
+    return new Promise(function (resolve) {
+      const done = function (l) { l = l.trim(); resolve(l || def || ''); };
+      if (queue.length) done(queue.shift());
+      else if (closed) { process.stderr.write('\n'); done(''); }
+      else waiting.push(done);
+    });
+  }
+  async function field(key, question, def) {
+    if (g[key] != null) return g[key];
+    return interactive ? ask(question, def) : (def || '');
+  }
+
+  try {
+    const lang = await field('lang', 'Language (en/pt)', 'en');
+    if (lang !== 'en' && lang !== 'pt') throw new Error('Unknown language "' + lang + '". Expected en or pt.');
+
+    let kit = g.kit;
+    if (kit == null && interactive) {
+      scaffold.kitKeys().forEach(function (k, i) {
+        err('  ' + (i + 1) + '. ' + k + ' — ' + generator.KIT_CONFIG[k].label[lang]);
+      });
+      kit = await ask('Project type (number or name)', scaffold.kitKeys()[0]);
+    }
+    const kitKey = scaffold.resolveKit(kit == null ? scaffold.kitKeys()[0] : kit);
+    if (!kitKey) throw new Error('Unknown kit "' + kit + '". Expected one of: ' + scaffold.kitKeys().join(', ') + '.');
+
+    const name = await field('name', 'Project name', '');
+    const desc = await field('desc', 'Short description', '');
+    const obj = await field('obj', 'Main goal', '');
+    const stack = await field('stack', 'Stack', '');
+    const limits = await field('limits', 'Limits (what the AI must not do)', '');
+
+    let agentList = g.agents != null ? scaffold.list(g.agents) : null;
+    if (agentList == null) {
+      agentList = interactive
+        ? scaffold.list(await ask('Agents (' + scaffold.AGENT_KEYS.join(', ') + ')', scaffold.DEFAULT_AGENTS.join(',')))
+        : scaffold.DEFAULT_AGENTS;
+    }
+
+    let folders = null;
+    if (args.noFolders) folders = [];
+    else if (g.folders != null) folders = scaffold.list(g.folders);
+    else if (interactive) {
+      folders = [];
+      for (const c of scaffold.folderChoices(kitKey, lang)) {
+        const a = await ask('Create ' + c.name + '/ (' + c.label + (c.localOnly ? ', local only' : '') + ')? y/n', c.checked ? 'y' : 'n');
+        if (/^y/i.test(a)) folders.push(c.name);
+      }
+    }
+
+    let wantGit = args.git;
+    if (!wantGit && interactive && !args.dryRun) wantGit = /^y/i.test(await ask('Run git init and commit? y/n', 'n'));
+
+    const input = scaffold.buildInput({
+      name: name, kit: kitKey, lang: lang, desc: desc, obj: obj, stack: stack, limits: limits,
+      agents: agentList, folders: folders, extra: args.extra,
+    });
+    args.sets.forEach(function (s) {
+      const set = scaffold.parseSet(s);
+      const parts = set.path.split('.');
+      let node = input;
+      parts.slice(0, -1).forEach(function (p) { node = (node[p] = node[p] && typeof node[p] === 'object' ? node[p] : {}); });
+      node[parts[parts.length - 1]] = set.value;
+    });
+
+    const files = generator.buildFileMap(input).files;
+    const paths = Object.keys(files).sort();
+
+    if (args.dryRun) {
+      err('Would write ' + paths.length + ' files into ' + dir + ':');
+      paths.forEach(function (p) { err('  ' + p); });
+      return 0;
+    }
+
+    const plan = scaffold.plan(dir, files, args.force);
+    if (!plan.ok) { err(plan.error); return 1; }
+
+    scaffold.write(dir, files);
+    err('Wrote ' + paths.length + ' files into ' + dir);
+    if (plan.overwrites.length) {
+      err('Overwrote ' + plan.overwrites.length + ' existing ' + (plan.overwrites.length === 1 ? 'file' : 'files') + ':');
+      plan.overwrites.forEach(function (p) { err('  ' + p); });
+    }
+
+    if (wantGit) {
+      const r = scaffold.gitInit(dir, { commit: !args.noCommit });
+      if (r.existing) err('Already a repository at this folder — left it untouched.');
+      else err('Initialised a repository' + (r.committed ? ' and made the first commit.' : '.'));
+      if (r.warning) err('Warning: ' + r.warning);
+    }
+
+    const prompt = generator.buildStarterPrompt(input);
+    if (args.promptOut) {
+      fs.writeFileSync(path.resolve(args.promptOut), prompt + '\n');
+      err('Starter prompt also written to ' + path.resolve(args.promptOut));
+    }
+    err('');
+    err('Starter prompt (paste into your AI tool):');
+    err('');
+    process.stdout.write(prompt + '\n');
+    return 0;
+  } catch (e) {
+    err(e.message);
+    return 1;
+  } finally {
+    if (rl) rl.close();
+  }
+}
+
 function main(argv) {
   const args = parseArgs(argv);
 
@@ -116,6 +290,14 @@ function main(argv) {
   }
 
   const dir = path.resolve(args.dir || process.cwd());
+
+  if (args.command === 'new') {
+    runNew(args, dir).then(function (c) { process.exit(c); }, function (err) {
+      process.stderr.write(err.message + '\n');
+      process.exit(1);
+    });
+    return null; // async: the process exits when the promise settles
+  }
 
   if (args.command === 'status') {
     const index = inspector.inspect(dir);
